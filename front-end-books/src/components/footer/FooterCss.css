@@ -1,0 +1,53 @@
+
+.container {
+    background-color: #f8f9fa; /* Màu nền */
+    padding: 20px 0; /* Khoảng cách trên và dưới */
+    text-align: center; /* Căn giữa văn bản */
+    color: #333; /* Màu chữ */
+    max-width: 1200px; /* Chiều rộng tối đa */
+    margin: 0 auto; /* Căn giữa container */
+    padding: 0 15px; /* Khoảng cách bên trong */
+}
+
+.row {
+    display: flex; /* Sử dụng Flexbox */
+    justify-content: space-between; /* Khoảng cách đều giữa các cột */
+}
+
+.col-md-4 {
+    flex: 1; /* Mỗi cột chiếm một phần bằng nhau */
+    margin: 0 10px; /* Khoảng cách giữa các cột */
+}
+
+h5 {
+    font-size: 18px; /* Kích thước tiêu đề */
+    margin-bottom: 10px; /* Khoảng cách dưới tiêu đề */
+}
+
+p {
+    margin: 5px 0; /* Khoảng cách cho đoạn văn */
+}
+
+ul {
+    list-style-type: none; /* Không có dấu đầu dòng */
+    padding: 0; /* Không có khoảng cách bên trong */
+}
+
+ul li {
+    margin: 5px 0; /* Khoảng cách giữa các mục trong danh sách */
+}
+
+a {
+    text-decoration: none; /* Không gạch chân cho liên kết */
+    color: #007bff; /* Màu liên kết */
+    margin: 0 10px; /* Khoảng cách giữa các liên kết */
+}
+
+a:hover {
+    text-decoration: underline; /* Gạch chân khi di chuột qua */
+}
+
+hr {
+    margin: 20px 0; /* Khoảng cách cho đường ngang */
+    border: 1px solid #e0e0e0; /* Màu và độ dày đường ngang */
+}
