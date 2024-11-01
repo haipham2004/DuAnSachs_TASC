@@ -20,6 +20,8 @@ public interface UsersRepository extends JpaRepository<Users, Integer> {
 
     Boolean existsByUsername(String username);
 
+    Boolean existsByEmail(String email);
+
     @Query("SELECT us FROM Users us where us.deletedAt=false ")
     Page<Users> page(Pageable pageable);
 }

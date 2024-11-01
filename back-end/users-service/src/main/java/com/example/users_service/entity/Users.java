@@ -26,6 +26,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 @Entity
 @Table(name="users")
 public class Users {
