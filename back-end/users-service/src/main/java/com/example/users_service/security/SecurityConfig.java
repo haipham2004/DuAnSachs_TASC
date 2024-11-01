@@ -58,6 +58,7 @@ public class SecurityConfig {
                 -> requests
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/csrf-token").permitAll()
+                .requestMatchers("/api/auth/public/**").permitAll()
                 .anyRequest().authenticated());
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -77,48 +78,48 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public CommandLineRunner initData(RolesRepository roleRepository,
-                                      UsersRepository usersRepository,
-                                      PasswordEncoder passwordEncoder) {
-        return args -> {
-            Roles userRole = roleRepository.findByEnumRolesName(EnumRoles.ROLE_USER)
-                    .orElseGet(() -> roleRepository.save(new Roles(EnumRoles.ROLE_USER)));
-
-            Roles adminRole = roleRepository.findByEnumRolesName(EnumRoles.ROLE_ADMIN)
-                    .orElseGet(() -> roleRepository.save(new Roles(EnumRoles.ROLE_ADMIN)));
-
-            if (!usersRepository.existsByUsername("user1")) {
-                Users user1 = new Users("user1", "user1@example.com",
-                        passwordEncoder.encode("password1"));
-                user1.setAccountNonLocked(false);
-                user1.setAccountNonExpired(true);
-                user1.setCredentialsNonExpired(true);
-                user1.setEnabled(true);
-                user1.setCredentialsExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
-                user1.setAccountExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
-                user1.setTwoFactorEnabled(false);
-                user1.setSignUpMethod("email");
-                user1.setRoles(userRole);
-                usersRepository.save(user1);
-            }
-
-            if (!usersRepository.existsByUsername("admin")) {
-                Users admin = new Users("admin", "admin@example.com",
-                        passwordEncoder.encode("adminPass"));
-                admin.setAccountNonLocked(true);
-                admin.setAccountNonExpired(true);
-                admin.setCredentialsNonExpired(true);
-                admin.setEnabled(true);
-                admin.setCredentialsExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
-                admin.setAccountExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
-                admin.setTwoFactorEnabled(false);
-                admin.setSignUpMethod("email");
-                admin.setRoles(adminRole);
-                usersRepository.save(admin);
-            }
-        };
-    }
+//    @Bean
+//    public CommandLineRunner initData(RolesRepository roleRepository,
+//                                      UsersRepository usersRepository,
+//                                      PasswordEncoder passwordEncoder) {
+//        return args -> {
+//            Roles userRole = roleRepository.findByEnumRolesName(EnumRoles.ROLE_USER)
+//                    .orElseGet(() -> roleRepository.save(new Roles(EnumRoles.ROLE_USER)));
+//
+//            Roles adminRole = roleRepository.findByEnumRolesName(EnumRoles.ROLE_ADMIN)
+//                    .orElseGet(() -> roleRepository.save(new Roles(EnumRoles.ROLE_ADMIN)));
+//
+//            if (!usersRepository.existsByUsername("user1")) {
+//                Users user1 = new Users("user1", "user1@example.com",
+//                        passwordEncoder.encode("password1"));
+//                user1.setAccountNonLocked(false);
+//                user1.setAccountNonExpired(true);
+//                user1.setCredentialsNonExpired(true);
+//                user1.setEnabled(true);
+//                user1.setCredentialsExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
+//                user1.setAccountExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
+//                user1.setTwoFactorEnabled(false);
+//                user1.setSignUpMethod("email");
+//                user1.setRoles(userRole);
+//                usersRepository.save(user1);
+//            }
+//
+//            if (!usersRepository.existsByUsername("admin")) {
+//                Users admin = new Users("admin", "admin@example.com",
+//                        passwordEncoder.encode("adminPass"));
+//                admin.setAccountNonLocked(true);
+//                admin.setAccountNonExpired(true);
+//                admin.setCredentialsNonExpired(true);
+//                admin.setEnabled(true);
+//                admin.setCredentialsExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
+//                admin.setAccountExpiryDate(Date.valueOf(LocalDate.now().plusYears(1)));
+//                admin.setTwoFactorEnabled(false);
+//                admin.setSignUpMethod("email");
+//                admin.setRoles(adminRole);
+//                usersRepository.save(admin);
+//            }
+//        };
+//    }
 }
 
 

@@ -1,8 +1,9 @@
 package com.example.users_service.rest;
 
-import com.example.users_service.dto.NoteDto;
+import com.example.users_service.entity.Note;
 import com.example.users_service.service.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,27 +28,32 @@ public class NoteRest {
         this.noteService = noteService;
     }
 
+    @GetMapping("wellcome")
+    public ResponseEntity<String> wellcome(){
+       return ResponseEntity.ok("Nguyen Hang");
+    }
+
     @PostMapping
-    public NoteDto createNote(@RequestBody NoteDto noteDto,
-                              @AuthenticationPrincipal UserDetails userDetails) {
+    public Note createNote(@RequestBody String content,
+                           @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         System.out.println("USER DETAILS: " + username);
-        return noteService.createNoteForUser(noteDto);
+        return noteService.createNoteForUser(username, content);
     }
 
     @GetMapping
-    public List<NoteDto> getUserNotes(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<Note> getUserNotes(@AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         System.out.println("USER DETAILS: " + username);
         return noteService.getNotesForUser(username);
     }
 
     @PutMapping("/{noteId}")
-    public NoteDto updateNote(@PathVariable Integer noteId,
-                              @RequestBody NoteDto noteDto,
-                              @AuthenticationPrincipal UserDetails userDetails) {
+    public Note updateNote(@PathVariable Integer noteId,
+                           @RequestBody String content,
+                           @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
-        return noteService.updateNoteForUser(noteId, noteDto);
+        return noteService.updateNoteForUser(noteId, content, username);
     }
 
     @DeleteMapping("/{noteId}")

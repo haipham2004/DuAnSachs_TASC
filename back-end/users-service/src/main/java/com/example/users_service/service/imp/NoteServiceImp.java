@@ -28,31 +28,32 @@ public class NoteServiceImp implements NoteService {
 
 
     @Override
-    public NoteDto createNoteForUser(NoteDto noteDto) {
-        Note note=noteMapper.mapToNote(noteDto);
-        Note noteSave=noteRepository.save(note);
-        return noteMapper.mapToDto(noteSave);
+    public Note createNoteForUser(String username, String content) {
+        Note note = new Note();
+        note.setContent(content);
+        note.setOwnerUsername(username);
+        Note savedNote = noteRepository.save(note);
+        return savedNote;
     }
 
     @Override
-    public NoteDto updateNoteForUser(Integer noteId, NoteDto noteDto) {
-        Note note=noteRepository.findById(noteId).
-                orElseThrow(() ->new ResourceNotfound("Không tồn tại ID note: "+noteId));
-        note.setContent(noteDto.getContent());
-        Note noteUpdate=noteRepository.save(note);
-        return noteMapper.mapToDto(noteUpdate);
+    public Note updateNoteForUser(Integer noteId, String content, String username) {
+        Note note = noteRepository.findById(noteId).orElseThrow(()
+                -> new RuntimeException("Note not found"));
+        note.setContent(content);
+        Note updatedNote = noteRepository.save(note);
+        return updatedNote;
     }
 
     @Override
-    public void deleteNoteForUser(Integer noteId , String username) {
-        Note note=noteRepository.findById(noteId).
-                orElseThrow(() ->new ResourceNotfound("Không tồn tại ID note: "+noteId));
+    public void deleteNoteForUser(Integer noteId, String username) {
         noteRepository.deleteById(noteId);
     }
 
     @Override
-    public List<NoteDto> getNotesForUser(String username) {
-        return  noteRepository.findByOwnerUsername(username).stream()
-                .map((note) ->noteMapper.mapToDto(note)).collect(Collectors.toList());
+    public List<Note> getNotesForUser(String username) {
+        List<Note> personalNotes = noteRepository
+                .findByOwnerUsername(username);
+        return personalNotes;
     }
 }
