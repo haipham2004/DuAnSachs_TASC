@@ -34,8 +34,8 @@ public class Roles {
     private int roleId;
 
     @ToString.Exclude
-    @Enumerated(EnumType.STRING)
-    @Column(name="name",nullable = false, unique = true, length = 50)
+    @Enumerated(EnumType.STRING)  // Lưu giá trị Enum dưới dạng chuỗi
+    @Column(name = "name", nullable = false, unique = true, length = 50)
     private EnumRoles enumRolesName;
 //    private String name;
 
@@ -53,7 +53,7 @@ public class Roles {
     @Column(name = "deleted_at", columnDefinition = "BIT(0) DEFAULT 0")
     private boolean deletedAt = true;
 
-    public Roles(EnumRoles enumRolesName) {
-        this.enumRolesName = enumRolesName;
-    }
+//    public Roles(EnumRoles enumRolesName) {
+//        this.enumRolesName = enumRolesName;
+//    }
 }

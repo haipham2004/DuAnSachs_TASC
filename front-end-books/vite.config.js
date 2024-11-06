@@ -5,9 +5,20 @@ import dns from 'dns'
 dns.setDefaultResultOrder('verbatim')
 
 // https://vitejs.dev/config/
+
 export default defineConfig({
+  // Các cấu hình khác
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Ẩn cảnh báo deprecation
+        silenceDeprecations: ["legacy-js-api"],
+      },
+    },
+  },
   plugins: [react()],
   server: {
     port: 3000,
   },
-})
+});
+

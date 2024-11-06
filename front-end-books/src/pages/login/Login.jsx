@@ -1,17 +1,67 @@
 import React from 'react';
-import { Button, Checkbox, Form, Input } from 'antd';
-
-const onFinish = (values) => {
-  console.log('Success:', values);
-};
+import { Button, Divider, Checkbox, Form, Input, message, notification } from 'antd';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { callLogin } from '../../services/Api';
+import { doLoginAction } from '../../redux/account/AccountSlice';
 
 const onFinishFailed = (errorInfo) => {
   console.log('Failed:', errorInfo);
 };
 
 const LoginPage = () => {
+
+  const navigate  =useNavigate();
+
+  const [isSubmit, setIsSubmit] = useState(false);
+
+  const dispatch = useDispatch();
+
+  const onFinish = async (values) => {
+
+  const { username, password } = values;
+  setIsSubmit(true)
+  const res= await callLogin(username, password);
+  setIsSubmit(false)
+
+
+  if(res && res.username){
+    localStorage.setItem('access_token', res.jwtToken);
+    console.log("Data localStorage: ", localStorage.getItem('access_token'));
+
+    dispatch(doLoginAction({
+      username: res.username,
+      roles: res.roles,
+      email: res.email,
+      phone: res.phone,
+  }));
+  
+    message.success('Đăng nhập tài khoản thành công!');
+
+     if (res.roles.includes('ROLE_ADMIN')) {
+      navigate('/admin'); 
+    } else if (res.roles.includes('ROLE_USER')) {
+      navigate('/'); 
+    } else {
+      navigate('/');
+    }
+  }else {
+    notification.error({
+        message: "Login fail",
+        description:
+            res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+        duration: 5
+    })
+}
+
+};
+  
+
+
   return (
     <>
+      <p>Login nha</p>
       <Form
         name="basic"
         labelCol={{
@@ -21,7 +71,7 @@ const LoginPage = () => {
           span: 16,
         }}
         style={{
-          maxWidth: 600,
+          maxWidth: 600, margin: '0 auto'
         }}
         initialValues={{
           remember: true,
@@ -47,25 +97,6 @@ const LoginPage = () => {
         </Form.Item>
 
         <Form.Item
-          label="Email"
-          name="email"
-          rules={[
-            { required: true, message: 'Please input your Email!' },
-            { type: 'email', message: 'The input is not valid E-mail!' },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Phone"
-          name="phone"
-          rules={[{ required: true, message: 'Please input your Phone!' }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
           name="remember"
           valuePropName="checked"
           wrapperCol={{
@@ -82,10 +113,17 @@ const LoginPage = () => {
             span: 16,
           }}
         >
-          <Button type="primary" htmlType="submit">
-            Register
+          <Button type="primary" htmlType="submit" loading={isSubmit}>
+            Login
           </Button>
         </Form.Item>
+        <Divider>Or</Divider>
+        <p className="text text-normal">Chưa có tài khoản ?
+          <span>
+            <Link to='/register' > Đăng Ký </Link>
+          </span>
+        </p>
+
       </Form>
     </>
   );

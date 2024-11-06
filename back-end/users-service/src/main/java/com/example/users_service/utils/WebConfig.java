@@ -1,0 +1,18 @@
+//package com.example.users_service.utils;
+//
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.web.servlet.config.annotation.CorsRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//
+//@Configuration
+//public class WebConfig implements WebMvcConfigurer {
+//
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOrigins("http://localhost:3000") // Cổng React
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                .allowedHeaders("*") // Cho phép tất cả các header
+//                .allowCredentials(true); // Cho phép gửi thông tin xác thực
+//    }
+//}

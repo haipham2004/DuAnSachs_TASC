@@ -1,5 +1,6 @@
 package com.example.users_service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,14 +17,8 @@ public class UsersServiceApplication {
 		SpringApplication.run(UsersServiceApplication.class, args);
 	}
 
-//	@Bean
-//	public AuthenticationManager authenticationManager() {
-//		return new AuthenticationManager() {
-//			@Override
-//			public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-//				return null;
-//			}
-//		};
-//	}
-
+	@Bean
+	public ModelMapper modelMapper(){
+		return new ModelMapper();
+	}
 }
