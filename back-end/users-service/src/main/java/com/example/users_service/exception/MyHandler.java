@@ -18,7 +18,7 @@ import java.util.Map;
 public class MyHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<ErrolResponse> GlobalExceptionUsers(Exception ex) {
+    public static ResponseEntity<ErrolResponse> globalExceptionHandler(Exception ex) {
         ErrolResponse ers = new ErrolResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ers);
     }
@@ -34,20 +34,31 @@ public class MyHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers,
                                                                   HttpStatusCode status,
                                                                   WebRequest request) {
+        // Tạo response chứa thông tin lỗi
         Map<String, Object> response = new HashMap<>();
+
+        // Tạo một map để lưu các lỗi cụ thể cho từng trường
         Map<String, String> errors = new HashMap<>();
 
+        // Duyệt qua các lỗi trong BindingResult và lấy tên trường + thông báo lỗi
         ex.getBindingResult().getAllErrors().forEach(error -> {
+            // Lấy tên trường có lỗi
             String fieldName = ((FieldError) error).getField();
+
+            // Lấy thông điệp lỗi từ validation
             String message = error.getDefaultMessage();
+
+            // Lưu tên trường và thông điệp lỗi vào Map
             errors.put(fieldName, message);
         });
 
+        // Trả về mã lỗi HTTP 400 (Bad Request) và thông tin chi tiết lỗi
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("error", "Bad request");
-        response.put("message", errors);
+        response.put("messageValidation", errors);  // Lưu các lỗi vào "message"
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
 
 }

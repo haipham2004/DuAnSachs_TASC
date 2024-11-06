@@ -1,5 +1,10 @@
 package com.example.users_service.dto;
 
+import com.example.users_service.entity.EnumRoles;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -7,46 +12,46 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDate;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @ToString
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UsersDto {
 
-    private Long userId;
+    private Integer userId;
 
-    private String userName;
+    @NotBlank(message = "Username cannot be empty")  // Kiểm tra username không trống
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")  // Đảm bảo độ dài hợp lý
+    private String username;
 
+    @NotBlank(message = "Email cannot be empty")  // Kiểm tra email không trống
+    @Email(message = "Invalid email format")  // Kiểm tra email hợp lệ
     private String email;
 
-    private boolean accountNonLocked;
+    @NotBlank(message = "Phone cannot be empty")  // Kiểm tra phone không trống
+    @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 digits")
+    // Kiểm tra độ dài của số điện thoại
+    private String phone;
 
-    private boolean accountNonExpired;
+    //    @JsonIgnore
+    private String password;
 
-    private boolean credentialsNonExpired;
-
-    private boolean enabled;
-
-    private LocalDate credentialsExpiryDate;
-
-    private LocalDate accountExpiryDate;
-
-    private String twoFactorSecret;
-
-    private boolean isTwoFactorEnabled;
-
-    private String signUpMethod;
-
+    //    @JsonIgnore
     private Integer idRoles;
 
-    public UsersDto(String userName, String email, Integer idRoles) {
-        this.userName = userName;
+    private String enumRolesName;
+
+    // Constructor chuyển enum thành String
+    public UsersDto(Integer userId, String username, String email, String phone, EnumRoles enumRolesName) {
+        this.userId = userId;
+        this.username = username;
         this.email = email;
-        this.idRoles = idRoles;
+        this.phone = phone;
+        this.enumRolesName = enumRolesName != null ? enumRolesName.name() : null;  // Chuyển EnumRoles thành String
     }
 }
+
 

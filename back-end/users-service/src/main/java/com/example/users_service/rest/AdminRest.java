@@ -2,6 +2,7 @@ package com.example.users_service.rest;
 
 
 import com.example.users_service.dto.UsersDto;
+import com.example.users_service.dto.response.UsersResponse;
 import com.example.users_service.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,7 @@ public class AdminRest {
     }
 
     @GetMapping("/getusers")
-    public ResponseEntity<List<UsersDto>> getAllUsers() {
+    public ResponseEntity<List<UsersResponse>> getAllUsers() {
         return new ResponseEntity<>(userService.findAll(),
                 HttpStatus.OK);
     }
@@ -39,7 +40,7 @@ public class AdminRest {
 //    }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<UsersDto> getUser(@PathVariable Integer id) {
+    public ResponseEntity<UsersResponse> getUser(@PathVariable Integer id) {
         return new ResponseEntity<>(userService.getUserById(id),
                 HttpStatus.OK);
     }
