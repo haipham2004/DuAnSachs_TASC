@@ -4,7 +4,7 @@ import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.exception.ResourceNotfound;
-import com.example.books_service.service.imp.BooksRowMapper;
+import com.example.books_service.util.BooksRowMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,18 +67,6 @@ public class BooksRepository {
     }
 
 
-//    public BooksRequest save(BooksRequest booksRequest) {
-//        String sql = "INSERT INTO books (title, author_id, publisher_id, category_id, price, description, stock, quantity, status, image_url, thumbnail) " +
-//                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-//        jdbcTemplate.update(sql, booksRequest.getTitle(), booksRequest.getAuthorId(), booksRequest.getPublisherId(),
-//                booksRequest.getCategoryId(), booksRequest.getPrice(), booksRequest.getDescription(),
-//                booksRequest.getStock(), booksRequest.getQuantity(), booksRequest.getStatus(), booksRequest.getImageUrl(), booksRequest.getThumbnail());
-//        String getLastIdSql = "SELECT LAST_INSERT_ID()";
-//        Integer newBookId = jdbcTemplate.queryForObject(getLastIdSql, Integer.class);
-//        booksRequest.setBookId(newBookId);
-//        return booksRequest;
-//    }
-
     public BooksRequest save(BooksRequest booksRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
         String imageUrlJson = null;
@@ -98,15 +86,6 @@ public class BooksRepository {
         return booksRequest;
     }
 
-//    public BooksRequest update(BooksRequest booksRequest, Integer id) {
-//        String sql = "UPDATE books SET title = ?, author_id = ?, publisher_id = ?, category_id = ?, price = ?, " +
-//                "description = ?, stock = ?, quantity = ?, status = ?, image_url=?, thumbnail=?  WHERE book_id = ?";
-//        jdbcTemplate.update(sql, booksRequest.getTitle(), booksRequest.getAuthorId(), booksRequest.getPublisherId(),
-//                booksRequest.getCategoryId(), booksRequest.getPrice(), booksRequest.getDescription(),
-//                booksRequest.getStock(), booksRequest.getQuantity(), booksRequest.getStatus(), booksRequest.getImageUrl(), booksRequest.getThumbnail(), id);
-//        booksRequest.setBookId(id);
-//        return booksRequest;
-//    }
 
     public BooksRequest update(BooksRequest booksRequest, Integer id) {
         String imageUrlStr = String.join(",", booksRequest.getImageUrl());
