@@ -10,5 +10,7 @@ public class MessageExceptionResponse {
     public static final String INVALID_REFRESH_TOKEN =" Refresh token không hợp lệ. Vui lòng đăng nhập lại để lấy token mới.";
     public static final String USER_NOT_FOUND="Người dùng không tìm thấy. Vui lòng kiểm tra lại thông tin đăng nhập.";
     public static final String UNAUTHORIZED = "Full authentication is required to access this resource.";
-    public static final String TOKEN_NOT_FOUND = "Refresh token not found for the user."; // Thêm dòng này
+    public static final String TOKEN_NOT_FOUND = "Refresh token not found for the user.";
+
+    public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token không tồn tại hoặc đã hết hạn. Vui lòng đăng nhập lại.";
 }

@@ -13,7 +13,7 @@ const RegisterPage = () => {
     setIsSubmit(true);
     const res = await callRegister(username, email, phone, password, [role]);
     setIsSubmit(false);
-    if (res && res.id) {
+    if (res && res.message && res.statusCode) {
       message.success('Đăng ký tài khoản thành công!');
       navigate('/login')
     } else {

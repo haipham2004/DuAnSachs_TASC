@@ -34,31 +34,18 @@ public class MyHandler extends ResponseEntityExceptionHandler {
                                                                   HttpHeaders headers,
                                                                   HttpStatusCode status,
                                                                   WebRequest request) {
-        // Tạo response chứa thông tin lỗi
         Map<String, Object> response = new HashMap<>();
-
-        // Tạo một map để lưu các lỗi cụ thể cho từng trường
         Map<String, String> errors = new HashMap<>();
-
-        // Duyệt qua các lỗi trong BindingResult và lấy tên trường + thông báo lỗi
         ex.getBindingResult().getAllErrors().forEach(error -> {
-            // Lấy tên trường có lỗi
-            String fieldName = ((FieldError) error).getField();
+         String fieldName = ((FieldError) error).getField();
+         String message = error.getDefaultMessage();
 
-            // Lấy thông điệp lỗi từ validation
-            String message = error.getDefaultMessage();
-
-            // Lưu tên trường và thông điệp lỗi vào Map
             errors.put(fieldName, message);
         });
-
-        // Trả về mã lỗi HTTP 400 (Bad Request) và thông tin chi tiết lỗi
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("error", "Bad request");
-        response.put("messageValidation", errors);  // Lưu các lỗi vào "message"
-
+        response.put("messageValidation", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
-
 
 }

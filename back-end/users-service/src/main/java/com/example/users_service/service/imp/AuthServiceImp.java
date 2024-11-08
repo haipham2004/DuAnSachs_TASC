@@ -1,5 +1,8 @@
 package com.example.users_service.service.imp;
 
+import com.example.users_service.dto.request.LoginRequest;
+import com.example.users_service.dto.request.SignupRequest;
+import com.example.users_service.dto.response.LoginResponse;
 import com.example.users_service.entity.EnumRoles;
 import com.example.users_service.entity.Roles;
 import com.example.users_service.entity.Tokens;
@@ -10,17 +13,15 @@ import com.example.users_service.repository.RolesRepository;
 import com.example.users_service.repository.TokensRepository;
 import com.example.users_service.repository.UsersRepository;
 import com.example.users_service.security.jwt.JwtUtils;
-import com.example.users_service.dto.request.LoginRequest;
-import com.example.users_service.dto.request.SignupRequest;
-import com.example.users_service.dto.response.LoginResponse;
-import com.example.users_service.dto.response.LogoutResponse;
-import com.example.users_service.dto.response.MessageResponse;
-import com.example.users_service.dto.response.TokensResponse;
 import com.example.users_service.security.service.UserDetailsImpl;
 import com.example.users_service.service.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,8 +75,8 @@ public class AuthServiceImp implements AuthService {
     private long jwtExpirationMsRefresh;
 
     @Override
-    public LoginResponse authenticateUser(LoginRequest loginRequest) {
-        // Kiểm tra hợp lệ cho tên đăng nhập và mật khẩu
+    public LoginResponse authenticateUser(LoginRequest loginRequest, HttpServletResponse response) {
+
         if (loginRequest.getUsername() == null || loginRequest.getUsername().isEmpty()) {
             throw new CustomException(MessageExceptionResponse.USERNAME_ALREADY_IN_USE);
         }
@@ -118,15 +119,23 @@ public class AuthServiceImp implements AuthService {
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        LoginResponse response = new LoginResponse(jwtToken,jwtTokenRefresh, userDetails.getUsername(), roles, "Login token success",
+        // set cookies
+        ResponseCookie resCookies = ResponseCookie
+                .from("refresh_token", jwtTokenRefresh)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtExpirationMsRefresh)
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, resCookies.toString());
+
+        LoginResponse loginResponse = new LoginResponse(jwtToken,jwtTokenRefresh, userDetails.getUsername(), roles, "Login token success",
                 userDetails.getEmail(), userDetails.getPhone());
-        return response;
+        return loginResponse;
     }
 
-
     @Override
-    public MessageResponse registerUser(SignupRequest signUpRequest) {
-
+    public void registerUser(SignupRequest signUpRequest) {
         if (usersRepository.existsByUsername(signUpRequest.getUsername())) {
             throw new CustomException(MessageExceptionResponse.USERNAME_ALREADY_IN_USE);
         }
@@ -162,39 +171,98 @@ public class AuthServiceImp implements AuthService {
                         .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             }
         }
-
-
         user.setIdRoles(role.getRoleId());
         usersRepository.save(user);
-        return new MessageResponse("User registered successfully!", user.getUserId());
     }
 
     @Override
-    public TokensResponse refreshToken(HttpServletRequest request) {
+    public LoginResponse refreshToken(HttpServletRequest request, HttpServletResponse response) {
 
-        String refreshToken = jwtUtils.getJwtFromHeader(request);
-
-
-        if (refreshToken == null || !jwtUtils.validateJwtToken(refreshToken)) {
-            throw new CustomException(MessageExceptionResponse.TOKEN_NOT_FOUND);
+        // Lấy refresh token từ cookie
+        Cookie[] cookies = request.getCookies();
+        String refreshToken = null;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refresh_token".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
         }
 
-        String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
+        // Kiểm tra xem có refresh token hay không
+        if (refreshToken == null) {
+            throw new CustomException(MessageExceptionResponse.REFRESH_TOKEN_NOT_FOUND);
+        }
 
+        // Kiểm tra tính hợp lệ của refresh token
+        if (!jwtUtils.validateJwtToken(refreshToken)) {
+            throw new CustomException(MessageExceptionResponse.INVALID_REFRESH_TOKEN);
+        }
+
+        // Lấy thông tin người dùng từ refresh token (subject là email hoặc username tùy vào cách mã hóa)
+        String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
         UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
 
-        Tokens existingToken = tokensRepository.findByIdUsers(userDetails.getId())
-                .orElseThrow(() -> new CustomException(MessageExceptionResponse.TOKEN_NOT_FOUND));
+        // Kiểm tra xem người dùng có tồn tại trong hệ thống không
+        if (userDetails == null) {
+            throw new CustomException(MessageExceptionResponse.USER_NOT_FOUND);
+        }
 
+        // Tạo access token mới (không thay đổi refresh token)
         String newAccessToken = jwtUtils.generateTokenFromUsername(userDetails);
 
-        String currentRefreshToken = existingToken.getToken();
+        // Không thay đổi refresh token, giữ nguyên refresh token hiện tại
+        String currentRefreshToken = refreshToken;  // Giữ nguyên refresh token cũ
 
-        return new TokensResponse(newAccessToken, currentRefreshToken);
+        // Lấy quyền của người dùng
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        // Thiết lập cookie mới cho refresh token (giữ nguyên refresh token cũ)
+        ResponseCookie resCookies = ResponseCookie
+                .from("refresh_token", currentRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(jwtExpirationMsRefresh)
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, resCookies.toString());  // Đặt cookie trong header response
+
+        // Tạo và trả về response với access token mới
+        LoginResponse loginResponse = new LoginResponse(
+                newAccessToken,    // Access token mới
+                currentRefreshToken,   // Giữ nguyên refresh token cũ
+                userDetails.getUsername(),  // Tên người dùng
+                roles,             // Quyền của người dùng
+                "Refresh token success",  // Thông báo thành công
+                userDetails.getEmail(),  // Email người dùng
+                userDetails.getPhone()   // Số điện thoại người dùng
+        );
+
+        return loginResponse;  // Trả về login response với access token mới
+    }
+
+
+
+    @Override
+    public LoginResponse fetchAccount(HttpServletRequest request) {
+        String accessToken = jwtUtils.getJwtFromHeader(request);
+        if (accessToken == null || !jwtUtils.validateJwtToken(accessToken)) {
+            throw new CustomException(MessageExceptionResponse.UNAUTHORIZED);
+        }
+        String username = jwtUtils.getUserNameFromJwtToken(accessToken);
+        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+        LoginResponse loginResponse = new LoginResponse(userDetails.getUsername(), roles, userDetails.getEmail(), userDetails.getPhone());
+        return loginResponse;
     }
 
     @Override
-    public LogoutResponse logout(HttpServletRequest request) {
+    public void logout(HttpServletRequest request) {
         String accessToken = jwtUtils.getJwtFromHeader(request);
 
         if (accessToken == null || !jwtUtils.validateJwtToken(accessToken)) {
@@ -215,49 +283,6 @@ public class AuthServiceImp implements AuthService {
 
         SecurityContextHolder.clearContext();
 
-        return new LogoutResponse("User logged out successfully.");
     }
 
-
-//    @Override
-//    public TokensResponse refreshToken(HttpServletRequest request) {
-//        // Lấy refresh token từ header
-//        String refreshToken = jwtUtils.getJwtFromHeader(request);
-//
-//        // Kiểm tra tính hợp lệ của refresh token
-//        if (refreshToken == null || !jwtUtils.validateJwtToken(refreshToken)) {
-//            throw new CustomException(MessageExceptionResponse.TOKEN_NOT_FOUND);
-//        }
-//
-//        // Lấy tên người dùng từ refresh token
-//        String username = jwtUtils.getUserNameFromJwtToken(refreshToken);
-//
-//        // Tìm người dùng trong cơ sở dữ liệu
-//        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
-//
-//        // Kiểm tra sự tồn tại của token trong cơ sở dữ liệu
-//        Tokens existingToken = tokensRepository.findByIdUsers(userDetails.getId())
-//                .orElseThrow(() -> new CustomException(MessageExceptionResponse.TOKEN_NOT_FOUND));
-//
-//        // Tạo token mới
-//        String newAccessToken = jwtUtils.generateTokenFromUsername(userDetails);
-//        String newRefreshToken = jwtUtils.generateTokenFromUsernameRefresh(userDetails);
-//
-//        // Cập nhật refresh token vào cơ sở dữ liệu
-//        updateUserToken(newRefreshToken, userDetails.getId());
-//
-//        // Trả về token mới
-//        return new TokensResponse(newAccessToken, newRefreshToken);
-//    }
-//
-//    // Phương thức cập nhật token không cần thay đổi
-//    private void updateUserToken(String refreshToken, Integer userId) {
-//        Tokens token = tokensRepository.findByIdUsers(userId)
-//                .orElseThrow(() -> new RuntimeException("Error: Token not found."));
-//
-//        token.setToken(refreshToken);
-//        token.setExpirationDate(LocalDateTime.now().plus(jwtExpirationMsRefresh, ChronoUnit.MILLIS)); // Cập nhật thời gian hết hạn
-//
-//        tokensRepository.save(token);
-//    }
 }

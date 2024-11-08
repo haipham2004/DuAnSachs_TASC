@@ -1,17 +1,15 @@
 package com.example.users_service.rest;
 
+import com.example.users_service.dto.response.ApiResponse;
 import com.example.users_service.security.jwt.JwtUtils;
 import com.example.users_service.dto.request.LoginRequest;
 import com.example.users_service.dto.request.SignupRequest;
 import com.example.users_service.dto.response.LoginResponse;
-import com.example.users_service.dto.response.LogoutResponse;
-import com.example.users_service.dto.response.TokensResponse;
-import com.example.users_service.security.service.UserDetailsImpl;
 import com.example.users_service.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -41,44 +36,34 @@ public class AuthRest {
     }
 
     @PostMapping("/public/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authService.authenticateUser(loginRequest));
-    }
-
-    @PostMapping("/public/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
-        return ResponseEntity.ok(authService.registerUser(signUpRequest));
-    }
-
-    @GetMapping("/public/refreshToken")
-    public ResponseEntity<TokensResponse> refreshToken(HttpServletRequest request) {
-        TokensResponse tokensResponse = authService.refreshToken(request);
-        return ResponseEntity.ok(tokensResponse);
-    }
-
-
-    @GetMapping("/public/fetchAccount")
-    public ResponseEntity<LoginResponse> getUserInfo(HttpServletRequest request) {
-        String accessToken = jwtUtils.getJwtFromHeader(request);
-        if (accessToken == null || !jwtUtils.validateJwtToken(accessToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        // Giải mã token để lấy thông tin người dùng
-        String username = jwtUtils.getUserNameFromJwtToken(accessToken);
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
-        // Tạo phản hồi
-        LoginResponse loginResponse = new LoginResponse(userDetails.getUsername(),roles,userDetails.getEmail(), userDetails.getPhone());
+    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        LoginResponse loginResponse = authService.authenticateUser(loginRequest, response);
         return ResponseEntity.ok(loginResponse);
     }
 
+
+    @PostMapping("/public/signup")
+    public ApiResponse<Void> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+        authService.registerUser(signUpRequest);
+        return ApiResponse.<Void>builder()
+                .statusCode(200).message("Đăng ký success").build();
+    }
+
+    @GetMapping("/public/refreshToken")
+    public ApiResponse<LoginResponse> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        return ApiResponse.<LoginResponse>builder().results(authService.refreshToken(request,response)).build();
+    }
+
+    @GetMapping("/public/fetchAccount")
+    public ApiResponse<LoginResponse> getUserInfo(HttpServletRequest httpServletRequest){
+       return ApiResponse.<LoginResponse>builder().results(authService.fetchAccount(httpServletRequest)).build();
+    }
+
     @PostMapping("/public/logout")
-    public ResponseEntity<LogoutResponse> logoutUser(HttpServletRequest request) {
-        LogoutResponse logoutResponse=authService.logout(request);
-        // Gọi service để xử lý đăng xuất
-        return ResponseEntity.ok(logoutResponse); // Trả về phản hồi thành công
+    public ApiResponse<Void>  logoutUser(HttpServletRequest request) {
+        authService.logout(request);
+        return ApiResponse.<Void>builder()
+                .statusCode(200).message("Logout success").build();
     }
 
 }

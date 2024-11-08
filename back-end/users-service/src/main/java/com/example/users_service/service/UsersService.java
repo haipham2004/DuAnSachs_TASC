@@ -30,6 +30,4 @@ public interface UsersService {
 
     void deleteById(Integer id);
 
-
-
 }

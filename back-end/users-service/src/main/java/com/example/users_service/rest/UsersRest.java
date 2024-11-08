@@ -51,14 +51,6 @@ public class UsersRest {
         return ApiResponse.<Page<UsersResponse>>builder().results(usersService.findAllUserDtoWithPage(pageable)).build();
     }
 
-//    @GetMapping("findAllUserWithPage")
-//    public ApiResponse<Page<UsersResponse>> findAllUserWithPage(
-//            @Filter Specification<Users> specification,
-//            Pageable pageable) {
-//        return ApiResponse.<Page<UsersResponse>>builder().results(usersService.findAllUserDtoWithPage(specification, pageable)).build();
-//    }
-
-
     @PostMapping("save")
     public ApiResponse<UsersRequest> save(@Valid @RequestBody UsersRequest usersRequest) {
         return ApiResponse.<UsersRequest>builder().message("Create Success").results(usersService.save(usersRequest))

@@ -16,10 +16,12 @@ import RegisterPage from "./pages/register/Register";
 import { callFetchAccount } from "./services/Api";
 import Loading from "./components/Loading/Loading";
 import NotFound from "./components/notfound/NotFound";
-import AdminPage from "./pages/admin/AdminPage";
 import ProtectedRoute from "./components/protectedroute/RoleBaseRoute";
 import { doGetAccountAction } from "./redux/account/AccountSlice";
-import LayoutAdmin from "./pages/admin/LayoutAdmin";
+import LayoutAdmin from "./components/admin/LayoutAdmin";
+import AdminPage from "./components/admin/AdminPage";
+import ManageBookPage from "./pages/admin/book";
+
 
 
 const Layout = () => {
@@ -37,26 +39,26 @@ const Layout = () => {
 export default function App() {
   const isAdminRoute = window.location.pathname.startsWith("/admin");
   const user = useSelector((state) => state.account.user);
-  const userRole = user.roles || []; 
+  const userRole = user.roles || [];
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.account.isLoading);
 
   const getAccount = async () => {
     if (
       window.location.pathname === "/login" ||
-      window.location.pathname === "/register" 
+      window.location.pathname === "/register"
     )
       return;
 
     const res = await callFetchAccount();
-    console.log("Data ",res)
-    if (res && res.username ) {
-  
+    console.log("Data ", res)
+    if (res && res.results) {
+
       dispatch(doGetAccountAction({
-        username: res.username, 
-        roles: res.roles,       
-        email: res.email,        
-        phone: res.phone         
+        username: res.username,
+        roles: res.results.roles,
+        email: res.results.email,
+        phone: res.results.phone
       }));
     }
   };
@@ -110,19 +112,18 @@ export default function App() {
         {
           path: "user",
           element: (
-            // <ProtectedRoute>
-            //   {/* <ManageUserPage /> */}
-            // </ProtectedRoute>
-            <p>user</p>
+            <ProtectedRoute>
+              <ManageBookPage />
+            </ProtectedRoute>
+
           ),
         },
         {
           path: "book",
           element: (
-            // <ProtectedRout>
-            //   {/* <ManageBookPage /> */}
-            // </ProtectedRout>
-            <p>book</p>
+            <ProtectedRoute>
+              <ManageBookPage />
+            </ProtectedRoute>
           ),
         },
         {
