@@ -61,15 +61,14 @@ public class UsersServiceImp implements UsersService {
 
 //    @Override
 //    public Page<UsersResponse> findAllUserDtoWithPage(Specification<Users> specification, Pageable pageable) {
-//        // Lấy Page<Users> dựa trên Specification và Pageable
+//
 //        Page<Users> usersPage = usersRepository.findAll(specification, pageable);
 //
 //
-//        // Chuyển đổi Page<Users> thành Page<UsersResponse>
+
 //        List<UsersResponse> usersResponses = usersPage.getContent().stream()
 //                .map(user ->userMapper.mapToUsersResponse(user))
 //                .collect(Collectors.toList());
-//        // Trả về Page<UsersResponse> với cùng Pageable và tổng số phần tử
 //        return new PageImpl<>(usersResponses, pageable, usersPage.getTotalElements());
 //    }
 

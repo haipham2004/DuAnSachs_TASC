@@ -3,20 +3,18 @@ package com.example.users_service.service;
 import com.example.users_service.dto.request.LoginRequest;
 import com.example.users_service.dto.request.SignupRequest;
 import com.example.users_service.dto.response.LoginResponse;
-import com.example.users_service.dto.response.LogoutResponse;
-import com.example.users_service.dto.response.MessageResponse;
-import com.example.users_service.dto.response.TokensResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestBody;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
 
-    LoginResponse authenticateUser(LoginRequest loginRequest);
+    LoginResponse authenticateUser(LoginRequest loginRequest, HttpServletResponse response);
 
-    MessageResponse registerUser(SignupRequest signUpRequest);
+    void registerUser(SignupRequest signUpRequest);
 
-    TokensResponse refreshToken(HttpServletRequest request);
+    LoginResponse refreshToken(HttpServletRequest request, HttpServletResponse response) ;
 
-    LogoutResponse logout(HttpServletRequest request);
+    LoginResponse fetchAccount(HttpServletRequest request);
+
+    void logout(HttpServletRequest request);
 }

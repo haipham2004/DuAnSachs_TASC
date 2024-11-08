@@ -11,10 +11,6 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel ="spring")
 public interface UserMapper {
 
-//    UsersDto mapToUsersDto(Users users);
-//
-//    Users mapToUsers(UsersDto usersDto);
-
     UsersResponse mapToUsersResponse(Users users);
 
     Users mapToUsers(UsersRequest usersRequest);

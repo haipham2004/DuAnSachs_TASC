@@ -92,6 +92,7 @@ const UserTable = () => {
 
 
     const onChange = (pagination, filters, sorter) => {
+        console.log("Pagination changed: ", pagination);
         if (pagination.current !== current) {
             setCurrent(pagination.current);
         }

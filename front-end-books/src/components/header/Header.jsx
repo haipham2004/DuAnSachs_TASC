@@ -22,7 +22,7 @@ const Header = (props) => {
     const handleLogout = async () => {
         // Nếu cần gọi API logout, thì bỏ dòng comment dưới
         const res = await callLogout();
-        if (res && res.data) {
+        if (res && res.statusCode && res.message) {
             dispatch(doLogoutAction());
             message.success('Đăng xuất thành công');
             navigate('/');
