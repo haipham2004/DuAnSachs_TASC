@@ -1,4 +1,4 @@
-package com.example.books_service.service.imp;
+package com.example.books_service.util;
 
 import com.example.books_service.dto.response.BooksResponse;
 import org.springframework.jdbc.core.RowMapper;
