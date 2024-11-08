@@ -1,10 +1,8 @@
 package com.example.books_service.rest;
 
 import com.example.books_service.dto.request.BooksRequest;
-import com.example.books_service.dto.request.BooksRequest2;
 import com.example.books_service.dto.response.ApiResponse;
 import com.example.books_service.dto.response.BooksResponse;
-import com.example.books_service.dto.response.BooksResponse2;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +50,6 @@ public class BooksRest {
         return ApiResponse.<BooksRequest>builder().statusCode(201).message("Create books users succes ").data(booksService.save(booksRequest)).build();
     }
 
-    @PostMapping("saveBooks2")
-    public ApiResponse<BooksRequest2> saveBooks(@RequestBody BooksRequest2 booksRequest2){
-        return ApiResponse.<BooksRequest2>builder().statusCode(201).message("Create books users succes ").data(booksService.save2(booksRequest2)).build();
-    }
-
 
     @PutMapping("updateBooks/{id}")
     public ApiResponse<BooksRequest> updateBooks(@RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id){
@@ -78,12 +71,4 @@ public class BooksRest {
         return   ApiResponse.<PageResponse<BooksResponse>>builder().statusCode(200).message("Page book success").data(booksService.findAllBooksPage(pageNumber,pageSize)).build();
     }
 
-    @GetMapping("findAllBooksPage2")
-    public ApiResponse<PageResponse<BooksResponse2>> findAllBooksPage2(
-            @RequestParam( defaultValue = "1") int pageNumber,
-            @RequestParam( defaultValue = "5") int pageSize
-
-    ) {
-        return   ApiResponse.<PageResponse<BooksResponse2>>builder().statusCode(200).message("Page book success").data(booksService.findAllBooksPage2(pageNumber,pageSize)).build();
-    }
 }
