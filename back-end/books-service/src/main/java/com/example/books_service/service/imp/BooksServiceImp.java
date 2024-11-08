@@ -1,9 +1,7 @@
 package com.example.books_service.service.imp;
 
 import com.example.books_service.dto.request.BooksRequest;
-import com.example.books_service.dto.request.BooksRequest2;
 import com.example.books_service.dto.response.BooksResponse;
-import com.example.books_service.dto.response.BooksResponse2;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.mapper.BooksMapper;
 import com.example.books_service.repository.BooksRepository;
@@ -37,11 +35,6 @@ public class BooksServiceImp implements BooksService {
     }
 
     @Override
-    public PageResponse<BooksResponse2> findAllBooksPage2(int pageSize, int offset) {
-        return booksRepository.findBooksPage2(pageSize, offset);
-    }
-
-    @Override
     public BooksResponse findById(Integer id) {
         return booksRepository.findById(id);
     }
@@ -51,15 +44,12 @@ public class BooksServiceImp implements BooksService {
         return booksRepository.save(booksRequest);
     }
 
-    @Override
-    public BooksRequest2 save2(BooksRequest2 booksRequest2) {
-        return booksRepository.save(booksRequest2);
-    }
 
     @Override
     public BooksRequest update(BooksRequest booksRequest, Integer id) {
         return booksRepository.update(booksRequest, id);
     }
+
 
     @Override
     public void deleteById(Integer id) {
