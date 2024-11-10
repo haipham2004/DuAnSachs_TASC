@@ -11,5 +11,7 @@ import lombok.Setter;
 @Setter
 public class PublishersResponse {
 
+    private Integer id;
+
     private String name;
 }

@@ -1,17 +1,14 @@
-package com.example.users_service.rest;
+package com.example.users_service.controller;
 
 import com.example.users_service.dto.request.UsersRequest;
 import com.example.users_service.dto.response.ApiResponse;
 import com.example.users_service.dto.response.UsersResponse;
-import com.example.users_service.entity.Users;
 import com.example.users_service.service.UsersService;
-import com.turkraft.springfilter.boot.Filter;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,12 +25,12 @@ import java.util.List;
 @RestController
 //@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("users")
-public class UsersRest {
+public class UsersController {
 
     private UsersService usersService;
 
     @Autowired
-    public UsersRest(UsersService usersService) {
+    public UsersController(UsersService usersService) {
         this.usersService = usersService;
     }
 
@@ -67,5 +64,10 @@ public class UsersRest {
     public ApiResponse<Void> deleteUser(@PathVariable Integer id) {
         usersService.deleteById(id);
         return ApiResponse.<Void>builder().message("Deltee success: " + id).build();
+    }
+
+    @GetMapping("huhu")
+    public String getChao(){
+        return "ahhuhu";
     }
 }

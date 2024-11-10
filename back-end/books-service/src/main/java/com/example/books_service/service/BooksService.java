@@ -18,5 +18,7 @@ public interface BooksService {
 
     BooksRequest update(BooksRequest booksRequest, Integer id);
 
-    void deleteById(Integer id);
+    void deleteById(boolean delete, Integer id);
+
+    public PageResponse<BooksResponse> findBooksPage2(int pageNumber, int pageSize, String filter);
 }

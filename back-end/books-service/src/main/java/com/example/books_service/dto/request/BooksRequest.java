@@ -25,9 +25,9 @@ public class BooksRequest {
 
     private Double price;
 
-    private String description;
+    private Double consPrice;
 
-    private Integer stock;
+    private String description;
 
     private Integer quantity;
 

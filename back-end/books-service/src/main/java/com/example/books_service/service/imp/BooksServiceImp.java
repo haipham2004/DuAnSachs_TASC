@@ -4,7 +4,8 @@ import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.mapper.BooksMapper;
-import com.example.books_service.repository.BooksRepository;
+import com.example.books_service.repository.BooksServiceRepository;
+import com.example.books_service.repository.impl.BooksRepositoryImpl;
 import com.example.books_service.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,46 +15,48 @@ import java.util.List;
 @Service
 public class BooksServiceImp implements BooksService {
 
-    private BooksRepository booksRepository;
-
-    private BooksMapper booksMapper;
+    private BooksServiceRepository booksServiceRepository;
 
     @Autowired
-    public BooksServiceImp(BooksRepository booksRepository, BooksMapper booksMapper) {
-        this.booksRepository = booksRepository;
-        this.booksMapper = booksMapper;
+    public BooksServiceImp(BooksServiceRepository booksServiceRepository) {
+        this.booksServiceRepository = booksServiceRepository;
     }
 
     @Override
     public List<BooksResponse> findAllBooksDto() {
-        return booksRepository.findAllBooksDto();
+        return booksServiceRepository.findAllBooksDto();
     }
 
     @Override
     public PageResponse<BooksResponse> findAllBooksPage(int pageSize, int offset) {
-        return booksRepository.findBooksPage(pageSize, offset);
+        return booksServiceRepository.findBooksPage(pageSize, offset);
     }
 
     @Override
     public BooksResponse findById(Integer id) {
-        return booksRepository.findById(id);
+        return booksServiceRepository.findById(id);
     }
 
     @Override
     public BooksRequest save(BooksRequest booksRequest) {
-        return booksRepository.save(booksRequest);
+        return booksServiceRepository.save(booksRequest);
     }
 
 
     @Override
     public BooksRequest update(BooksRequest booksRequest, Integer id) {
-        return booksRepository.update(booksRequest, id);
+        return booksServiceRepository.update(booksRequest, id);
     }
 
 
     @Override
-    public void deleteById(Integer id) {
-        booksRepository.deleteById(id);
+    public void deleteById(boolean delete, Integer id) {
+        booksServiceRepository.deleteById(delete,id);
+    }
+
+    @Override
+    public PageResponse<BooksResponse> findBooksPage2(int pageNumber, int pageSize, String filter) {
+        return booksServiceRepository.findBooksPage2(pageNumber,pageSize,filter);
     }
 
 

@@ -1,4 +1,4 @@
-package com.example.users_service.service.imp;
+package com.example.users_service.service.impl;
 
 import com.example.users_service.dto.request.LoginRequest;
 import com.example.users_service.dto.request.SignupRequest;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 @Service
 @CrossOrigin("http://localhost:3000")
-public class AuthServiceImp implements AuthService {
+public class AuthServiceImpl implements AuthService {
 
     private JwtUtils jwtUtils;
 
@@ -57,8 +57,8 @@ public class AuthServiceImp implements AuthService {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    public AuthServiceImp(JwtUtils jwtUtils, AuthenticationManager authenticationManager, UsersRepository usersRepository, RolesRepository rolesRepository, TokensRepository tokensRepository, PasswordEncoder passwordEncoder,
-                          UserDetailsService userDetailsService) {
+    public AuthServiceImpl(JwtUtils jwtUtils, AuthenticationManager authenticationManager, UsersRepository usersRepository, RolesRepository rolesRepository, TokensRepository tokensRepository, PasswordEncoder passwordEncoder,
+                           UserDetailsService userDetailsService) {
         this.jwtUtils = jwtUtils;
         this.authenticationManager = authenticationManager;
         this.usersRepository = usersRepository;

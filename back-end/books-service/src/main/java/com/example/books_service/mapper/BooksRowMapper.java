@@ -1,4 +1,4 @@
-package com.example.books_service.util;
+package com.example.books_service.mapper;
 
 import com.example.books_service.dto.response.BooksResponse;
 import org.springframework.jdbc.core.RowMapper;
@@ -20,19 +20,19 @@ public class BooksRowMapper implements RowMapper<BooksResponse> {
         booksResponse.setNameCategory(rs.getString("name_categories"));
         booksResponse.setPrice(rs.getDouble("price"));
         booksResponse.setDescription(rs.getString("description"));
-        booksResponse.setStock(rs.getInt("stock"));
+        booksResponse.setConsPrice(rs.getDouble("cost_price"));
         booksResponse.setQuantity(rs.getInt("quantity"));
         booksResponse.setStatus(rs.getString("status"));
-        // Lấy chuỗi 'image_url' từ cơ sở dữ liệu
         String imageUrlsString = rs.getString("image_url");
 
-        // Nếu chuỗi không null và không rỗng, tách chuỗi thành danh sách các URL
         if (imageUrlsString != null && !imageUrlsString.isEmpty()) {
-            // Tách chuỗi thành danh sách các URL
             List<String> imageUrls = Arrays.asList(imageUrlsString.split(","));
             booksResponse.setImageUrl(imageUrls);
         }
         booksResponse.setThumbnail(rs.getString("thumbnail"));
+        booksResponse.setAuthorId(rs.getInt("author_id"));
+        booksResponse.setPublisherId(rs.getInt("publisher_id"));
+        booksResponse.setCategoryId(rs.getInt("category_id"));
         return booksResponse;
     }
 }

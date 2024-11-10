@@ -25,9 +25,9 @@ public class BooksResponse {
 
     private Double price;
 
-    private String description;
+    private Double consPrice;
 
-    private Integer stock;
+    private String description;
 
     private Integer quantity;
 
@@ -36,4 +36,10 @@ public class BooksResponse {
     private List<String> imageUrl;
 
     private String thumbnail;
+
+    private Integer authorId;
+
+    private Integer publisherId;
+
+    private Integer categoryId;
 }

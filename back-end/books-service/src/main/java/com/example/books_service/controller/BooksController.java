@@ -1,4 +1,4 @@
-package com.example.books_service.rest;
+package com.example.books_service.controller;
 
 import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.ApiResponse;
@@ -20,12 +20,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("books")
-public class BooksRest {
+public class BooksController {
 
     private BooksService booksService;
 
     @Autowired
-    public BooksRest(BooksService booksService) {
+    public BooksController(BooksService booksService) {
         this.booksService = booksService;
     }
 
@@ -45,20 +45,20 @@ public class BooksRest {
       return   ApiResponse.<List<BooksResponse>>builder().data(booksService.findAllBooksDto()).build();
     }
 
-    @PostMapping("saveBooks")
-    public ApiResponse<BooksRequest> saveBooks(@RequestBody BooksRequest booksRequest){
+    @PostMapping("save")
+    public ApiResponse<BooksRequest> save(@RequestBody BooksRequest booksRequest){
         return ApiResponse.<BooksRequest>builder().statusCode(201).message("Create books users succes ").data(booksService.save(booksRequest)).build();
     }
 
 
-    @PutMapping("updateBooks/{id}")
-    public ApiResponse<BooksRequest> updateBooks(@RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id){
+    @PutMapping("update/{id}")
+    public ApiResponse<BooksRequest> update(@RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id){
         return ApiResponse.<BooksRequest>builder().statusCode(200).message("Update books users succes ").data(booksService.update(booksRequest,id)).build();
     }
 
-    @DeleteMapping("deleteBooks/{id}")
-    public ApiResponse<Void> deleteBooks(@PathVariable("id") Integer id){
-        booksService.deleteById(id);
+    @DeleteMapping("delete/{id}")
+    public ApiResponse<Void> delete(@PathVariable("id") Integer id, @RequestParam("delete") boolean delete){
+        booksService.deleteById(delete ,id);
         return ApiResponse.<Void>builder().statusCode(200).message("Delete book success with ID: "+id).build();
     }
 
@@ -69,6 +69,16 @@ public class BooksRest {
 
     ) {
         return   ApiResponse.<PageResponse<BooksResponse>>builder().statusCode(200).message("Page book success").data(booksService.findAllBooksPage(pageNumber,pageSize)).build();
+    }
+
+    @GetMapping("findAllBooksPage2")
+    public ApiResponse<PageResponse<BooksResponse>> findAllBooksPage2(
+            @RequestParam( defaultValue = "1") int pageNumber,
+            @RequestParam( defaultValue = "5") int pageSize,
+            @RequestParam( name = "filter" ,required = false) String filter
+
+    ) {
+        return   ApiResponse.<PageResponse<BooksResponse>>builder().statusCode(200).message("Page book success").data(booksService.findBooksPage2(pageNumber,pageSize,filter)).build();
     }
 
 }

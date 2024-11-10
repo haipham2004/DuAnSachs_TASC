@@ -72,11 +72,11 @@ const BookViewDetail = (props) => {
                     bordered
                     column={2}
                 >
-                     <Descriptions.Item label="Id">{dataViewDetail?.bookId}</Descriptions.Item>
+                    <Descriptions.Item label="Id">{dataViewDetail?.bookId}</Descriptions.Item>
                     <Descriptions.Item label="Tên sách">{dataViewDetail?.title}</Descriptions.Item>
-                    <Descriptions.Item label="Giá tiền">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(dataViewDetail?.price ?? 0)}</Descriptions.Item>
+                    <Descriptions.Item label="Giá nhập">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(dataViewDetail?.consPrice ?? 0)}</Descriptions.Item>
+                    <Descriptions.Item label="Giá bán">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(dataViewDetail?.price ?? 0)}</Descriptions.Item>
                     <Descriptions.Item label="Số lượng">{dataViewDetail?.quantity ?? 0}</Descriptions.Item>
-                    <Descriptions.Item label="Đã bán">{dataViewDetail?.stock}</Descriptions.Item>
                     <Descriptions.Item label="Mô tả sách">{dataViewDetail?.description}</Descriptions.Item>
            
                     <Descriptions.Item label="Tác giả" span={2}>
@@ -102,7 +102,6 @@ const BookViewDetail = (props) => {
                         { showRemoveIcon: false }
                     }
                 >
-
                 </Upload>
                 <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
                     <img alt="example" style={{ width: '100%' }} src={previewImage} />

@@ -1,9 +1,7 @@
-package com.example.books_service.rest;
+package com.example.books_service.controller;
 
 import com.example.books_service.dto.response.ApiResponse;
-import com.example.books_service.dto.response.AuthorsResponse;
 import com.example.books_service.dto.response.CategoriesResponse;
-import com.example.books_service.service.AuthorsService;
 import com.example.books_service.service.CategoriesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +12,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("categories")
-public class CategoriesRest {
+public class CategoriesController {
 
     private CategoriesService categoriesService;
 
     @Autowired
-    public CategoriesRest(CategoriesService categoriesService) {
+    public CategoriesController(CategoriesService categoriesService) {
         this.categoriesService = categoriesService;
     }
 
