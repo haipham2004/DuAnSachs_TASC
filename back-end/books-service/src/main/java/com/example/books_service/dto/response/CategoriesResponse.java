@@ -10,5 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CategoriesResponse {
+
+    private Integer id;
+
     private String name;
 }

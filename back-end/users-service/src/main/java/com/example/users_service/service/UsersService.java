@@ -2,12 +2,9 @@ package com.example.users_service.service;
 
 import com.example.users_service.dto.request.UsersRequest;
 import com.example.users_service.dto.response.UsersResponse;
-import com.example.users_service.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
-import javax.management.relation.RoleNotFoundException;
 import java.util.List;
 
 public interface UsersService {

@@ -89,23 +89,33 @@ export const callDeleteUser = (id) => {
 
 
 export const callFetchListBook = (query) => {
-    return bookInstance.get(`/books/findAllBooksPage2?${query}`)
+    return bookInstance.get(`/books/findAllBooksPage?${query}`)
 }
 
 
 export const callFetchCategory = () => {
-    return bookInstance.get('/api/v1/database/category');
+    return bookInstance.get('/categories/findAllCategoriesDto');
 }
 
-export const callCreateBook = (thumbnail, slider, mainText, author, price, sold, quantity, category) => {
-    return bookInstance.post('/api/v1/book', {
-        thumbnail, slider, mainText, author, price, sold, quantity, category
+export const callFetchAuthor = () => {
+    return bookInstance.get('/authors/findAllAuthorsDto');
+}
+
+
+export const callFetchPublisher = () => {
+    return bookInstance.get('/publisher/findAllPublisherDto');
+}
+
+
+export const callCreateBook = (title, authorId, publisherId, categoryId, price, consPrice, description, quantity,imageUrl, thumbnail) => {
+    return bookInstance.post('/books/save', {
+        title, authorId, publisherId, categoryId, price, consPrice, description, quantity,imageUrl, thumbnail
     })
 }
 
-export const callUpdateBook = (id, thumbnail, slider, mainText, author, price, sold, quantity, category) => {
-    return bookInstance.put(`/api/v1/book/${id}`, {
-        thumbnail, slider, mainText, author, price, sold, quantity, category
+export const callUpdateBook = (bookId, title, authorId, publisherId, categoryId, price, consPrice, description, quantity,imageUrl, thumbnail) => {
+    return bookInstance.put(`books/update/${bookId}`, {
+        title, authorId, publisherId, categoryId, price, consPrice, description, quantity,imageUrl, thumbnail
     })
 }
 
@@ -123,10 +133,11 @@ export const callUpdateBook = (id, thumbnail, slider, mainText, author, price, s
 //     });
 // }
 
-export const callUploadBookImg = (fileImg) => {
+export const callUploadBookImg = (file) => {
     const bodyFormData = new FormData();
-    bodyFormData.append('fileImg', fileImg);
-    return axios({
+    bodyFormData.append('file', file);
+    console.log("file là: ",file)
+    return bookInstance({
         method: 'post',
         url: 'http://localhost:8802/files',
         data: bodyFormData,
@@ -138,9 +149,14 @@ export const callUploadBookImg = (fileImg) => {
 }
 
 
-export const callDeleteBook = (id) => {
-    return bookInstance.delete(`/api/v1/book/${id}`);
+export const callDeleteBook = (id, deleteFlag) => {
+    return bookInstance.delete(`/books/delete/${id}`, {
+        params: {
+            delete: deleteFlag // Truyền tham số delete dưới dạng query parameter
+        }
+    });
 }
+
 
 export const callFetchBookById = (id) => {
     return bookInstance.get(`api/v1/book/${id}`)

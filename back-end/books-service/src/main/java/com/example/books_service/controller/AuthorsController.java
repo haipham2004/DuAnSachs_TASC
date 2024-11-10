@@ -1,9 +1,8 @@
-package com.example.books_service.rest;
+package com.example.books_service.controller;
 
 import com.example.books_service.dto.response.ApiResponse;
 import com.example.books_service.dto.response.AuthorsResponse;
 import com.example.books_service.service.AuthorsService;
-import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,12 +12,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("authors")
-public class AuthorsRest {
+public class AuthorsController {
 
     private AuthorsService authorsService;
 
     @Autowired
-    public AuthorsRest(AuthorsService authorsService) {
+    public AuthorsController(AuthorsService authorsService) {
         this.authorsService = authorsService;
     }
 

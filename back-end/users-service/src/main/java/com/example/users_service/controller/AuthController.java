@@ -1,4 +1,4 @@
-package com.example.users_service.rest;
+package com.example.users_service.controller;
 
 import com.example.users_service.dto.response.ApiResponse;
 import com.example.users_service.security.jwt.JwtUtils;
@@ -20,19 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
-public class AuthRest {
+public class AuthController {
 
     private AuthService authService;
 
-    private UserDetailsService userDetailsService;
 
-    private JwtUtils jwtUtils;
 
     @Autowired
-    public AuthRest(AuthService authService, UserDetailsService userDetailsService, JwtUtils jwtUtils) {
+    public AuthController(AuthService authService) {
         this.authService = authService;
-        this.userDetailsService = userDetailsService;
-        this.jwtUtils = jwtUtils;
+
     }
 
     @PostMapping("/public/signin")

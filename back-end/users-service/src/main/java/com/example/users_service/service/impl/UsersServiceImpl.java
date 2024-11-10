@@ -1,4 +1,4 @@
-package com.example.users_service.service.imp;
+package com.example.users_service.service.impl;
 
 import com.example.users_service.dto.request.UsersRequest;
 import com.example.users_service.dto.response.UsersResponse;
@@ -13,9 +13,7 @@ import com.example.users_service.repository.UsersRepository;
 import com.example.users_service.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UsersServiceImp implements UsersService {
+public class UsersServiceImpl implements UsersService {
 
     private UsersRepository usersRepository;
 
@@ -34,7 +32,7 @@ public class UsersServiceImp implements UsersService {
     private RolesRepository rolesRepository;
 
     @Autowired
-    public UsersServiceImp(UsersRepository usersRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RolesRepository rolesRepository) {
+    public UsersServiceImpl(UsersRepository usersRepository, UserMapper userMapper, PasswordEncoder passwordEncoder, RolesRepository rolesRepository) {
         this.usersRepository = usersRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;

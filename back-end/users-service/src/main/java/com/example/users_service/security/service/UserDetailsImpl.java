@@ -20,7 +20,6 @@ import java.util.Objects;
 @Getter
 @Setter
 public class UserDetailsImpl implements UserDetails {
-    private static final long serialVersionUID = 1L;
 
     private Integer id;
     private String username;

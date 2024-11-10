@@ -1,7 +1,8 @@
-package com.example.books_service.repository;
+package com.example.books_service.repository.impl;
 
 import com.example.books_service.dto.response.AuthorsResponse;
-import com.example.books_service.util.AuthorsRowMapper;
+import com.example.books_service.mapper.AuthorsRowMapper;
+import com.example.books_service.repository.AuthorsServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,12 +10,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class AuthorRepository {
+public class AuthorsRepositoryImpl implements AuthorsServiceRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public AuthorRepository(JdbcTemplate jdbcTemplate) {
+    public AuthorsRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -22,8 +23,9 @@ public class AuthorRepository {
         return new AuthorsRowMapper();
     }
 
+    @Override
    public List<AuthorsResponse> findAllAuthorsDto(){
-        String sql="SELECT name_authors FROM authors";
+        String sql="SELECT author_id ,name_authors FROM authors";
        return jdbcTemplate.query(sql,getAuthorsMapper());
     }
 }

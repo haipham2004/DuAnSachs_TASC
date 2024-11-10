@@ -27,19 +27,18 @@ public class FileService {
         if (!tmpDir.isDirectory()) {
             try {
                 Files.createDirectory(tmpDir.toPath());
-                System.out.println(">>> CREATE NEW DIRECTORY SUCCESSFUL, PATH = " + folder);
+                System.out.println("CREATE NEW DIRECTORY SUCCESSFUL, PATH = " + folder);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            System.out.println(">>> SKIP MAKING DIRECTORY, ALREADY EXISTS");
+            System.out.println("SKIP MAKING DIRECTORY, ALREADY EXISTS");
         }
     }
 
     public String store(MultipartFile file, String folder) throws URISyntaxException, IOException {
-        // create unique filename
-        String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
-
+//        String finalName = System.currentTimeMillis() + "-" + file.getOriginalFilename();
+        String finalName =file.getOriginalFilename();
         URI uri = new URI(baseURI + folder + "/" + finalName);
         Path path = Paths.get(uri);
         try (InputStream inputStream = file.getInputStream()) {
