@@ -20,5 +20,5 @@ public interface BooksService {
 
     void deleteById(boolean delete, Integer id);
 
-    public PageResponse<BooksResponse> findBooksPage2(int pageNumber, int pageSize, String filter);
+    PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory, int pageNumber, int pageSize);
 }

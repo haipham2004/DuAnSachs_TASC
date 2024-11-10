@@ -89,7 +89,7 @@ export const callDeleteUser = (id) => {
 
 
 export const callFetchListBook = (query) => {
-    return bookInstance.get(`/books/findAllBooksPage?${query}`)
+    return bookInstance.get(`/books/findAllBooksPage3?${query}`)
 }
 
 

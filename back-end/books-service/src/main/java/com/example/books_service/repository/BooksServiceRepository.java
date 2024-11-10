@@ -20,6 +20,7 @@ public interface BooksServiceRepository {
 
     PageResponse<BooksResponse> findBooksPage(int pageNumber, int pageSize);
 
-    PageResponse<BooksResponse> findBooksPage2(int pageNumber, int pageSize, String filter);
+
+     PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory,int pageNumber, int pageSize);
 
 }

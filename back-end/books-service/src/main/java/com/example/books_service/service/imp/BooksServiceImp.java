@@ -53,10 +53,11 @@ public class BooksServiceImp implements BooksService {
     public void deleteById(boolean delete, Integer id) {
         booksServiceRepository.deleteById(delete,id);
     }
+    
 
     @Override
-    public PageResponse<BooksResponse> findBooksPage2(int pageNumber, int pageSize, String filter) {
-        return booksServiceRepository.findBooksPage2(pageNumber,pageSize,filter);
+    public PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory, int pageNumber, int pageSize) {
+        return booksServiceRepository.findBooksPage3( nameBook,  nameAuthor,  namePublisher,  nameCategory,  pageNumber,  pageSize);
     }
 
 

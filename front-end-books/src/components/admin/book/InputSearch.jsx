@@ -13,64 +13,66 @@ const InputSearch = (props) => {
     };
 
     const onFinish = (values) => {
+        console.log("Values check: ",values)
         let query = "";
         //build query
-        if (values.mainText) {
-            query += `&mainText=/${values.mainText}/i`
+        if (values.title) {
+            query += `&title=${values.title}`
         }
-        if (values.author) {
-            query += `&author=/${values.author}/i`
+        if (values.nameAuthor) {
+            query += `&nameAuthor=${values.nameAuthor}`
         }
 
-        if (values.category) {
-            query += `&category=/${values.category}/i`
+        if (values.namePublisher) {
+            query += `&namePublisher=${values.namePublisher}`
+        }
+
+        if (values.nameCategory) {
+            query += `&nameCategory=${values.nameCategory}`
         }
 
         if (query) {
             props.handleSearch(query);
         }
 
-        //remove undefined
-        // https://stackoverflow.com/questions/25421233/javascript-removing-undefined-fields-from-an-object
-        // Object.keys(values).forEach(key => {
-        //     if (values[key] === undefined) {
-        //         delete values[key];
-        //     }
-        // });
-
-        // if (values && Object.keys(values).length > 0) {
-        //     // https://stackoverflow.com/questions/1714786/query-string-encoding-of-a-javascript-object
-        //     const params = new URLSearchParams(values).toString();
-        //     props.handleSearch(params);
-        // }
     };
 
     return (
         <Form form={form} name="advanced_search" style={formStyle} onFinish={onFinish}>
             <Row gutter={24}>
-                <Col span={8}>
+                <Col span={6}>
                     <Form.Item
                         labelCol={{ span: 24 }}
-                        name={`mainText`}
+                        name={`title`}
                         label={`Tên sách`}
                     >
                         <Input />
                     </Form.Item>
                 </Col>
-                <Col span={8}>
+                <Col span={6}>
                     <Form.Item
                         labelCol={{ span: 24 }}
-                        name={`author`}
+                        name={`nameAuthor`}
                         label={`Tác giả`}
                     >
                         <Input />
                     </Form.Item>
                 </Col>
 
-                <Col span={8}>
+                <Col span={6}>
                     <Form.Item
                         labelCol={{ span: 24 }}
-                        name={`category`}
+                        name={`namePublisher`}
+                        label={`Nhà xuất bản`}
+                    >
+                        <Input />
+                    </Form.Item>
+                </Col>
+
+                <Col span={6}>
+                    <Form.Item
+                        labelCol={{ span: 24 }}
+                        name={`nameCategory`}
                         label={`Thể loại`}
                     >
                         <Input />
@@ -91,14 +93,7 @@ const InputSearch = (props) => {
                     >
                         Clear
                     </Button>
-                    {/* <a
-                        style={{ fontSize: 12 }}
-                        onClick={() => {
-                            setExpand(!expand);
-                        }}
-                    >
-                        {expand ? <UpOutlined /> : <DownOutlined />} Collapse
-                    </a> */}
+    
                 </Col>
             </Row>
         </Form>
