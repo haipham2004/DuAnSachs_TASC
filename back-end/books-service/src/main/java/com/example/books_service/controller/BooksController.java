@@ -42,43 +42,50 @@ public class BooksController {
 
     @GetMapping("findAllBooksDto")
     public ApiResponse<List<BooksResponse>> findAllBooksDto() {
-      return   ApiResponse.<List<BooksResponse>>builder().data(booksService.findAllBooksDto()).build();
+        return ApiResponse.<List<BooksResponse>>builder().data(booksService.findAllBooksDto()).build();
     }
 
     @PostMapping("save")
-    public ApiResponse<BooksRequest> save(@RequestBody BooksRequest booksRequest){
+    public ApiResponse<BooksRequest> save(@RequestBody BooksRequest booksRequest) {
         return ApiResponse.<BooksRequest>builder().statusCode(201).message("Create books users succes ").data(booksService.save(booksRequest)).build();
     }
 
 
     @PutMapping("update/{id}")
-    public ApiResponse<BooksRequest> update(@RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id){
-        return ApiResponse.<BooksRequest>builder().statusCode(200).message("Update books users succes ").data(booksService.update(booksRequest,id)).build();
+    public ApiResponse<BooksRequest> update(@RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id) {
+        return ApiResponse.<BooksRequest>builder().statusCode(200).message("Update books users succes ").data(booksService.update(booksRequest, id)).build();
     }
 
     @DeleteMapping("delete/{id}")
-    public ApiResponse<Void> delete(@PathVariable("id") Integer id, @RequestParam("delete") boolean delete){
-        booksService.deleteById(delete ,id);
-        return ApiResponse.<Void>builder().statusCode(200).message("Delete book success with ID: "+id).build();
+    public ApiResponse<Void> delete(@PathVariable("id") Integer id, @RequestParam("delete") boolean delete) {
+        booksService.deleteById(delete, id);
+        return ApiResponse.<Void>builder().statusCode(200).message("Delete book success with ID: " + id).build();
     }
 
     @GetMapping("findAllBooksPage")
     public ApiResponse<PageResponse<BooksResponse>> findAllBooksPage(
-            @RequestParam( defaultValue = "1") int pageNumber,
-            @RequestParam( defaultValue = "5") int pageSize
+            @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize
 
     ) {
-        return   ApiResponse.<PageResponse<BooksResponse>>builder().statusCode(200).message("Page book success").data(booksService.findAllBooksPage(pageNumber,pageSize)).build();
+        return ApiResponse.<PageResponse<BooksResponse>>builder().statusCode(200).message("Page book success").data(booksService.findAllBooksPage(pageNumber, pageSize)).build();
     }
 
-    @GetMapping("findAllBooksPage2")
-    public ApiResponse<PageResponse<BooksResponse>> findAllBooksPage2(
-            @RequestParam( defaultValue = "1") int pageNumber,
-            @RequestParam( defaultValue = "5") int pageSize,
-            @RequestParam( name = "filter" ,required = false) String filter
 
-    ) {
-        return   ApiResponse.<PageResponse<BooksResponse>>builder().statusCode(200).message("Page book success").data(booksService.findBooksPage2(pageNumber,pageSize,filter)).build();
+    @GetMapping("findAllBooksPage3")
+    public ApiResponse<PageResponse<BooksResponse>> findAllBooksPage3(
+            @RequestParam(name = "title", defaultValue = "") String title,
+            @RequestParam(name = "nameAuthor", defaultValue = "") String nameAuthor,
+            @RequestParam(name = "namePublisher", defaultValue = "") String namePublisher,
+            @RequestParam(name = "nameCategory", defaultValue = "") String nameCategory,
+            @RequestParam(defaultValue = "1") int pageNumber,
+            @RequestParam(defaultValue = "5") int pageSize) {
+
+        return ApiResponse.<PageResponse<BooksResponse>>builder()
+                .statusCode(200)
+                .message("Page book success")
+                .data(booksService.findBooksPage3(title, nameAuthor, namePublisher, nameCategory, pageNumber, pageSize))
+                .build();
     }
 
 }

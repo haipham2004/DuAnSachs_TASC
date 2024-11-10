@@ -139,62 +139,53 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
     }
 
     @Override
-    public PageResponse<BooksResponse> findBooksPage2(int pageNumber, int pageSize, String filter) {
+    public PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory, int pageNumber, int pageSize) {
         int offset = (pageNumber - 1) * pageSize;
 
-        String sql;
-        Object[] params;
+        // Câu SQL để lấy dữ liệu
+        String sql = "SELECT b.book_id, b.title, " +
+                "a.name_authors, p.name_publishers, c.name_categories, " +
+                "b.price, b.description, b.cost_price, b.quantity, b.status, b.image_url, b.thumbnail, " +
+                "a.author_id, p.publisher_id, c.category_id " +
+                "FROM books b " +
+                "LEFT JOIN authors a ON b.author_id = a.author_id " +
+                "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
+                "LEFT JOIN categories c ON b.category_id = c.category_id " +
+                "WHERE (b.title LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (a.name_authors LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (p.name_publishers LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (c.name_categories LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "LIMIT ? OFFSET ?";
 
-        if (filter == null || filter.isEmpty()) {
-            sql = "SELECT b.book_id, b.title, " +
-                    "a.name_authors, p.name_publishers, c.name_categories, " +
-                    "b.price, b.description, b.cost_price, b.quantity, b.status, b.image_url, b.thumbnail, " +
-                    "a.author_id, p.publisher_id, c.category_id " +
-                    "FROM books b " +
-                    "LEFT JOIN authors a ON b.author_id = a.author_id " +
-                    "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
-                    "LEFT JOIN categories c ON b.category_id = c.category_id " +
-                    "LIMIT ? OFFSET ?";
-            params = new Object[]{pageSize, offset};
-        } else {
-            sql = "SELECT b.book_id, b.title, " +
-                    "a.name_authors, p.name_publishers, c.name_categories, " +
-                    "b.price, b.description, b.cost_price, b.quantity, b.status, b.image_url, b.thumbnail, " +
-                    "a.author_id, p.publisher_id, c.category_id " +
-                    "FROM books b " +
-                    "LEFT JOIN authors a ON b.author_id = a.author_id " +
-                    "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
-                    "LEFT JOIN categories c ON b.category_id = c.category_id " +
-                    "WHERE b.title LIKE ? OR a.name_authors LIKE ? OR p.name_publishers LIKE ? OR c.name_categories LIKE ? " +
-                    "LIMIT ? OFFSET ?";
-            params = new Object[]{"%" + filter + "%", "%" + filter + "%", "%" + filter + "%", "%" + filter + "%", pageSize, offset};
-        }
-        List<BooksResponse> books = jdbcTemplate.query(sql, getBookMapper(), params);
+        // Truyền các tham số vào câu SQL và thực thi
+        List<BooksResponse> books = jdbcTemplate.query(sql, getBookMapper(),
+                nameBook, nameBook,
+                nameAuthor, nameAuthor,
+                namePublisher, namePublisher,
+                nameCategory, nameCategory,
+                pageSize, offset);
 
-        String countSql;
-        Object[] countParams;
+        // Câu lệnh đếm tổng số bản ghi
+        String countSql = "SELECT COUNT(*) FROM books b " +
+                "LEFT JOIN authors a ON b.author_id = a.author_id " +
+                "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
+                "LEFT JOIN categories c ON b.category_id = c.category_id " +
+                "WHERE (b.title LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (a.name_authors LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (p.name_publishers LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (c.name_categories LIKE CONCAT('%', ?, '%') OR ? IS NULL)";
 
-        if (filter == null || filter.isEmpty()) {
-            countSql ="SELECT COUNT(*) FROM books b " +
-                    "LEFT JOIN authors a ON b.author_id = a.author_id " +
-                    "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
-                    "LEFT JOIN categories c ON b.category_id = c.category_id";
-            countParams = new Object[]{};
-        } else {
-            // Nếu có filter, đếm theo điều kiện LIKE
-            countSql = "SELECT COUNT(*) FROM books b " +
-                    "LEFT JOIN authors a ON b.author_id = a.author_id " +
-                    "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
-                    "LEFT JOIN categories c ON b.category_id = c.category_id " +
-                    "WHERE b.title LIKE ? OR a.name_authors LIKE ? OR p.name_publishers LIKE ? OR c.name_categories LIKE ?";
-            countParams = new Object[]{"%" + filter + "%", "%" + filter + "%", "%" + filter + "%", "%" + filter + "%"};
-        }
+        // Tính tổng số bản ghi
+        int totalElements = jdbcTemplate.queryForObject(countSql, Integer.class,
+                nameBook, nameBook,
+                nameAuthor, nameAuthor,
+                namePublisher, namePublisher,
+                nameCategory, nameCategory);
 
-        int totalElements = jdbcTemplate.queryForObject(countSql, Integer.class, countParams);
-
-
+        // Tính số trang
         int totalPages = (int) Math.ceil((double) totalElements / pageSize);
 
+        // Trả về kết quả phân trang
         return new PageResponse<>(books, totalElements, totalPages, pageNumber);
     }
 

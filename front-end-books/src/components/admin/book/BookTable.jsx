@@ -30,17 +30,15 @@ const BookTable = () => {
 
     useEffect(() => {
         fetchBook();
-    }, [current, pageSize]);
+    }, [current, pageSize, filter]);
 
     const fetchBook = async () => {
         setIsLoading(true)
         let query = `pageNumber=${current}&pageSize=${pageSize}`;
-        // if (filter) {
-        //     query += `&${filter}`;
-        // }
-        // if (sortQuery) {
-        //     query += `&${sortQuery}`;
-        // }
+        if (filter) {
+            query += `&${filter}`;
+        }
+        
 
         const res = await callFetchListBook(query);
         if (res && res.data) {
