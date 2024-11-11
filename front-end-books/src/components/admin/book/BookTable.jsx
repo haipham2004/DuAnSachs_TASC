@@ -171,6 +171,7 @@ const BookTable = () => {
             setSortQuery(q);
         }
     };
+    
     const handleSwitchChange = async (checked, id) => {
         const deleteFlag = checked ? false : true;  // Nếu checked = true, thì sách chưa bị xóa (deleted = false), ngược lại (checked = false) thì xóa mềm (deleted = true)
         

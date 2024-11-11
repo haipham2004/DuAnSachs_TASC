@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface BooksService {
 
-    List<BooksResponse> findAllBooksDto();
 
     PageResponse<BooksResponse> findAllBooksPage(int pageSize, int offset);
 
@@ -20,5 +19,7 @@ public interface BooksService {
 
     void deleteById(boolean delete, Integer id);
 
-    PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory, int pageNumber, int pageSize);
+    PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher,
+                                               String nameCategory, double priceMin, double priceMax,
+                                               int pageNumber, int pageSize, String sort);
 }

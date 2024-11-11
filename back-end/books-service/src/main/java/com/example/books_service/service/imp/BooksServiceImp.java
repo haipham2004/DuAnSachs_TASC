@@ -3,9 +3,7 @@ package com.example.books_service.service.imp;
 import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
-import com.example.books_service.mapper.BooksMapper;
 import com.example.books_service.repository.BooksServiceRepository;
-import com.example.books_service.repository.impl.BooksRepositoryImpl;
 import com.example.books_service.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,11 +18,6 @@ public class BooksServiceImp implements BooksService {
     @Autowired
     public BooksServiceImp(BooksServiceRepository booksServiceRepository) {
         this.booksServiceRepository = booksServiceRepository;
-    }
-
-    @Override
-    public List<BooksResponse> findAllBooksDto() {
-        return booksServiceRepository.findAllBooksDto();
     }
 
     @Override
@@ -53,11 +46,13 @@ public class BooksServiceImp implements BooksService {
     public void deleteById(boolean delete, Integer id) {
         booksServiceRepository.deleteById(delete,id);
     }
-    
+
 
     @Override
-    public PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory, int pageNumber, int pageSize) {
-        return booksServiceRepository.findBooksPage3( nameBook,  nameAuthor,  namePublisher,  nameCategory,  pageNumber,  pageSize);
+    public PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher,
+                                                      String nameCategory, double priceMin, double priceMax,
+                                                      int pageNumber, int pageSize, String sort) {
+        return booksServiceRepository.findBooksPage3( nameBook,  nameAuthor,  namePublisher,  nameCategory, priceMin, priceMax,  pageNumber,  pageSize, sort );
     }
 
 

@@ -53,7 +53,7 @@ const LayoutAdmin = () => {
             icon: <UserOutlined />,
             children: [
                 {
-                    label: <Link to='/admin'>CRUD</Link>,
+                    label: <Link to='/admin'>USEE</Link>,
                     key: 'crud',
                     icon: <TeamOutlined />,
                 },

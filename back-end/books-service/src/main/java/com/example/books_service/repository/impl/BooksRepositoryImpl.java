@@ -32,21 +32,6 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
     }
 
     @Override
-    public List<BooksResponse> findAllBooksDto() {
-        String sql = "SELECT b.book_id, b.title, " +
-                "a.name_authors, " +
-                "p.name_publishers , " +
-                "c.name_categories, " +
-                "b.price, b.description, b.cost_price, b.quantity, b.status, b.image_url, b.thumbnail  " +
-                "FROM books b " +
-                "LEFT JOIN authors a ON b.author_id = a.author_id " +
-                "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
-                "LEFT JOIN categories c ON b.category_id = c.category_id";
-
-        return jdbcTemplate.query(sql, getBookMapper());
-    }
-
-    @Override
     public BooksResponse findById(Integer id) {
         String sql = "SELECT b.book_id, b.title, " +
                 "a.name_authors, " +
@@ -139,8 +124,17 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
     }
 
     @Override
-    public PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory, int pageNumber, int pageSize) {
+    public PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher,
+                                                      String nameCategory, double priceMin, double priceMax,
+                                                      int pageNumber, int pageSize, String sort) {
         int offset = (pageNumber - 1) * pageSize;
+
+        String sortColumn = "b.title";
+        if ("price".equalsIgnoreCase(sort)) {
+            sortColumn = "b.price";
+        } else if ("quantity".equalsIgnoreCase(sort)) {
+            sortColumn = "b.quantity";
+        }
 
         // Câu SQL để lấy dữ liệu
         String sql = "SELECT b.book_id, b.title, " +
@@ -155,6 +149,8 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
                 "AND (a.name_authors LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
                 "AND (p.name_publishers LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
                 "AND (c.name_categories LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
+                "AND (b.price >= ? AND b.price <= ?) " +
+                "ORDER BY " + sortColumn + " " +
                 "LIMIT ? OFFSET ?";
 
         // Truyền các tham số vào câu SQL và thực thi
@@ -163,6 +159,7 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
                 nameAuthor, nameAuthor,
                 namePublisher, namePublisher,
                 nameCategory, nameCategory,
+                priceMin, priceMax,
                 pageSize, offset);
 
         // Câu lệnh đếm tổng số bản ghi
@@ -173,14 +170,16 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
                 "WHERE (b.title LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
                 "AND (a.name_authors LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
                 "AND (p.name_publishers LIKE CONCAT('%', ?, '%') OR ? IS NULL) " +
-                "AND (c.name_categories LIKE CONCAT('%', ?, '%') OR ? IS NULL)";
+                "AND (c.name_categories LIKE CONCAT('%', ?, '%') OR ? IS NULL)" +
+                "AND (b.price >= ? AND b.price <= ?)";
 
         // Tính tổng số bản ghi
         int totalElements = jdbcTemplate.queryForObject(countSql, Integer.class,
                 nameBook, nameBook,
                 nameAuthor, nameAuthor,
                 namePublisher, namePublisher,
-                nameCategory, nameCategory);
+                nameCategory, nameCategory,
+                priceMin, priceMax);
 
         // Tính số trang
         int totalPages = (int) Math.ceil((double) totalElements / pageSize);
