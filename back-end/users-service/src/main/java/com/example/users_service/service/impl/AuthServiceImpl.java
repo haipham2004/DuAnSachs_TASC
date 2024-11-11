@@ -2,6 +2,7 @@ package com.example.users_service.service.impl;
 
 import com.example.users_service.dto.request.LoginRequest;
 import com.example.users_service.dto.request.SignupRequest;
+import com.example.users_service.dto.request.TokenRequest;
 import com.example.users_service.dto.response.LoginResponse;
 import com.example.users_service.entity.EnumRoles;
 import com.example.users_service.entity.Roles;
@@ -28,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -284,5 +286,35 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.clearContext();
 
     }
+
+
+    @Override
+    public LoginResponse checkToken(TokenRequest tokenRequest) {
+
+        String accessToken = tokenRequest.getToken();
+
+        if (accessToken == null || accessToken.trim().isEmpty() || !jwtUtils.validateJwtToken(accessToken)) {
+            throw new CustomException(MessageExceptionResponse.UNAUTHORIZED);
+        }
+
+        String username = jwtUtils.getUserNameFromJwtToken(accessToken);
+
+        UserDetailsImpl userDetails;
+        try {
+            userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            throw new CustomException(MessageExceptionResponse.USER_NOT_FOUND);
+        }
+
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        return new LoginResponse(userDetails.getUsername(), roles, userDetails.getEmail(), userDetails.getPhone());
+    }
+
+
+
+
 
 }

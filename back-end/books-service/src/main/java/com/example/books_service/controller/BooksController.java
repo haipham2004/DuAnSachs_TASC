@@ -40,11 +40,6 @@ public class BooksController {
     }
 
 
-    @GetMapping("findAllBooksDto")
-    public ApiResponse<List<BooksResponse>> findAllBooksDto() {
-        return ApiResponse.<List<BooksResponse>>builder().data(booksService.findAllBooksDto()).build();
-    }
-
     @PostMapping("save")
     public ApiResponse<BooksRequest> save(@RequestBody BooksRequest booksRequest) {
         return ApiResponse.<BooksRequest>builder().statusCode(201).message("Create books users succes ").data(booksService.save(booksRequest)).build();
@@ -78,13 +73,16 @@ public class BooksController {
             @RequestParam(name = "nameAuthor", defaultValue = "") String nameAuthor,
             @RequestParam(name = "namePublisher", defaultValue = "") String namePublisher,
             @RequestParam(name = "nameCategory", defaultValue = "") String nameCategory,
+            @RequestParam(defaultValue = "0") double priceMin,
+            @RequestParam(defaultValue = "100000000") double priceMax,
             @RequestParam(defaultValue = "1") int pageNumber,
-            @RequestParam(defaultValue = "5") int pageSize) {
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(name = "sort", defaultValue = "") String sort) {
 
         return ApiResponse.<PageResponse<BooksResponse>>builder()
                 .statusCode(200)
                 .message("Page book success")
-                .data(booksService.findBooksPage3(title, nameAuthor, namePublisher, nameCategory, pageNumber, pageSize))
+                .data(booksService.findBooksPage3(title, nameAuthor, namePublisher, nameCategory,priceMin,priceMax, pageNumber, pageSize, sort))
                 .build();
     }
 

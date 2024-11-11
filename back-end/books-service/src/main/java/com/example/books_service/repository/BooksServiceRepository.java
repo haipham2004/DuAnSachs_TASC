@@ -8,11 +8,9 @@ import java.util.List;
 
 public interface BooksServiceRepository {
 
-     List<BooksResponse> findAllBooksDto();
+    BooksResponse findById(Integer id);
 
-     BooksResponse findById(Integer id);
-
-     BooksRequest save(BooksRequest booksRequest);
+    BooksRequest save(BooksRequest booksRequest);
 
     BooksRequest update(BooksRequest booksRequest, Integer id);
 
@@ -21,6 +19,7 @@ public interface BooksServiceRepository {
     PageResponse<BooksResponse> findBooksPage(int pageNumber, int pageSize);
 
 
-     PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher, String nameCategory,int pageNumber, int pageSize);
+    PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher,
+                                               String nameCategory, double priceMin, double priceMax, int pageNumber, int pageSize, String sort);
 
 }
