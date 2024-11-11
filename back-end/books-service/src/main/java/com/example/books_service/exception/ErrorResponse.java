@@ -5,13 +5,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ErrolResponse {
+public class ErrorResponse {
 
     public int status;
     public String message;
     public long timestamp;
 
-    public ErrolResponse(int status, String message) {
+    public ErrorResponse(int status, String message) {
         this.status = status;
         this.message = message;
         this.timestamp=System.currentTimeMillis();

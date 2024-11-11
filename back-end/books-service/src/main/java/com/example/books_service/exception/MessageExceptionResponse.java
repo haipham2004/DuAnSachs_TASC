@@ -1,6 +1,16 @@
 package com.example.books_service.exception;
 
+import org.springframework.http.HttpStatusCode;
+
 public class MessageExceptionResponse {
 
-    public static final String REFRESH_TOKEN_NOT_FOUND = "Refresh token không tồn tại hoặc đã hết hạn. Vui lòng đăng nhập lại.";
+    public static final String name_not_found = "Tên không tồn tại";
+
+
+    private int statusCode;
+
+    private String message;
+
+    private HttpStatusCode httpStatusCode;
+
 }

@@ -159,7 +159,7 @@ export const callDeleteBook = (id, deleteFlag) => {
 
 
 export const callFetchBookById = (id) => {
-    return bookInstance.get(`api/v1/book/${id}`)
+    return bookInstance.get(`/books/findById/${id}`)
 }
 
 

@@ -18,13 +18,14 @@ const Home = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [filter, setFilter] = useState("");
-    const [sortQuery, setSortQuery] = useState(""); 
+    const [sortQuery, setSortQuery] = useState("");
 
     const [showMobileFilter, setShowMobileFilter] = useState(false);
 
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
+    console.log("filter1: ", filter)
     useEffect(() => {
         const initCategory = async () => {
             const res = await callFetchCategory();
@@ -33,6 +34,7 @@ const Home = () => {
                     return { label: item.name || item, value: item.id || item };
                 });
                 setListCategory(d);
+                console.log("listCate: ",d)
             }
         };
         initCategory();
@@ -41,41 +43,41 @@ const Home = () => {
     useEffect(() => {
 
         fetchBook();
-    }, [current, pageSize, filter, sortQuery]);  
-    
-    console.log("filter: ",filter)
+    }, [current, pageSize, filter, sortQuery]);
+    console.log("filter2: ", filter)
+
     const fetchBook = async () => {
         setIsLoading(true);
         let query = `pageNumber=${current}&pageSize=${pageSize}`;
         if (filter) {
-            query += `&${filter}`; 
+            query += `&${filter}`;
         }
-        
+
         if (sortQuery) {
-            query += `&${sortQuery}`;  
+            query += `&${sortQuery}`;
         }
-    
+
         console.log("API Query:", query);  // In ra query để kiểm tra xem API có đúng tham số không
-    
+
         const res = await callFetchListBook(query);  // Gọi API với tham số phân trang và bộ lọc
         console.log("API Response:", res);  // Kiểm tra phản hồi của API
-    
+
         if (res && res.data) {
             setListBook(res.data.content);  // Cập nhật danh sách sách
             setTotal(res.data.totalElements);  // Cập nhật tổng số sách
         } else {
             console.error("Error fetching data:", res);  // Nếu có lỗi, in ra
         }
-    
+
         setIsLoading(false);  // Tắt loading
     };
-    
+
 
     const handleTabChange = (key) => {
         setSortQuery(key); // Cập nhật `sortQuery` khi người dùng chọn tab
         setCurrent(1); // Reset lại trang về 1
     };
-    
+
 
     // const handleOnchangePage = (pagination) => {
     //     if (pagination && pagination.current !== current) {
@@ -93,7 +95,7 @@ const Home = () => {
         if (pagination && pagination.current !== current) {
             setCurrent(pagination.current)
         }
-        console.log("vị trí: ",current)
+        console.log("vị trí: ", current)
         if (pagination && pagination.pageSize !== pageSize) {
             setPageSize(pagination.pageSize)
             setCurrent(1);
@@ -103,90 +105,42 @@ const Home = () => {
 
 
 
-    // const handleChangeFilter = (changedValues, values) => {
-    //     console.log("changecategory ", changedValues);
-    //     console.log("Valueschangecategory ", values);
-    
-
-
-    //     if (changedValues.nameCategory) {
-    //         const cate = values.nameCategory;
-    //         if (cate && cate.length > 0) {
-    //             const f = cate.join(',');
-    //             setFilter(`category=${f}`)
-    //         } else {
-    //             //reset data -> fetch all
-    //             setFilter('');
-    //         }
-    //     }
-
-    // }
-
-    // const handleChangeFilter = (changedValues, values) => {
-    //     console.log("changecategory ", changedValues);
-    //     console.log("Valueschangecategory ", values);
-    
-    //     if (changedValues.nameCategory) {
-    //         const cate = values.nameCategory;
-    
-    //         // Check if cate is an array before calling join
-    //         if (Array.isArray(cate) && cate.length > 0) {
-    //             const f = cate.join(',');  // Directly join the items in the array
-    //             setFilter(`category=${f}`);
-    //         } else {
-    //             // Reset data -> fetch all
-    //             setFilter('');
-    //         }
-    //     }
-    // }
-
     const handleChangeFilter = (changedValues, values) => {
-        console.log("changecategory ", changedValues);
-        console.log("Valueschangecategory ", values);
-    
-        // Kiểm tra xem có thay đổi giá trị category không
+
         if (changedValues.nameCategory) {
             let cate = values.nameCategory;
-    
-            // Kiểm tra xem cate có phải là chuỗi không, nếu phải, chuyển nó thành một mảng
+
             if (typeof cate === 'string') {
-                cate = [cate];  // Nếu là chuỗi, chuyển thành mảng
+                cate = [cate];  
             }
-    
-            // In ra giá trị của nameCategory (bây giờ cate luôn là mảng)
-            console.log("Final nameCategory:", cate);
-    
-            // Nếu cate là mảng và có giá trị, thì join nó lại thành chuỗi và thiết lập filter
             if (Array.isArray(cate) && cate.length > 0) {
                 const f = cate.join(',');
-                setFilter(`category=${f}`);
+                setFilter(`nameCategory=${f}`);
             } else {
                 // Nếu không có giá trị, reset filter
                 setFilter('');
             }
         }
     }
-    
-    
-    
 
-    
 
-    
 
     const onFinish = (values) => {
-        // console.log('>> check values: ', values)
+        console.log('>> check values: ', values)
 
         if (values?.range?.from >= 0 && values?.range?.to >= 0) {
-            let f = `price>=${values?.range?.from}&price<=${values?.range?.to}`;
-            if (values?.category?.length) {
-                const cate = values?.category?.join(',');
-                f += `&category=${cate}`
+            let f = `priceMin=${values?.range?.from}&priceMax=${values?.range?.to}`;
+            if (values?.nameCategory?.length) {
+                const cate = values?.nameCategory;
+                f += `&nameCategory=${cate}`
             }
             setFilter(f);
         }
     }
 
+
+    
+    
     const items = [
         {
             key: "ntth",
@@ -198,7 +152,7 @@ const Home = () => {
             key: "",
             label: `Phổ biến`,
             children: <>
-            huhu
+                huhu
             </>,
         },
         {
@@ -214,6 +168,11 @@ const Home = () => {
     ];
 
     const nonAccentVietnamese = (str) => {
+        // Kiểm tra nếu str là null hoặc undefined, nếu có trả về chuỗi rỗng
+        if (typeof str !== 'string') {
+            return '';
+        }
+    
         str = str.replace(/A|Á|À|Ã|Ạ|Â|Ấ|Ầ|Ẫ|Ậ|Ă|Ắ|Ằ|Ẵ|Ặ/g, "A");
         str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
         str = str.replace(/E|É|È|Ẽ|Ẹ|Ê|Ế|Ề|Ễ|Ệ/, "E");
@@ -228,12 +187,14 @@ const Home = () => {
         str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
         str = str.replace(/Đ/g, "D");
         str = str.replace(/đ/g, "d");
-        // Some system encode vietnamese combining accent as individual utf-8 characters
+    
+        // Các ký tự kết hợp (diacritical marks) UTF-8
         str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // Huyền sắc hỏi ngã nặng
         str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ê, Ă, Ơ, Ư
+    
         return str;
     }
-
+    
     const convertSlug = (str) => {
         str = nonAccentVietnamese(str);
         str = str.replace(/^\s+|\s+$/g, ''); // trim
@@ -254,7 +215,7 @@ const Home = () => {
     }
 
     const handleRedirectBook = (book) => {
-        const slug = convertSlug(book.mainText);
+        const slug = convertSlug(book.title);
         navigate(`/book/${slug}?id=${book.bookId}`)
     }
     handleChangeFilter
@@ -301,7 +262,7 @@ const Home = () => {
                                     onValuesChange={(changedValues, values) => handleChangeFilter(changedValues, values)}
                                 >
                                     <Form.Item
-                                        name="nameCategory"
+                                        name="category"
                                         labelCol={{ span: 24 }}
                                     >
                                         <Form.Item name="nameCategory" label="Danh mục sản phẩm" labelCol={{ span: 24 }}>
@@ -310,7 +271,8 @@ const Home = () => {
                                                     {listCategory?.map((item, index) => {
                                                         return (
                                                             <Col span={24} key={`index-${index}`} style={{ padding: '7px 0' }}>
-                                                                <Checkbox value={item.value}>{item.label}</Checkbox> {/* Chỉ render item.label */}
+                                                                <Checkbox value={item.label}>{item.label}</Checkbox> 
+                                                                
                                                             </Col>
                                                         )
                                                     })}
@@ -391,7 +353,7 @@ const Home = () => {
                                 <div style={{ padding: "20px", background: '#fff', borderRadius: 5 }}>
                                     <Row >
                                         <Tabs
-                                            defaultActiveKey="ntth"
+                                            defaultActiveKey=""
                                             items={items}
                                             activeKey={sortQuery} //
                                             // onChange={(value) => { setSortQuery(value) }}

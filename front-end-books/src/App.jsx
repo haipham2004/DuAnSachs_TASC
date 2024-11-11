@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import LoginPage from "./pages/login/Login";
-import BookPage from "./pages/book/Book";
+import BookPage from "./pages/book/BookPage";
 import {
   createBrowserRouter,
   RouterProvider,
@@ -14,7 +14,7 @@ import Header from "./components/header/Header";
 import HomePage from "./components/home/Home";
 import RegisterPage from "./pages/register/Register";
 import { callFetchAccount } from "./services/Api";
-import Loading from "./components/Loading/Loading";
+import Loading from "./components/loading/Loading";
 import NotFound from "./components/notfound/NotFound";
 import ProtectedRoute from "./components/protectedroute/RoleBaseRoute";
 import { doGetAccountAction } from "./redux/account/AccountSlice";
@@ -90,7 +90,7 @@ export default function App() {
           element: <RegisterPage />,
         },
         {
-          path: "book",
+          path: "book/:slug",
           element: <BookPage />,
         },
       ],
