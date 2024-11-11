@@ -19,9 +19,9 @@ const Header = (props) => {
     const dispatch = useDispatch();
     const [showManageAccount, setShowManageAccount] = useState(false);
 
+    console.log("Ho tên header: ",user.username)
     const handleLogout = async () => {
-        // Nếu cần gọi API logout, thì bỏ dòng comment dưới
-        const res = await callLogout();
+        const res = await callLogout();  // Xử lý logout
         if (res && res.statusCode && res.message) {
             dispatch(doLogoutAction());
             message.success('Đăng xuất thành công');
@@ -29,7 +29,8 @@ const Header = (props) => {
         }
     };
 
-    let items = [
+    // Menu items for authenticated user
+    const items = [
         {
             label: <label style={{ cursor: 'pointer' }} onClick={() => setShowManageAccount(true)}>Quản lý tài khoản</label>,
             key: 'account',
@@ -51,18 +52,15 @@ const Header = (props) => {
         });
     }
 
-    // const urlAvatar = `${import.meta.env.VITE_BACKEND_URL}/images/avatar/${user?.avatar}`;
-
-    const contentPopover = () => {
-        return (
-            <div className='pop-cart-body'>
-                <div className='pop-cart-content'>
-                    {/* Giỏ hàng trống */}
-                </div>
-                <Empty description="Không có sản phẩm trong giỏ hàng" />
+    // Content of cart popover
+    const contentPopover = () => (
+        <div className='pop-cart-body'>
+            <div className='pop-cart-content'>
+                {/* Giỏ hàng trống */}
             </div>
-        );
-    };
+            <Empty description="Không có sản phẩm trong giỏ hàng" />
+        </div>
+    );
 
     return (
         <>
@@ -72,44 +70,50 @@ const Header = (props) => {
                         <div className="page-header__toggle" onClick={() => setOpenDrawer(true)}>☰</div>
                         <div className='page-header__logo'>
                             <span className='logo'>
-                                <span onClick={() => navigate('/')}> <FaReact className='rotate icon-react' />phamngochai3010</span>
+                                <span onClick={() => navigate('/')}> 
+                                    <FaReact className='rotate icon-react' />phamngochai3010
+                                </span>
                                 <IoBook className='icon-search' />
                             </span>
-                            
                             <input
-                                className="input-search" type={'text'}
+                                className="input-search"
+                                type="text"
                                 placeholder="Bạn tìm gì hôm nay"
                                 value={props.searchTerm}
                                 onChange={(e) => props.setSearchTerm(e.target.value)}
                             />
                         </div>
                     </div>
+
                     <nav className="page-header__bottom">
                         <ul id="navigation" className="navigation">
                             <li className="navigation__item">
                                 <Popover
                                     className="popover-carts"
                                     placement="topRight"
-                                    rootClassName="popover-carts"
-                                    title={"Sản phẩm mới thêm"}
+                                    title="Sản phẩm mới thêm"
                                     content={contentPopover}
-                                    arrow={true}>
+                                    arrow={true}
+                                >
                                     <Badge size="small" showZero>
                                         <FiShoppingCart className='icon-cart' />
                                     </Badge>
                                 </Popover>
                             </li>
+
+                            {/* Divider for mobile */}
                             <li className="navigation__item mobile"><Divider type='vertical' /></li>
+
                             <li className="navigation__item mobile">
                                 {!isAuthenticated ? 
-                                    <span onClick={() => navigate('/login')}>Tài Khoản</span> 
-                                    : 
+                                    <span onClick={() => navigate('/login')}>Tài Khoản</span> : 
                                     <Dropdown menu={{ items }} trigger={['click']}>
                                         <Space>
-                                            {/* <Avatar src={urlAvatar} /> */}
-                                            {user?.fullName}
+                                            {/* Avatar src={urlAvatar} if you wish to display avatar */}
+                                            {user?.username} <DownOutlined />
                                         </Space>
                                     </Dropdown>
+                    
                                 }
                             </li>
                         </ul>
@@ -124,9 +128,9 @@ const Header = (props) => {
                 onClose={() => setOpenDrawer(false)}
                 open={openDrawer}
             >
-                <p>Quản lý tài khoản</p>
+                <p onClick={() => setShowManageAccount(true)}>Quản lý tài khoản</p>
                 <Divider />
-                <p>Đăng xuất</p>
+                <p onClick={() => handleLogout()}>Đăng xuất</p>
                 <Divider />
             </Drawer>
         </>

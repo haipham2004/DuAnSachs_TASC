@@ -91,7 +91,6 @@ const BookModalCreate = (props) => {
 
         setIsSubmit(true);
         const res = await callCreateBook(title, authorId, publisherId, categoryId, price, consPrice, description, quantity,imageUrl, thumbnail);
-        console.log("thumbnail",res)
         if (res && res.data) {
             message.success('Tạo mới book thành công');
             form.resetFields();
@@ -100,10 +99,23 @@ const BookModalCreate = (props) => {
             setOpenModalCreate(false);
             await props.fetchBook();
         } else {
-            notification.error({
-                message: 'Đã có lỗi xảy ra',
-                description: res.message
-            });
+            if (res.messageValidation) {
+                const { messageValidation } = res;
+                Object.keys(messageValidation).forEach((field) => {
+                    notification.error({
+                        message: `Lỗi ở trường ${field}`,
+                        description: messageValidation[field],
+                        duration: 5,
+                    });
+                });
+            }
+            if (res.message) {
+                notification.error({
+                    message: "Có lỗi xảy ra",
+                    description: res.message,  // Thông báo lỗi tổng quát từ API
+                    duration: 5,
+                });
+            }
         }
         setIsSubmit(false);
     };

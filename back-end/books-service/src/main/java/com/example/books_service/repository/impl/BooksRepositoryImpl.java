@@ -3,7 +3,7 @@ package com.example.books_service.repository.impl;
 import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
-import com.example.books_service.exception.ResourceNotfound;
+import com.example.books_service.exception.NotfoundException;
 import com.example.books_service.mapper.BooksRowMapper;
 import com.example.books_service.repository.BooksServiceRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,19 +34,18 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
     @Override
     public BooksResponse findById(Integer id) {
         String sql = "SELECT b.book_id, b.title, " +
-                "a.name_authors, " +
-                "p.name_publishers , " +
-                "c.name_categories, " +
-                "b.price, b.description, b.cost_price, b.quantity, b.status,b.image_url, b.thumbnail " +
+                "a.name_authors, p.name_publishers, c.name_categories, " +
+                "b.price, b.description, b.cost_price, b.quantity, b.status, b.image_url, b.thumbnail, " +
+                "a.author_id, p.publisher_id, c.category_id " +
                 "FROM books b " +
                 "LEFT JOIN authors a ON b.author_id = a.author_id " +
                 "LEFT JOIN publishers p ON b.publisher_id = p.publisher_id " +
-                "LEFT JOIN categories c ON b.category_id = c.category_id where b.book_id=?";
+                "LEFT JOIN categories c ON b.category_id = c.category_id  where b.book_id=?";
         try {
             return jdbcTemplate.queryForObject(sql, getBookMapper(), id);
         } catch (EmptyResultDataAccessException e) {
 
-            throw new ResourceNotfound("Book with ID " + id + " not found.");
+            throw new NotfoundException("Book with ID " + id + " not found.");
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("Error accessing database", e);

@@ -5,6 +5,7 @@ import com.example.books_service.dto.response.ApiResponse;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.service.BooksService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +30,7 @@ public class BooksController {
         this.booksService = booksService;
     }
 
-    @GetMapping("/findByIdBooks/{id}")
+    @GetMapping("/findById/{id}")
     public ApiResponse<BooksResponse> findById(@PathVariable("id") Integer id) {
         BooksResponse book = booksService.findById(id);
         return ApiResponse.<BooksResponse>builder()
@@ -41,13 +42,13 @@ public class BooksController {
 
 
     @PostMapping("save")
-    public ApiResponse<BooksRequest> save(@RequestBody BooksRequest booksRequest) {
+    public ApiResponse<BooksRequest> save(@Valid @RequestBody BooksRequest booksRequest) {
         return ApiResponse.<BooksRequest>builder().statusCode(201).message("Create books users succes ").data(booksService.save(booksRequest)).build();
     }
 
 
     @PutMapping("update/{id}")
-    public ApiResponse<BooksRequest> update(@RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id) {
+    public ApiResponse<BooksRequest> update(@Valid @RequestBody BooksRequest booksRequest, @PathVariable("id") Integer id) {
         return ApiResponse.<BooksRequest>builder().statusCode(200).message("Update books users succes ").data(booksService.update(booksRequest, id)).build();
     }
 
