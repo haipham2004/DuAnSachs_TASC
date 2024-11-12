@@ -12,6 +12,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -32,8 +33,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationFilter implements GlobalFilter, Ordered, GatewayFilter {
-
-    UsersService usersService;
+    @Lazy UsersService usersService;
 
     String[] publicEndpoints = {
             "/api/auth/public/fetchAccount",
@@ -58,7 +58,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered, GatewayFilte
 
         String token = authHeader.get(0).replace("Bearer ", "");
 
-        Mono<ApiResponse<LoginResponse>> result = usersService.checkToken(token);
+        Mono<ApiResponse<LoginResponse>> result = usersService.validateToken(token);
 
         return result.flatMap(apiResponse -> {
             if (apiResponse != null && apiResponse.getResults().getUsername() != null) {

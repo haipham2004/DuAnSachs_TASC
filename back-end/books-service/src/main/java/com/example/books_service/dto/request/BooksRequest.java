@@ -54,6 +54,6 @@ public class BooksRequest {
     @Size(min = 1, message = "At least one image URL must be provided")
     private List<String> imageUrl;
 
-    @NotBlank(message = "Thumbnail cannot be blank")  
+    @NotBlank(message = "Thumbnail cannot be blank")
     private String thumbnail;
 }

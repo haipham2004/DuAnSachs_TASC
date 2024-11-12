@@ -7,9 +7,11 @@ import lombok.Setter;
 @Setter
 public class ErrorResponse {
 
-    public int status;
-    public String message;
-    public long timestamp;
+    private final int status;
+
+    private final String message;
+
+    private final long timestamp;
 
     public ErrorResponse(int status, String message) {
         this.status = status;
