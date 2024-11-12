@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/back-end.iml" filepath="$PROJECT_DIR$/.idea/back-end.iml" />
       <module fileurl="file://$PROJECT_DIR$/books-service/books-service.iml" filepath="$PROJECT_DIR$/books-service/books-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/eureka-service/eureka-service.iml" filepath="$PROJECT_DIR$/eureka-service/eureka-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/notifications/notifications.iml" filepath="$PROJECT_DIR$/notifications/notifications.iml" />
       <module fileurl="file://$PROJECT_DIR$/orders-service/orders-service.iml" filepath="$PROJECT_DIR$/orders-service/orders-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/spring-cloud-config-service/spring-cloud-config-service.iml" filepath="$PROJECT_DIR$/spring-cloud-config-service/spring-cloud-config-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/users-service/users-service.iml" filepath="$PROJECT_DIR$/users-service/users-service.iml" />
