@@ -21,6 +21,8 @@ import { doGetAccountAction } from "./redux/account/AccountSlice";
 import LayoutAdmin from "./components/admin/LayoutAdmin";
 import AdminPage from "./components/admin/AdminPage";
 import ManageBookPage from "./pages/admin/book";
+import './styles/Reset.scss';
+import './styles/Global.scss';
 
 
 

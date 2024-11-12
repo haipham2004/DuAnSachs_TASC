@@ -7,7 +7,7 @@ import { MinusOutlined, PlusOutlined, HomeOutlined } from '@ant-design/icons';
 import { BsCartPlus } from 'react-icons/bs';
 import BookLoader from './BookLoader';
 import { useDispatch } from 'react-redux';
-// import { doAddBookAction } from '../../redux/order/orderSlice'
+import { doAddBookAction } from '../../redux/order/OrderSlice'
 import { Link, useNavigate } from 'react-router-dom';
 
 const ViewDetail = (props) => {
@@ -51,7 +51,7 @@ const ViewDetail = (props) => {
     }
 
     const handleAddToCart = (quantity, book) => {
-        // dispatch(doAddBookAction({ quantity, detail: book, _id: book._id }))
+        dispatch(doAddBookAction({ quantity, detail: book, bookId: book.bookId }))
     }
 
     const handleBuyNow = (quantity, book) => {
@@ -155,7 +155,7 @@ const ViewDetail = (props) => {
                 setIsOpen={setIsOpenModalGallery}
                 currentIndex={currentIndex}
                 items={images}
-                title={dataBook?.mainText}
+                title={dataBook?.title}
             />
         </div>
     )

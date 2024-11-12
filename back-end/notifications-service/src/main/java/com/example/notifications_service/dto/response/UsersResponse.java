@@ -1,10 +1,6 @@
-package com.example.users_service.dto.response;
+package com.example.notifications_service.dto.response;
 
-import com.example.users_service.entity.EnumRoles;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +29,6 @@ public class UsersResponse {
 
     private String enumRolesName;
 
-    // Constructor chuyển enum thành String
     public UsersResponse(Integer userId, String username, String email, String phone, EnumRoles enumRolesName) {
         this.userId = userId;
         this.username = username;

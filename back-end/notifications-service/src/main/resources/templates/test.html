@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chào Mừng Đến Với Ninh Bình - [Tên Công Ty]</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-image: url('https://your-image-link.com/image.jpg');
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .header h1 {
+            font-size: 36px;
+            margin: 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+        }
+        .header p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .content {
+            padding: 30px;
+            background-color: #fafafa;
+        }
+        .content h2 {
+            font-size: 26px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            text-align: center;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .footer {
+            background-color: #222222;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Header Section with Image -->
+    <div class="header">
+        <h1>Chào Mừng Bạn Đến Với Ninh Bình</h1>
+        <p>Khám Phá Văn Hóa, Thiên Nhiên, và Những Trải Nghiệm Độc Đáo</p>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+        <h2>Chào bạn: <p th:text="${name}"></p></h2>
+        <p>Chúng tôi rất vui mừng được chào đón bạn đến với [Công nghệ TASC Việt Nam]! Hãy chuẩn bị cho một hành trình khám phá Ninh Bình đầy ấn tượng cùng chúng tôi.</p>
+        <p>Ninh Bình không chỉ nổi bật với cảnh đẹp hùng vĩ như Tràng An, Tam Cốc, Bái Đính mà còn mang trong mình những nét văn hóa, ẩm thực đặc sắc mà bạn sẽ khó có thể tìm thấy ở bất kỳ đâu. Đặc biệt, bạn sẽ được trải nghiệm những sản phẩm chất lượng cao từ địa phương, đồng thời nhận nhiều ưu đãi hấp dẫn từ chúng tôi.</p>
+
+        <p>Để bắt đầu, bạn có thể <a href="[Link Đến Trang Web]" class="button">Khám Phá Ngay</a> và tìm hiểu thêm về các dịch vụ và sản phẩm chúng tôi cung cấp.</p>
+
+        <p>Cảm ơn bạn đã lựa chọn [Tên Công Ty]. Chúng tôi hy vọng sẽ đồng hành cùng bạn trong mỗi chuyến đi, mỗi trải nghiệm tuyệt vời tại Ninh Bình.</p>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>© 2024 [Tên Công Ty]. Tất cả quyền lợi thuộc về công ty.</p>
+        <p><a href="[Link Đến Chính Sách Riêng Tư]">Chính Sách Bảo Mật</a> | <a href="[Link Đến Hủy Đăng Ký]">Hủy Đăng Ký</a></p>
+    </div>
+</div>
+</body>
+</html>

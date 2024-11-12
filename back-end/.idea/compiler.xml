@@ -13,7 +13,7 @@
         <module name="spring-cloud-config-service" />
         <module name="users-service" />
         <module name="api-gateway-service" />
-        <module name="notifications" />
+        <module name="notifications-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -21,6 +21,7 @@
       <module name="books-service" target="17" />
       <module name="eureka-service" target="17" />
       <module name="notifications" target="17" />
+      <module name="notifications-service" target="17" />
       <module name="orders-service" target="17" />
       <module name="spring-cloud-config-service" target="17" />
       <module name="users-service" target="17" />
@@ -32,6 +33,7 @@
       <module name="books-service" options="-parameters" />
       <module name="eureka-service" options="-parameters" />
       <module name="notifications" options="-parameters" />
+      <module name="notifications-service" options="-parameters" />
       <module name="orders-service" options="-parameters" />
       <module name="spring-cloud-config-service" options="-parameters" />
       <module name="users-service" options="-parameters" />
