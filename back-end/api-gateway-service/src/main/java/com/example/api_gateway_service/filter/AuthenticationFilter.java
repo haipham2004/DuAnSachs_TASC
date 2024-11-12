@@ -38,7 +38,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered, GatewayFilte
     String[] publicEndpoints = {
             "/api/auth/public/fetchAccount",
             "/api/auth/public/checkToKen",
-            "/api/auth/public/signin"
+            "/api/auth/public/signin",
+            "/testnhe/wellcome",
+            ""
     };
 
     @SneakyThrows

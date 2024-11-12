@@ -18,8 +18,8 @@ const Header = (props) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [showManageAccount, setShowManageAccount] = useState(false);
-
-    console.log("Ho tên header: ",user.username)
+    const carts = useSelector(state => state.order.carts);
+    console.log("Ho tên header: ", user.username)
     const handleLogout = async () => {
         const res = await callLogout();  // Xử lý logout
         if (res && res.statusCode && res.message) {
@@ -53,14 +53,39 @@ const Header = (props) => {
     }
 
     // Content of cart popover
-    const contentPopover = () => (
-        <div className='pop-cart-body'>
-            <div className='pop-cart-content'>
-                {/* Giỏ hàng trống */}
+    const contentPopover = () => {
+        return (
+            <div className='pop-cart-body'>
+                <div className='pop-cart-content'>
+                    {carts?.map((book, index) => {
+                        return (
+                            <div className='book' key={`book-${index}`}>
+                                <img
+                                    // style={{ width: '400px', height: '200px', objectFit: 'cover' }}
+                                    src={`${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${book?.detail?.thumbnail}`}
+                                />
+
+                                <div>{book?.detail?.title}</div>
+                                <div className='price'>
+                                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(book?.detail?.price ?? 0)}
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+                {carts.length > 0 ?
+                    <div className='pop-cart-footer'>
+                        <button onClick={() => navigate('/order')}>Xem giỏ hàng</button>
+                    </div>
+                    :
+                    <Empty
+                        description="Không có sản phẩm trong giỏ hàng"
+                    />
+                }
             </div>
-            <Empty description="Không có sản phẩm trong giỏ hàng" />
-        </div>
-    );
+        )
+    }
+
 
     return (
         <>
@@ -70,7 +95,7 @@ const Header = (props) => {
                         <div className="page-header__toggle" onClick={() => setOpenDrawer(true)}>☰</div>
                         <div className='page-header__logo'>
                             <span className='logo'>
-                                <span onClick={() => navigate('/')}> 
+                                <span onClick={() => navigate('/')}>
                                     <FaReact className='rotate icon-react' />phamngochai3010
                                 </span>
                                 <IoBook className='icon-search' />
@@ -88,32 +113,37 @@ const Header = (props) => {
                     <nav className="page-header__bottom">
                         <ul id="navigation" className="navigation">
                             <li className="navigation__item">
-                                <Popover
+                            <Popover
                                     className="popover-carts"
                                     placement="topRight"
-                                    title="Sản phẩm mới thêm"
+                                    rootClassName="popover-carts"
+                                    title={"Sản phẩm mới thêm"}
                                     content={contentPopover}
-                                    arrow={true}
-                                >
-                                    <Badge size="small" showZero>
+                                    arrow={true}>
+                                    <Badge
+                                        count={carts?.length ?? 0}
+                                        size={"small"}
+                                        showZero
+                                    >
                                         <FiShoppingCart className='icon-cart' />
                                     </Badge>
                                 </Popover>
+
                             </li>
 
                             {/* Divider for mobile */}
                             <li className="navigation__item mobile"><Divider type='vertical' /></li>
 
                             <li className="navigation__item mobile">
-                                {!isAuthenticated ? 
-                                    <span onClick={() => navigate('/login')}>Tài Khoản</span> : 
+                                {!isAuthenticated ?
+                                    <span onClick={() => navigate('/login')}>Tài Khoản</span> :
                                     <Dropdown menu={{ items }} trigger={['click']}>
                                         <Space>
                                             {/* Avatar src={urlAvatar} if you wish to display avatar */}
                                             {user?.username} <DownOutlined />
                                         </Space>
                                     </Dropdown>
-                    
+
                                 }
                             </li>
                         </ul>

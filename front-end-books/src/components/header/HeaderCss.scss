@@ -1,8 +1,6 @@
 .header-container {
-    .page-header {
+  .page-header {
       display: flex;
-      justify-content: start;  // Đảm bảo các phần tử phân bổ đều
-      align-items: center;  // Căn giữa các phần tử theo chiều dọc
       user-select: none;
       -moz-user-select: none;
       -webkit-user-select: none;
@@ -12,153 +10,151 @@
       max-width: 1440px;
       margin: 0 auto;
       line-height: 55px;
-      padding: 0 16px;
-  
+
+
       &__top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;  // Đảm bảo toàn bộ phần header sử dụng chiều rộng
-      }
-  
-      &__bottom {
-        display: flex;
-        align-items: center;
-      }
-  
-      // Biểu tượng hamburger menu hiển thị trên mọi màn hình
-      &__toggle {
-        display: block;
-        font-size: 2em;
-        cursor: pointer;
-        margin-right: 15px;
-        color: #808089;  // Đổi màu cho dễ nhìn
-      }
-  
-      .page-header__logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-  
-      .logo {
-        color: #61dafb;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-  
-        .icon-react {
-          font-size: 30px;
-          position: relative;
-          top: 8px;
-          margin-right: 5px;
-  
-          &.rotate {
-            -webkit-animation: spin 10s linear infinite;
-            -moz-animation: spin 10s linear infinite;
-            animation: spin 10s linear infinite;
-          }
-  
-          @keyframes spin {
-            100% {
-              transform: rotate(360deg);
-            }
-          }
-        }
-  
-        .icon-search {
-          font-size: 20px;
-          color: #808089;
-          position: relative;
-          left: 35px;
-        }
-      }
-  
-      .input-search {
-        height: 35px;  // Tăng chiều cao để dễ gõ
-        outline: none;
-        padding: 5px 30px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        flex: 1;
-        font-size: 14px;  // Tăng kích thước chữ cho dễ đọc
-      }
-    }
-  
-    .navigation {
-      display: flex;
-      align-items: center;  // Căn giữa các mục điều hướng
-      height: 100%;
-      
-      &__item {
-        opacity: 0.8;
-        padding: 0 10px;
-        cursor: pointer;
-  
-        &:hover {
-          opacity: 1;
-        }
-      }
-  
-      .icon-cart {
-        font-size: 20px;
-        color: #61dafb;
-        margin-right: 15px;  // Thêm khoảng cách với phần tử tiếp theo
-      }
-    }
-  
-    // Media query cho màn hình nhỏ hơn 600px
-    @media (max-width: 600px) {
-      .page-header {
-        flex-direction: column;
-        height: auto;
-        padding: 10px;
-  
-        .logo {
-          display: none;  // Ẩn logo trên màn hình nhỏ
-        }
-  
-        .input-search {
-          margin-top: 10px;
-          width: 100%;  // Đảm bảo input chiếm toàn bộ chiều rộng
-        }
-  
-        .page-header__bottom {
           display: flex;
-          justify-content: center;
-          width: 100%;
-          margin-top: 10px;
-        }
-  
-        .navigation {
-          display: block;
-          width: 100%;
-          margin-top: 10px;
-  
-          &__item {
-            width: 100%;  // Mỗi mục navigation chiếm toàn bộ chiều rộng
-            text-align: center;
-            padding: 10px 0;
-          }
-  
-          &__item.mobile {
-            display: none;  // Ẩn các mục không cần thiết trên màn hình nhỏ
-          }
-        }
+          width: 70%;
+          padding: 0 16px;
       }
-  
-      // Hiển thị menu hamburger khi màn hình nhỏ
-      .page-header__toggle {
-        display: block;  // Đảm bảo biểu tượng menu hiển thị trên màn hình nhỏ
-        margin-top: 10px;
+
+      &__bottom {
+          display: flex;
       }
-    }
-  
-    // Media query cho màn hình từ 600px trở lên (desktop)
-    @media (min-width: 600px) {
+
+      &__toggle {
+          display: none;
+      }
+
       .page-header__top {
-        width: 70%;  // Căn chỉnh header ở giữa màn hình trên desktop
+          .page-header__logo {
+              display: flex;
+              width: 100%;
+              align-items: center;
+              gap: 10px;
+          }
       }
-    }
+
+      .logo {
+          color: #61dafb;
+          cursor: pointer;
+          display: block;
+
+          .icon-react {
+              font-size: 30px;
+              position: relative;
+              top: 8px;
+              margin-right: 5px;
+
+
+              &.rotate {
+                  -webkit-animation: spin 10s linear infinite;
+                  -moz-animation: spin 10s linear infinite;
+                  animation: spin 10s linear infinite;
+
+                  @-moz-keyframes spin {
+                      100% {
+                          -moz-transform: rotate(360deg);
+                      }
+                  }
+
+                  @-webkit-keyframes spin {
+                      100% {
+                          -webkit-transform: rotate(360deg);
+                      }
+                  }
+
+                  @keyframes spin {
+                      100% {
+                          -webkit-transform: rotate(360deg);
+                          transform: rotate(360deg);
+                      }
+                  }
+              }
+          }
+
+          .icon-search {
+              position: relative;
+              left: 35px;
+          }
+
+
+      }
+
+      .input-search {
+          height: 25px;
+          outline: none;
+          padding: 5px 30px;
+          border-radius: 6px;
+          border: 1px solid #ddd;
+          flex: 1;
+      }
   }
-  
+
+  .navigation {
+      display: block;
+      opacity: 1;
+      height: auto;
+
+      &__item {
+          opacity: 0.8;
+          display: inline-block;
+          padding: 0 5px;
+
+          &:hover {
+              cursor: pointer;
+              opacity: 1;
+          }
+
+
+      }
+
+      .icon-cart {
+          font-size: 20px;
+          top: 5px;
+          position: relative;
+          color: #61dafb;
+      }
+  }
+
+  @media (max-width: 600px) {
+      .page-header {
+          display: flex;
+
+          .logo {
+              display: none;
+          }
+
+          &__toggle {
+              display: block;
+              font-size: 2em;
+              margin-right: 15px;
+          }
+
+          .page-header__bottom {
+              justify-content: center;
+              flex-grow: 1;
+          }
+      }
+
+      .navigation {
+          display: block;
+          opacity: 1;
+          height: auto;
+
+          &__item {
+              opacity: 0.8;
+              display: inline-block;
+
+              &:hover {
+                  cursor: pointer;
+                  opacity: 1;
+              }
+
+              &.mobile {
+                  display: none;
+              }
+          }
+      }
+  }
+}

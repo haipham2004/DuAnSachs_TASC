@@ -36,7 +36,7 @@ public class UsersController {
 
     @GetMapping("findAllUser")
     public ApiResponse<List<UsersResponse>> findAll() {
-        return ApiResponse.<List<UsersResponse>>builder().results(usersService.findAll()).build();
+        return ApiResponse.<List<UsersResponse>>builder().message("Success fillAll").results(usersService.findAll()).build();
     }
 
     @CrossOrigin
