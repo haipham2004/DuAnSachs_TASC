@@ -33,7 +33,6 @@ public class UsersDto {
 
     @NotBlank(message = "Phone cannot be empty")  // Kiểm tra phone không trống
     @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 digits")
-    // Kiểm tra độ dài của số điện thoại
     private String phone;
 
     //    @JsonIgnore
@@ -44,14 +43,7 @@ public class UsersDto {
 
     private String enumRolesName;
 
-    // Constructor chuyển enum thành String
-    public UsersDto(Integer userId, String username, String email, String phone, EnumRoles enumRolesName) {
-        this.userId = userId;
-        this.username = username;
-        this.email = email;
-        this.phone = phone;
-        this.enumRolesName = enumRolesName != null ? enumRolesName.name() : null;  // Chuyển EnumRoles thành String
-    }
+
 }
 
 

@@ -53,7 +53,7 @@ const LayoutAdmin = () => {
             icon: <UserOutlined />,
             children: [
                 {
-                    label: <Link to='/admin'>USEE</Link>,
+                    label: <Link to='/admin'>USER</Link>,
                     key: 'crud',
                     icon: <TeamOutlined />,
                 },
@@ -139,15 +139,9 @@ const LayoutAdmin = () => {
                     <Content style={{ padding: '15px' }}>
                         <Outlet />
                     </Content>
-                    {/* <Footer style={{ padding: 0 }}>
-                    React Test Fresher &copy; Hỏi Dân IT - Made with <HeartTwoTone />
-                </Footer> */}
+             
                 </Layout>
             </Layout>
-            {/* <ManageAccount
-                isModalOpen={showManageAccount}
-                setIsModalOpen={setShowManageAccount}
-            /> */}
         </>
     );
 };

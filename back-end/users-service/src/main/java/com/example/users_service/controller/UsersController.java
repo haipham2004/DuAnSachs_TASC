@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("users")
 public class UsersController {
 
@@ -34,18 +33,19 @@ public class UsersController {
         this.usersService = usersService;
     }
 
-    @GetMapping("findAllUser")
-    public ApiResponse<List<UsersResponse>> findAll() {
-        return ApiResponse.<List<UsersResponse>>builder().message("Success fillAll").results(usersService.findAll()).build();
-    }
+//    @GetMapping("findAll")
+//    public ApiResponse<List<UsersResponse>> findAll() {
+//        return ApiResponse.<List<UsersResponse>>builder().message("Success fillAll").results(usersService.findAll()).build();
+//    }
 
-    @CrossOrigin
-    @GetMapping("findAllUserWithPage")
-    public ApiResponse<Page<UsersResponse>> findAllUserWithPage(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.<Page<UsersResponse>>builder().results(usersService.findAllUserDtoWithPage(pageable)).build();
+    @GetMapping("findAll")
+    public ApiResponse<Page<UsersResponse>> findAllUserDtoWithPageSearch( @RequestParam(defaultValue = "1") int pageNumber,
+                                                                          @RequestParam(defaultValue = "5") int pageSize,
+                                                                          @RequestParam(name="fullName", defaultValue = "") String fullName,
+                                                                          @RequestParam(name="email", defaultValue = "") String email,
+                                                                          @RequestParam(name="phone", defaultValue = "") String phone){
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return ApiResponse.<Page<UsersResponse>>builder().results(usersService.findAllUserDtoWithPageSearch(pageable,fullName,email,phone)).build();
     }
 
     @PostMapping("save")
@@ -66,8 +66,5 @@ public class UsersController {
         return ApiResponse.<Void>builder().message("Deltee success: " + id).build();
     }
 
-    @GetMapping("huhu")
-    public String getChao(){
-        return "ahhuhu";
-    }
+
 }

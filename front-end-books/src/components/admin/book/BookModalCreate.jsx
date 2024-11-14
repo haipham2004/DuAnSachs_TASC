@@ -69,21 +69,22 @@ const BookModalCreate = (props) => {
         console.log("dataThumbnail",dataThumbnail)
         console.log("dataSlider",dataSlider)
         
-        // if (dataThumbnail.length === 0) {
-        //     notification.error({
-        //         message: 'Lỗi validate',
-        //         description: 'Vui lòng upload ảnh thumbnail'
-        //     });
-        //     return;
-        // }
+        if (dataThumbnail.length === 0) {
+            notification.error({
+                message: 'Status:400- BAD REQUEST',
+              message: 'BAD REQUEST',
+              description: 'Vui lòng upload ảnh thumbnail',
+            });
+            return;
+          }
 
-        // if (dataSlider.length === 0) {
-        //     notification.error({
-        //         message: 'Lỗi validate',
-        //         description: 'Vui lòng upload ảnh slider'
-        //     });
-        //     return;
-        // }
+        if (dataSlider.length === 0) {
+            notification.error({
+                message: 'Status:400- BAD REQUEST',
+                description: 'Vui lòng upload ảnh thumbnail',
+            });
+            return;
+        }
 
         const { title, authorId, publisherId, categoryId, price, consPrice, description, quantity} = values;
         const thumbnail = dataThumbnail[0].name;
@@ -103,7 +104,7 @@ const BookModalCreate = (props) => {
                 const { messageValidation } = res;
                 Object.keys(messageValidation).forEach((field) => {
                     notification.error({
-                        message: `Lỗi ở trường ${field}`,
+                        message: res.status + ' Please check again' + field,
                         description: messageValidation[field],
                         duration: 5,
                     });
@@ -111,8 +112,8 @@ const BookModalCreate = (props) => {
             }
             if (res.message) {
                 notification.error({
-                    message: "Có lỗi xảy ra",
-                    description: res.message,  // Thông báo lỗi tổng quát từ API
+                    message: "An error occurred",
+                    description:  res.message,  // Thông báo lỗi tổng quát từ API
                     duration: 5,
                 });
             }

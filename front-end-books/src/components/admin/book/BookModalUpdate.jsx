@@ -97,7 +97,6 @@ const BookModalUpdate = (props) => {
                 bookId: dataUpdate.bookId,
                 title: dataUpdate.title,
                 authorId :dataUpdate.authorId,
-                // nameAuthor: dataUpdate.nameAuthor,
                 namePublisher: dataUpdate.namePublisher,
                 nameCategory: dataUpdate.nameCategory,
                 consPrice: dataUpdate.consPrice,
@@ -107,9 +106,6 @@ const BookModalUpdate = (props) => {
                 thumbnail: { fileList: arrThumbnail },
                 imageUrl: { fileList: arrSlider }
             }
-            console.log("init", init.authorId);
-            console.log("init", init.namePublisher);
-
             setInitForm(init);
             setDataThumbnail(arrThumbnail);
             setDataSlider(arrSlider);
@@ -122,21 +118,21 @@ const BookModalUpdate = (props) => {
 
 
     const onFinish = async (values) => {
-        // if (dataThumbnail.length === 0) {
-        //     notification.error({
-        //         message: 'Lỗi validate',
-        //         description: 'Vui lòng upload ảnh thumbnail'
-        //     })
-        //     return;
-        // }
+        if (dataThumbnail.length === 0) {
+            notification.error({
+                message: 'Lỗi validate',
+                description: 'Vui lòng upload ảnh thumbnail'
+            })
+            return;
+        }
 
-        // if (dataSlider.length === 0) {
-        //     notification.error({
-        //         message: 'Lỗi validate',
-        //         description: 'Vui lòng upload ảnh slider'
-        //     })
-        //     return;
-        // }
+        if (dataSlider.length === 0) {
+            notification.error({
+                message: 'Lỗi validate',
+                description: 'Vui lòng upload ảnh slider'
+            })
+            return;
+        }
 
 
         const { bookId, title, authorId, publisherId, categoryId, price, consPrice, description, quantity } = values;
@@ -154,10 +150,23 @@ const BookModalUpdate = (props) => {
             setOpenModalUpdate(false);
             await props.fetchBook()
         } else {
-            notification.error({
-                message: 'Đã có lỗi xảy ra',
-                description: res.message
-            })
+            if (res.messageValidation) {
+                const { messageValidation } = res;
+                Object.keys(messageValidation).forEach((field) => {
+                    notification.error({
+                        message: res.status + ' Please check again' + field,
+                        description: messageValidation[field],
+                        duration: 5,
+                    });
+                });
+            }
+            if (res.message) {
+                notification.error({
+                    message: "An error occurred",
+                    description:  res.message,  // Thông báo lỗi tổng quát từ API
+                    duration: 5,
+                });
+            }
         }
         setIsSubmit(false)
     };
@@ -226,13 +235,8 @@ const BookModalUpdate = (props) => {
 
 
     const handleUploadFileSlider = async ({ file, onSuccess, onError }) => {
-        console.log("API slider");
-
         // Gọi API và nhận phản hồi
         const res = await callUploadBookImg(file);
-
-        console.log("API slider response", res);  // In ra phản hồi từ API
-
         // Kiểm tra xem có phản hồi và fileName không
         if (res && res.data && res.data.length > 0) {
             // Lấy fileName từ phản hồi và cập nhật state

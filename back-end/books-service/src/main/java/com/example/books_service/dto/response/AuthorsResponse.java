@@ -14,4 +14,6 @@ public class AuthorsResponse {
     private Integer id;
 
     private String name;
+
+    private Boolean deletedAt;
 }

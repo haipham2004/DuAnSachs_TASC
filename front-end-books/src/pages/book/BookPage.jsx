@@ -43,8 +43,8 @@ const BookPage = () => {
             raw.imageUrl?.map(item => {
                 images.push(
                     {
-                        original: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
-                        thumbnail: `${import.meta.env.VITE_BACKEND_URL}/images/book/${item}`,
+                        original: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${item}`,
+                        thumbnail: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${item}`,
                         originalClass: "original-image",
                         thumbnailClass: "thumbnail-image"
                     },

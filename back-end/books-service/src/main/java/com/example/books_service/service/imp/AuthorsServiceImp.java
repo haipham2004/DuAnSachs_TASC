@@ -1,5 +1,6 @@
 package com.example.books_service.service.imp;
 
+import com.example.books_service.dto.request.AuthorsRequest;
 import com.example.books_service.dto.response.AuthorsResponse;
 import com.example.books_service.repository.AuthorsServiceRepository;
 import com.example.books_service.service.AuthorsService;
@@ -21,5 +22,20 @@ public class AuthorsServiceImp implements AuthorsService {
     @Override
     public List<AuthorsResponse> findAllAuthorsDto() {
         return authorsServiceRepository.findAllAuthorsDto();
+    }
+
+    @Override
+    public AuthorsRequest save(AuthorsRequest authorsRequest) {
+        return authorsServiceRepository.save(authorsRequest);
+    }
+
+    @Override
+    public AuthorsRequest update(Integer id, AuthorsRequest authorsRequest) {
+        return authorsServiceRepository.update(id, authorsRequest);
+    }
+
+    @Override
+    public void delete(Integer id) {
+
     }
 }

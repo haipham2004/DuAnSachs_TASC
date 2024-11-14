@@ -10,6 +10,7 @@ import BookViewDetail from './BookViewDetail';
 import BookModalUpdate from './BookModalUpdate';
 import * as XLSX from 'xlsx';
 import BookModalCreate from './BookModalCreate';
+import AuthorCreate from './AuthorCreate';
 
 const BookTable = () => {
     const [listBook, setListBook] = useState([]);
@@ -28,6 +29,7 @@ const BookTable = () => {
     const [openModalUpdate, setOpenModalUpdate] = useState(false);
     const [dataUpdate, setDataUpdate] = useState(null);
 
+    const [openModalCreateAuthor, setOpenModalCreateAuthor] = useState(false);
     useEffect(() => {
         fetchBook();
     }, [current, pageSize, filter]);
@@ -38,7 +40,7 @@ const BookTable = () => {
         if (filter) {
             query += `&${filter}`;
         }
-        
+
 
         const res = await callFetchListBook(query);
         if (res && res.data) {
@@ -56,7 +58,7 @@ const BookTable = () => {
                 return (
                     <a href='#' onClick={() => {
                         setDataViewDetail(record);
-                        console.log("record của tui",record)
+                        console.log("record của tui", record)
                         setOpenViewDetail(true);
                     }}>{record.bookId}</a>
                 )
@@ -92,24 +94,12 @@ const BookTable = () => {
             title: 'Giá tiền',
             dataIndex: 'price',
             sorter: true,
-            // https://stackoverflow.com/questions/37985642/vnd-currency-formatting
             render: (text, record, index) => {
                 return (
                     <>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price)}</>
                 )
             }
         },
-        // {
-        //     title: 'Ngày cập nhật',
-        //     dataIndex: 'updatedAt',
-        //     sorter: true,
-        //     render: (text, record, index) => {
-        //         return (
-        //             <>{moment(record.updatedAt).format(FORMAT_DATE_DISPLAY)}</>
-        //         )
-        //     }
-
-        // },
         {
             title: 'Action',
             width: 100,
@@ -148,7 +138,7 @@ const BookTable = () => {
                                     publisherId: record.publisherId, // Thêm publisherId
                                     categoryId: record.categoryId // Thêm categoryId
                                 });
-                              console.log("Dữ liệu data: ",dataUpdate)                                
+                                console.log("Dữ liệu data: ", dataUpdate)
                             }}
                         />
                     </>
@@ -171,10 +161,10 @@ const BookTable = () => {
             setSortQuery(q);
         }
     };
-    
+
     const handleSwitchChange = async (checked, id) => {
         const deleteFlag = checked ? false : true;  // Nếu checked = true, thì sách chưa bị xóa (deleted = false), ngược lại (checked = false) thì xóa mềm (deleted = true)
-        
+
         try {
             const res = await callDeleteBook(id, deleteFlag); // Gọi API để cập nhật trạng thái deleted của sách
             if (res && res.statusCode) {
@@ -194,7 +184,7 @@ const BookTable = () => {
             });
         }
     };
-    
+
 
 
 
@@ -215,6 +205,14 @@ const BookTable = () => {
                         type="primary"
                         onClick={() => setOpenModalCreate(true)}
                     >Thêm mới</Button>
+
+                    <Button
+                        icon={<PlusOutlined />}
+                        type="primary"
+                        onClick={() => setOpenModalCreateAuthor(true)}
+                    >Thêm tác giả</Button>
+
+                    
                     <Button type='ghost' onClick={() => {
                         setFilter("");
                         setSortQuery("")
@@ -313,7 +311,15 @@ const BookTable = () => {
                 dataUpdate={dataUpdate}
                 setDataUpdate={setDataUpdate}
                 fetchBook={fetchBook}
-            /> }
+            />}
+
+
+
+            {<AuthorCreate
+                openModalCreateAuthor={openModalCreateAuthor}
+                setOpenModalCreateAuthor={setOpenModalCreateAuthor}
+            // fetchBook={fetchBook}
+            />}
 
         </>
     )

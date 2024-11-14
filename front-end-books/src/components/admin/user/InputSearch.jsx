@@ -16,14 +16,14 @@ const InputSearch = (props) => {
         let query = "";
 
         if (values.fullName) {
-            query += `&fullName=/${values.fullName}/i`
+            query += `&fullName=${values.fullName}`
         }
         if (values.email) {
-            query += `&email=/${values.email}/i`
+            query += `&email=${values.email}`
         }
 
         if (values.phone) {
-            query += `&phone=/${values.phone}/i`
+            query += `&phone=${values.phone}`
         }
 
         if (query) {
@@ -38,7 +38,7 @@ const InputSearch = (props) => {
                 <Col span={8}>
                     <Form.Item
                         labelCol={{ span: 24 }}
-                        name={`username`}
+                        name={`fullName`}
                         label={`Name`}
                     >
                         <Input />

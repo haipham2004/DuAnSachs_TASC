@@ -9,7 +9,8 @@ import BookLoader from './BookLoader';
 import { useDispatch } from 'react-redux';
 import { doAddBookAction } from '../../redux/order/OrderSlice'
 import { Link, useNavigate } from 'react-router-dom';
-
+import { useSelector } from 'react-redux';  // Để lấy trạng thái login từ Redux
+import { notification } from 'antd';
 const ViewDetail = (props) => {
     const { dataBook } = props;
     const [isOpenModalGallery, setIsOpenModalGallery] = useState(false);
@@ -18,7 +19,7 @@ const ViewDetail = (props) => {
     const [currentQuantity, setCurrentQuantity] = useState(1);
     const refGallery = useRef(null);
     const images = dataBook?.items ?? [];
-
+    const isAuthenticated = useSelector(state => state.account.isAuthenticated);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -51,12 +52,33 @@ const ViewDetail = (props) => {
     }
 
     const handleAddToCart = (quantity, book) => {
+        if (!isAuthenticated) {
+            // Nếu chưa đăng nhập, hiển thị thông báo yêu cầu đăng nhập
+            notification.info({
+                message: 'Bạn cần đăng nhập',
+                description: 'Để thực hiện hành động này, bạn cần đăng nhập vào hệ thống.',
+                placement: 'topRight',  // Vị trí hiển thị thông báo
+                duration: 3,  // Thời gian hiển thị thông báo (tính bằng giây)
+                btn: (
+                    <button
+                        onClick={() => {
+                            // Nếu người dùng nhấn vào nút này, chuyển hướng tới trang đăng nhập
+                            navigate('/login');
+                        }}
+                    >
+                        Đăng nhập
+                    </button>
+                ),
+            });
+            return;  // Dừng lại không thực hiện hành động thêm vào giỏ hàng
+        }
+
         dispatch(doAddBookAction({ quantity, detail: book, bookId: book.bookId }))
     }
 
     const handleBuyNow = (quantity, book) => {
-        // dispatch(doAddBookAction({ quantity, detail: book, _id: book._id }))
-        // navigate('/order');
+        dispatch(doAddBookAction({  quantity, detail: book, bookId: book.bookId }))
+        navigate('/order');
     }
     return (
         <div style={{ background: '#efefef', padding: "20px 0" }}>
@@ -132,7 +154,7 @@ const ViewDetail = (props) => {
                                             <button onClick={() => handleChangeButton('PLUS')}><PlusOutlined /></button>
                                         </span>
                                     </div>
-                                    <div className='buy'>
+                                    {/* <div className='buy'>
                                         <button className='cart' onClick={() => handleAddToCart(currentQuantity, dataBook)}>
                                             <BsCartPlus className='icon-cart' />
                                             <span>Thêm vào giỏ hàng</span>
@@ -141,6 +163,19 @@ const ViewDetail = (props) => {
                                             className='now'
                                             onClick={() => handleBuyNow(currentQuantity, dataBook)}
                                         >Mua ngay</button>
+                                    </div> */}
+
+                                    <div className="buy">
+                                        <button className="cart" onClick={() => handleAddToCart(currentQuantity, dataBook)}>
+                                            <BsCartPlus className="icon-cart" />
+                                            <span>Thêm vào giỏ hàng</span>
+                                        </button>
+                                        <button
+                                            className="now"
+                                            onClick={() => handleBuyNow(currentQuantity, dataBook)}
+                                        >
+                                            Mua ngay
+                                        </button>
                                     </div>
                                 </Col>
                             </Col>

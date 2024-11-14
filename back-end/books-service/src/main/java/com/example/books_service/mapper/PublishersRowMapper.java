@@ -12,6 +12,9 @@ public class PublishersRowMapper implements RowMapper<PublishersResponse> {
         PublishersResponse publishersResponse=new PublishersResponse();
         publishersResponse.setId(rs.getInt("publisher_id"));
         publishersResponse.setName(rs.getString("name_publishers"));
+        publishersResponse.setAddress(rs.getString("address"));
+        publishersResponse.setPhone(rs.getString("phone"));
+        publishersResponse.setName(rs.getString("email"));
         return publishersResponse;
     }
 }

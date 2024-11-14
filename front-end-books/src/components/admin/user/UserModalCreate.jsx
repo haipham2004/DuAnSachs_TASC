@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Select, Divider, Form, Input, message, Modal, notification } from 'antd';
-import { callCreateAUser } from '../../../services/Api';
+import { callCreateUser } from '../../../services/Api';
 
 const UserModalCreate = (props) => {
     const { openModalCreate, setOpenModalCreate } = props;
@@ -8,9 +8,10 @@ const UserModalCreate = (props) => {
     const [form] = Form.useForm();
 
     const onFinish = async (values) => {
-        const { username, password, email, phone, idRoles } = values;
+        const { username, password, email, phone, fullName, addRess, idRoles } = values;
         setIsSubmit(true);
-        const res = await callCreateAUser(username, password, email, phone, idRoles);
+        const res = await callCreateUser(username, password, email, phone, fullName, addRess, idRoles);
+        console.log("API posst",res)
         setIsSubmit(false);
         if (res && res.results) {
             message.success('Tạo mới user thành công');
@@ -91,6 +92,26 @@ const UserModalCreate = (props) => {
                 >
                     <Input />
                 </Form.Item>
+
+                <Form.Item
+                    labelCol={{ span: 24 }} //whole column
+                    label="FullName"
+                    name="fullName"
+                    rules={[{ required: true, message: 'Họ tên không được để trống!' }]}
+                >
+                    <Input />
+                </Form.Item>
+
+
+                <Form.Item
+                    labelCol={{ span: 24 }} //whole column
+                    label="Địa chỉ"
+                    name="addRess"
+                    rules={[{ required: true, message: 'Địa chỉ không được để trống!' }]}
+                >
+                    <Input />
+                </Form.Item>
+
                 <Form.Item label="ROLE" name="idRoles" labelCol={{ span: 24 }} rules={[{ required: true, message: 'Vui lòng chọn role!' }]}>
                     <Select>
                         <Select.Option value={1}>Role Admin</Select.Option>

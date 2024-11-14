@@ -27,6 +27,7 @@ export const accountSlice = createSlice({
         },
         doLogoutAction: (state) => {
             localStorage.removeItem('access_token');
+            localStorage.removeItem('persist:root');
             state.isAuthenticated = false;
             state.user = initialState.user; // Reset to initial user state
         },

@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private UsersRepository usersRepository;
-    private RolesRepository rolesRepository; // Thêm repository để lấy vai trò
+    private RolesRepository rolesRepository;
 
     @Autowired
     public UserDetailsServiceImpl(UsersRepository usersRepository, RolesRepository rolesRepository) {
         this.usersRepository = usersRepository;
-        this.rolesRepository = rolesRepository; // Khởi tạo repository vai trò
+        this.rolesRepository = rolesRepository;
     }
 
     @Override

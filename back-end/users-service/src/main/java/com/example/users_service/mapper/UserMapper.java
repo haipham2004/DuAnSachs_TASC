@@ -1,6 +1,5 @@
 package com.example.users_service.mapper;
 
-import com.example.users_service.dto.UsersDto;
 import com.example.users_service.dto.request.UsersRequest;
 import com.example.users_service.dto.response.UsersResponse;
 import com.example.users_service.entity.Users;

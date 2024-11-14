@@ -13,27 +13,55 @@ const UserTable = () => {
     const [pageSize, setPageSize] = useState(5);
     const [total, setTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
-
+    const [filter, setFilter] = useState("");
     const [openModalCreate, setOpenModalCreate] = useState(false);
     const [openViewDetail, setOpenViewDetail] = useState(false);
     const [dataViewDetail, setDataViewDetail] = useState(null);
     const [openModalUpdate, setOpenModalUpdate] = useState(false);
     const [dataUpdate, setDataUpdate] = useState(null);
 
+    // useEffect(() => {
+    //     fetchUser();
+    // }, [current, pageSize]);
+
+    // const fetchUser = async () => {
+    //     setIsLoading(true);
+    //         const res = await callFetchListUser(current, pageSize);
+    //         if (res && res.results) {
+    //             setListUser(res.results.content); 
+    //             setTotal(res.results.totalElements); 
+    //         }
+
+    //     setIsLoading(false);
+    // };
+
+
+    // useEffect(() => {
+    //     fetchUser();
+    // }, [current, pageSize, filter, sortQuery]);
+
     useEffect(() => {
         fetchUser();
-    }, [current, pageSize]);
+    }, [current, pageSize, filter]);
+
 
     const fetchUser = async () => {
-        setIsLoading(true);
-            const res = await callFetchListUser(current, pageSize);
-            if (res && res.results) {
-                setListUser(res.results.content); 
-                setTotal(res.results.totalElements); 
-            }
-        
-        setIsLoading(false);
-    };
+        setIsLoading(true)
+        let query = `pageNumber=${current-1}&pageSize=${pageSize}`;
+        if (filter) {
+            query += `&${filter}`;
+        }
+        console.log("API query",query)
+        const res = await callFetchListUser(query);
+        console.log("current: ",current)
+        console.log("APi rest: ",res)
+        if (res && res.results) {
+            setListUser(res.results.content);
+            setTotal(res.results.totalElements);
+        }
+        setIsLoading(false)
+    }
+
 
     const columns = [
         {
@@ -91,28 +119,27 @@ const UserTable = () => {
     ];
 
 
-    const onChange = (pagination, filters, sorter) => {
+    const onChange = (pagination) => {
         console.log("Pagination changed: ", pagination);
         if (pagination.current !== current) {
             setCurrent(pagination.current);
         }
         if (pagination.pageSize !== pageSize) {
             setPageSize(pagination.pageSize);
-            setCurrent(1); 
+            setCurrent(1);
         }
 
-        if (sorter.field) {
-            const q = sorter.order === 'ascend' ? `sort=${sorter.field}` : `sort=-${sorter.field}`;
-        }
+        // if (sorter.field) {
+        //     const q = sorter.order === 'ascend' ? `sort=${sorter.field}` : `sort=-${sorter.field}`;
+        // }
 
-        fetchUser();
     };
 
     const handleDeleteUser = async (userId) => {
         const res = await callDeleteUser(userId);
         if (res && res.message) {
             message.success('Xóa user thành công');
-            fetchUser();  
+            fetchUser();
         } else {
             notification.error({
                 message: 'Có lỗi xảy ra',
@@ -133,7 +160,7 @@ const UserTable = () => {
                     Thêm mới
                 </Button>
                 <Button type='ghost' onClick={() => {
-       
+
                     setFilter("");
                 }}>
                     <ReloadOutlined />
@@ -142,13 +169,18 @@ const UserTable = () => {
         </div>
     );
 
+    const handleSearch = (query) => {
+        setFilter(query);
+    }
+
+
     return (
         <>
             <Row gutter={[20, 20]}>
-            <Col span={24}>
+                <Col span={24}>
                     <InputSearch
-                        // handleSearch={handleSearch}
-                        // setFilter={setFilter}
+                        handleSearch={handleSearch}
+                        setFilter={setFilter}
                     />
                 </Col>
 

@@ -154,7 +154,9 @@ public class AuthServiceImpl implements AuthService {
                 signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 signUpRequest.getPhone(),
-                passwordEncoder.encode(signUpRequest.getPassword())
+                passwordEncoder.encode(signUpRequest.getPassword()),
+                signUpRequest.getFullName(),
+                signUpRequest.getAddRess()
         );
 
         Set<String> strRoles = signUpRequest.getRole();
@@ -174,6 +176,7 @@ public class AuthServiceImpl implements AuthService {
             }
         }
         user.setIdRoles(role.getRoleId());
+        user.setDeletedAt(false);
         usersRepository.save(user);
     }
 

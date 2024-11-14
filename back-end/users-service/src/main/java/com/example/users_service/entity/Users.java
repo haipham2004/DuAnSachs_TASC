@@ -42,6 +42,12 @@ public class Users  {
     @Column(name="password",nullable = false, length = 120)
     private String password;
 
+    @Column(name="fullname",nullable = true, length = 120)
+    private String fullName;
+
+    @Column(name="address",nullable = true, length = 120)
+    private String addRess;
+
     @Column(name = "role_id", nullable = false)
     private Integer idRoles;
 
@@ -56,21 +62,13 @@ public class Users  {
     @Column(name = "deleted_at", columnDefinition = "BIT(0) DEFAULT 0")
     private boolean deletedAt = true;
 
-    public Users(String username, String email, String phone, String password) {
+    public Users(String username, String email, String phone, String password, String fullName, String addRess) {
         this.username = username;
         this.email = email;
         this.phone = phone;
         this.password = password;
+        this.fullName=fullName;
+        this.addRess=addRess;
     }
 
 }
-//    @Column(name="role_id")
-//    private Integer idRoles;
-
-//    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE})
-//    @JoinColumn(name = "role_id", referencedColumnName = "role_id")
-//    @JsonBackReference
-//    @ToString.Exclude
-//    private Roles roles;
-
-// Sử dụng idRoles thay vì mối quan hệ ManyToOne
