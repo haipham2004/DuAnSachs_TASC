@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 import { doLogoutAction } from '../../redux/account/AccountSlice';
 import { Link } from 'react-router-dom';
 import './HeaderCss.scss';
+import { callLogout } from '../../services/Api';
 
 const Header = (props) => {
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -19,15 +20,16 @@ const Header = (props) => {
     const dispatch = useDispatch();
     const [showManageAccount, setShowManageAccount] = useState(false);
     const carts = useSelector(state => state.order.carts);
-    console.log("Ho tên header: ", user.username)
+
+
     const handleLogout = async () => {
-        const res = await callLogout();  // Xử lý logout
-        if (res && res.statusCode && res.message) {
+        const res = await callLogout();
+        if (res.message) {
             dispatch(doLogoutAction());
             message.success('Đăng xuất thành công');
-            navigate('/');
+            navigate('/')
         }
-    };
+    }
 
     // Menu items for authenticated user
     const items = [
@@ -45,7 +47,7 @@ const Header = (props) => {
         },
     ];
 
-    if (user?.role === 'ADMIN') {
+    if (user?.roles === 'ROLE_ADMIN') {
         items.unshift({
             label: <Link to='/admin'>Trang quản trị</Link>,
             key: 'admin',
@@ -136,10 +138,10 @@ const Header = (props) => {
 
                             <li className="navigation__item mobile">
                                 {!isAuthenticated ?
+                                   
                                     <span onClick={() => navigate('/login')}>Tài Khoản</span> :
                                     <Dropdown menu={{ items }} trigger={['click']}>
                                         <Space>
-                                            {/* Avatar src={urlAvatar} if you wish to display avatar */}
                                             {user?.username} <DownOutlined />
                                         </Space>
                                     </Dropdown>

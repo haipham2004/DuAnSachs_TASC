@@ -21,9 +21,10 @@ const UserViewDetail = (props) => {
                 >
                     <Descriptions.Item label="Id">{dataViewDetail?.userId}</Descriptions.Item>
                     <Descriptions.Item label="Tên hiển thị">{dataViewDetail?.username}</Descriptions.Item>
+                    <Descriptions.Item label="Họ và tên">{dataViewDetail?.fullName}</Descriptions.Item>
                     <Descriptions.Item label="Email">{dataViewDetail?.email}</Descriptions.Item>
                     <Descriptions.Item label="Số điện thoại">{dataViewDetail?.phone}</Descriptions.Item>
-
+                    <Descriptions.Item label="Địa chỉ">{dataViewDetail?.addRess}</Descriptions.Item>
                     <Descriptions.Item label="Role" span={2}>
                         <Badge status="processing" text={dataViewDetail?.enumRolesName} />
                     </Descriptions.Item>

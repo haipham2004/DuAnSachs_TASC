@@ -46,29 +46,10 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public List<UsersResponse> findAllUserDto() {
-        return usersRepository.findAllUserDto();
+    public Page<UsersResponse> findAllUserDtoWithPageSearch(Pageable pageable, String fullName, String email, String phone) {
+        return usersRepository.findAllUserDtoWithPageSearch(pageable,fullName,email,phone);
     }
 
-    @Override
-    public Page<UsersResponse> findAllUserDtoWithPage(Pageable pageable) {
-        return usersRepository.findAllUserDtoWithPage(pageable);
-    }
-
-
-
-//    @Override
-//    public Page<UsersResponse> findAllUserDtoWithPage(Specification<Users> specification, Pageable pageable) {
-//
-//        Page<Users> usersPage = usersRepository.findAll(specification, pageable);
-//
-//
-
-//        List<UsersResponse> usersResponses = usersPage.getContent().stream()
-//                .map(user ->userMapper.mapToUsersResponse(user))
-//                .collect(Collectors.toList());
-//        return new PageImpl<>(usersResponses, pageable, usersPage.getTotalElements());
-//    }
 
     @Override
     public UsersResponse getUserById(Integer id) {
@@ -139,6 +120,8 @@ public class UsersServiceImpl implements UsersService {
         existsUsers.setEmail(usersRequest.getEmail());
         existsUsers.setPhone(usersRequest.getPhone());
         existsUsers.setIdRoles(usersRequest.getIdRoles());
+        existsUsers.setFullName(usersRequest.getFullName());
+        existsUsers.setAddRess(usersRequest.getAddRess());
         existsUsers.setDeletedAt(false);  // Đảm bảo người dùng không bị xóa
 
         // Lưu người dùng cập nhật vào DB

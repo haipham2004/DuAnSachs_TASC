@@ -23,6 +23,8 @@ import AdminPage from "./components/admin/AdminPage";
 import ManageBookPage from "./pages/admin/book";
 import './styles/Reset.scss';
 import './styles/Global.scss';
+import AdminOrderPage from "./pages/admin/order/ManageOrderPage";
+import OrderPage from "./pages/order/OrderPage";
 
 
 
@@ -53,11 +55,10 @@ export default function App() {
       return;
 
     const res = await callFetchAccount();
-    console.log("Data ", res)
     if (res && res.results) {
 
       dispatch(doGetAccountAction({
-        username: res.username,
+        username: res.results.username,
         roles: res.results.roles,
         email: res.results.email,
         phone: res.results.phone
@@ -95,6 +96,12 @@ export default function App() {
           path: "book/:slug",
           element: <BookPage />,
         },
+        {
+          path: "order",
+          element:  <OrderPage />,
+           
+        }
+
       ],
     },
 
@@ -131,10 +138,10 @@ export default function App() {
         {
           path: "order",
           element: (
-            // <ProtectedRoute>
-            //   <AdminOrderPage />
-            // </ProtectedRoute>
-            <p>order</p>
+            <ProtectedRoute>
+              <AdminOrderPage />
+            </ProtectedRoute>
+          
           ),
         },
       ],
@@ -146,7 +153,9 @@ export default function App() {
       {isLoading === false ||
         window.location.pathname === "/login" ||
         window.location.pathname === "/register" ||
-        window.location.pathname === "/" ? (
+        window.location.pathname === "/" ||
+        window.location.pathname.startsWith('/book')
+        ? (
         <RouterProvider router={router} />
       ) : (
         <Loading />

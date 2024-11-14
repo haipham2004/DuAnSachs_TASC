@@ -7,7 +7,7 @@ import { callFetchCategory, callFetchListBook } from '../../services/Api';
 import './Home.scss';
 import MobileFilter from './Filter';
 const Home = () => {
-    // const [searchTerm, setSearchTerm] = useOutletContext()
+
 
     const [listCategory, setListCategory] = useState([]);
 
@@ -57,10 +57,7 @@ const Home = () => {
             query += `&${sortQuery}`;
         }
 
-        console.log("API Query:", query);  // In ra query để kiểm tra xem API có đúng tham số không
-
         const res = await callFetchListBook(query);  // Gọi API với tham số phân trang và bộ lọc
-        console.log("API Response:", res);  // Kiểm tra phản hồi của API
 
         if (res && res.data) {
             setListBook(res.data.content);  // Cập nhật danh sách sách
@@ -79,23 +76,10 @@ const Home = () => {
     };
 
 
-    // const handleOnchangePage = (pagination) => {
-    //     if (pagination && pagination.current !== current) {
-    //         setCurrent(pagination.current)
-    //     }
-    //     if (pagination && pagination.pageSize !== pageSize) {
-    //         setPageSize(pagination.pageSize)
-    //         setCurrent(1);
-    //     }
-
-    // }
-
     const handleOnchangePage = (pagination) => {
-        console.log("check call page")
         if (pagination && pagination.current !== current) {
             setCurrent(pagination.current)
         }
-        console.log("vị trí: ", current)
         if (pagination && pagination.pageSize !== pageSize) {
             setPageSize(pagination.pageSize)
             setCurrent(1);

@@ -11,9 +11,7 @@ public interface UsersService {
 
     List<UsersResponse> findAll();
 
-    List<UsersResponse> findAllUserDto();
-
-    Page<UsersResponse> findAllUserDtoWithPage(Pageable pageable);
+    Page<UsersResponse> findAllUserDtoWithPageSearch(Pageable pageable, String fullName, String email, String phone);
 
 //    Page<UsersResponse> findAllUserDtoWithPage(Specification<Users> specification, Pageable pageable);
 

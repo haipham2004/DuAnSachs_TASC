@@ -24,7 +24,7 @@ const LoginPage = () => {
   setIsSubmit(true)
   const res= await callLogin(username, password);
   setIsSubmit(false)
-
+ console.log("login ",res)
 
   if(res && res.username){
     localStorage.setItem('access_token', res.jwtToken);

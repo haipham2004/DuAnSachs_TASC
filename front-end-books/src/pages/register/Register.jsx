@@ -9,21 +9,33 @@ const RegisterPage = () => {
   const [isSubmit, setIsSubmit] = useState(false);
 
   const onFinish = async (values) => {
-    const { username, email, phone, password, role } = values;
+    
+    const { username, email, phone, password, fullName, addRess,role } = values;
     setIsSubmit(true);
-    const res = await callRegister(username, email, phone, password, [role]);
+    const res = await callRegister(username, email, phone, password, fullName, addRess, [role]);
     setIsSubmit(false);
     if (res && res.message && res.statusCode) {
       message.success('Đăng ký tài khoản thành công!');
       navigate('/login')
     } else {
-      notification.error({
-        message: "Có lỗi xảy ra",
-        description:
-          res.message && Array.isArray(res.message) ? res.message[0] : res.message,
-        duration: 5
-      })
-    }
+      if (res.messageValidation) {
+          const { messageValidation } = res;
+          Object.keys(messageValidation).forEach((field) => {
+              notification.error({
+                  message: res.status + ' Please check again' + field,
+                  description: messageValidation[field],
+                  duration: 5,
+              });
+          });
+      }
+      if (res.message) {
+          notification.error({
+              message: "An error occurred",
+              description:  res.message,  // Thông báo lỗi tổng quát từ API
+              duration: 5,
+          });
+      }
+  }
   };
 
 
@@ -44,7 +56,7 @@ const RegisterPage = () => {
             >
               <Form.Item
                 labelCol={{ span: 24 }} //whole column
-                label="Họ tên"
+                label="UserName"
                 name="username"
                 rules={[{ required: true, message: 'Họ tên không được để trống!' }]}
               >
@@ -74,6 +86,25 @@ const RegisterPage = () => {
                 label="Số điện thoại"
                 name="phone"
                 rules={[{ required: true, message: 'Số điện thoại không được để trống!' }]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                labelCol={{ span: 24 }} //whole column
+                label="FullName"
+                name="fullName"
+                rules={[{ required: true, message: 'Họ tên không được để trống!' }]}
+              >
+                <Input />
+              </Form.Item>
+
+
+              <Form.Item
+                labelCol={{ span: 24 }} //whole column
+                label="Địa chỉ"
+                name="addRess"
+                rules={[{ required: true, message: 'Địa chỉ không được để trống!' }]}
               >
                 <Input />
               </Form.Item>

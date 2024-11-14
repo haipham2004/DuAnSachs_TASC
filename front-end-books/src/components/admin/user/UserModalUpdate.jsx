@@ -10,9 +10,9 @@ const UserModalUpdate = (props) => {
 
     // Hàm xử lý khi form submit
     const onFinish = async (values) => {
-        const { userId, username, password, email, phone, idRoles } = values;
+        const { userId, username, password, email, phone, fullName, addRess,idRoles } = values;
         setIsSubmit(true);
-        const res = await callUpdateUser(userId, username, password, email, phone, idRoles);
+        const res = await callUpdateUser(userId, username, password, email, phone,fullName, addRess, idRoles);
         console.log("update res ",res)
         if (res && res.results) {
             message.success('Cập nhật user thành công');
@@ -99,6 +99,25 @@ const UserModalUpdate = (props) => {
                     >
                         <Input />
                     </Form.Item>
+
+                <Form.Item
+                    labelCol={{ span: 24 }} //whole column
+                    label="FullName"
+                    name="fullName"
+                    rules={[{ required: true, message: 'Họ tên không được để trống!' }]}
+                >
+                    <Input />
+                </Form.Item>
+
+
+                <Form.Item
+                    labelCol={{ span: 24 }} //whole column
+                    label="Địa chỉ"
+                    name="addRess"
+                    rules={[{ required: true, message: 'Địa chỉ không được để trống!' }]}
+                >
+                    <Input />
+                </Form.Item>
                     
 
                     <Form.Item

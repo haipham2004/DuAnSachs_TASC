@@ -33,6 +33,10 @@ public class UsersRequest {
 
     private String password;
 
+    private String fullName;
+
+    private String addRess;
+
     private Integer idRoles;
 
 
