@@ -1,6 +1,8 @@
 package com.example.books_service.service.imp;
 
+import com.example.books_service.dto.request.CategoriesRequest;
 import com.example.books_service.dto.response.CategoriesResponse;
+import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.repository.CategoriesServiceRepository;
 import com.example.books_service.service.CategoriesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,22 @@ public class CategoriesServiceImp implements CategoriesService {
     }
 
     @Override
-    public List<CategoriesResponse> findAllCategoriesDto() {
-        return categoriesServiceRepository.findAllCategoriesDto();
+    public PageResponse<CategoriesResponse> findAll(String name, int pageNum, int pageSize) {
+        return categoriesServiceRepository.findAll(name,pageNum,pageSize);
+    }
+
+    @Override
+    public CategoriesRequest save(CategoriesRequest categoriesRequest) {
+        return categoriesServiceRepository.save(categoriesRequest);
+    }
+
+    @Override
+    public CategoriesRequest update(Integer id, CategoriesRequest categoriesRequest) {
+        return categoriesServiceRepository.update(id, categoriesRequest);
+    }
+
+    @Override
+    public void delete(Integer id) {
+
     }
 }

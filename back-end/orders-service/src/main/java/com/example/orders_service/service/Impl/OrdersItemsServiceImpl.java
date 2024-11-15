@@ -22,4 +22,9 @@ public class OrdersItemsServiceImpl implements OrdersItemsService {
     public List<OrdersItemsResponse> findAll() {
         return ordersItemsRepositoryService.findAll();
     }
+
+    @Override
+    public List<OrdersItemsResponse> getOrderWithItems(int orderId) {
+        return ordersItemsRepositoryService.getOrderWithItems(orderId);
+    }
 }

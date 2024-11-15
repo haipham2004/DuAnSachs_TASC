@@ -2,6 +2,7 @@ package com.example.orders_service.service.Impl;
 
 import com.example.orders_service.dto.response.OrdersItemsResponse;
 import com.example.orders_service.dto.response.OrdersResponse;
+import com.example.orders_service.dto.response.PageResponse;
 import com.example.orders_service.repository.OrdersRepositoryService;
 import com.example.orders_service.service.OrdersItemsService;
 import com.example.orders_service.service.OrdersService;
@@ -20,9 +21,10 @@ public class OrdersServiceImpl implements OrdersService {
         this.ordersRepositoryService = ordersRepositoryService;
     }
 
-
     @Override
-    public List<OrdersResponse> findAll() {
-        return ordersRepositoryService.fillAll();
+    public PageResponse<OrdersResponse> fillAll(String fullName, String phone, int pageNum, int pageSize) {
+        return ordersRepositoryService.fillAll(fullName,phone,pageNum,pageSize);
     }
+
+
 }

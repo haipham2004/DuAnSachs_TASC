@@ -14,7 +14,8 @@ public class PublishersRowMapper implements RowMapper<PublishersResponse> {
         publishersResponse.setName(rs.getString("name_publishers"));
         publishersResponse.setAddress(rs.getString("address"));
         publishersResponse.setPhone(rs.getString("phone"));
-        publishersResponse.setName(rs.getString("email"));
+        publishersResponse.setEmail(rs.getString("email"));
+        publishersResponse.setDeletedAt(rs.getBoolean("deleted_at"));
         return publishersResponse;
     }
 }

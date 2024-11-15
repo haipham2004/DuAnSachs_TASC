@@ -14,4 +14,6 @@ public class CategoriesResponse {
     private Integer id;
 
     private String name;
+
+    private Boolean deletedAt;
 }

@@ -7,4 +7,6 @@ import java.util.List;
 public interface OrdersItemsService {
 
      List<OrdersItemsResponse> findAll();
+
+     List<OrdersItemsResponse> getOrderWithItems(int orderId);
 }

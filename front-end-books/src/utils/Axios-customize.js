@@ -4,8 +4,9 @@ import { Mutex } from 'async-mutex';
 const mutex = new Mutex();
 const baseUrl = import.meta.env.VITE_BACKEND_USER_URL;
 const baseBook = import.meta.env.VITE_BACKEND_BOOKS_URL;
+const baseOrder = import.meta.env.VITE_BACKEND_ORDERS_URL; // Order API URL
 
-if (!baseUrl || !baseBook) {
+if (!baseUrl || !baseBook || !baseOrder) {
     console.error("Base URL(s) are not defined.");
 }
 
@@ -18,6 +19,12 @@ const userInstance = axios.create({
 // Axios instance cho Book API
 const bookInstance = axios.create({
     baseURL: baseBook,
+    withCredentials: true,
+});
+
+// Axios instance cho Order API
+const orderInstance = axios.create({
+    baseURL: baseOrder,
     withCredentials: true,
 });
 
@@ -97,5 +104,28 @@ bookInstance.interceptors.response.use(
     }
 );
 
+// Axios interceptor cho Order API
+orderInstance.interceptors.request.use(
+    function (config) {
+        const token = window.localStorage.getItem('access_token');
+        if (token) {
+            config.headers.Authorization = 'Bearer ' + token;
+        }
+        return config;
+    },
+    function (error) {
+        return Promise.reject(error);
+    }
+);
+
+orderInstance.interceptors.response.use(
+    function (response) {
+        return response && response.data ? response.data : response;
+    },
+    function (error) {
+        return error?.response?.data ?? Promise.reject(error);
+    }
+);
+
 // Export ra các instance để sử dụng ở các nơi khác trong ứng dụng
-export { userInstance, bookInstance };
+export { userInstance, bookInstance, orderInstance };

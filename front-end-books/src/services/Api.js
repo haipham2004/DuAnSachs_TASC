@@ -1,4 +1,4 @@
-import {userInstance, bookInstance} from '../utils/Axios-customize';
+import {userInstance, bookInstance, orderInstance} from '../utils/Axios-customize';
 
 export const callRegister = (username, email, phone, password, fullName, addRess,role) => {
     return userInstance.post('/api/auth/public/signup', 
@@ -75,18 +75,21 @@ export const callFetchListBook = (query) => {
 }
 
 
-export const callFetchCategory = () => {
-    return bookInstance.get('/categories/findAllCategoriesDto');
-}
 
-export const callFetchAuthor = () => {
-    return bookInstance.get('/authors/findAllAuthorsDto');
+export const callFetchAuthor = (query) => {
+    return bookInstance.get(`/authors/findAll?${query}`);
 }
 
 
-export const callFetchPublisher = () => {
-    return bookInstance.get('/publisher/findAllPublisherDto');
+export const callFetchPublisher = (query) => {
+    return bookInstance.get(`/publisher/findAll?${query}`);
 }
+
+export const callFetchCategory = (query) => {
+    return bookInstance.get(`/categories/findAll?${query}`);
+}
+
+
 
 
 export const callCreateBook = (title, authorId, publisherId, categoryId, price, consPrice, description, quantity,imageUrl, thumbnail) => {
@@ -133,11 +136,58 @@ export const callFetchBookById = (id) => {
 
 
 
+export const callCreateAuthor  = (name, phone, addRess) => {
+    return bookInstance.post('/authors/save', {
+        name,phone, addRess
+    })
+}
+
+
+export const callUpdateAuthor = (id, name, phone, addRess) => {
+    return bookInstance.put(`/authors/update/${id}`, {
+        name,phone, addRess
+    })
+}
+
+//
+
+export const callCreatePublisher  = (name, address,phone, email) => {
+    return bookInstance.post('/publisher/save', {
+        name, address,phone, email
+    })
+}
+
+
+export const callUpdatePublisher = (id, name, address,phone, email) => {
+    return bookInstance.put(`/publisher/update/${id}`, {
+        name, address,phone, email
+    })
+}
+
+//
+
+export const callCreateCategories  = (name) => {
+    return bookInstance.post('/categories/save', {
+        name
+    })
+}
+
+
+export const callUpdateCategories = (id, name) => {
+    return bookInstance.put(`/categories/update/${id}`, {
+        name
+    })
+}
 //order 
 
 export const callFetchListOrder = (query) => {
-    return axios.get(`/api/v1/order?${query}`)
+    return orderInstance.get(`orders/findAll?${query}`)
 }
+
+export const getOrderWithItems = (id) => {
+    return orderInstance.get(`/orders-items/getOrderWithItems/${id}`)
+}
+
 
 export const callPlaceOrder = (data) => {
     return axios.post('/api/v1/order', {

@@ -12,6 +12,8 @@ public class AuthorsRowMapper implements RowMapper<AuthorsResponse> {
         AuthorsResponse authorsResponse=new AuthorsResponse();
         authorsResponse.setId(rs.getInt("author_id"));
         authorsResponse.setName(rs.getString("name_authors"));
+        authorsResponse.setPhone(rs.getString("phone"));
+        authorsResponse.setAddRess(rs.getString("address"));
         authorsResponse.setDeletedAt(rs.getBoolean("deleted_at"));
         return authorsResponse;
     }

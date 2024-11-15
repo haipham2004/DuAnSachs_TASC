@@ -20,4 +20,6 @@ public class PublishersResponse {
     private String phone;
 
     private String email;
+
+    private Boolean deletedAt;
 }

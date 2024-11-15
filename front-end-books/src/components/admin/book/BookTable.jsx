@@ -10,7 +10,9 @@ import BookViewDetail from './BookViewDetail';
 import BookModalUpdate from './BookModalUpdate';
 import * as XLSX from 'xlsx';
 import BookModalCreate from './BookModalCreate';
-import AuthorCreate from './AuthorCreate';
+import AuthorCreate from './AuthorTable';
+import PublisherTable from './PublisherTable';
+import CategoryTable from './CategoryTable';
 
 const BookTable = () => {
     const [listBook, setListBook] = useState([]);
@@ -30,6 +32,10 @@ const BookTable = () => {
     const [dataUpdate, setDataUpdate] = useState(null);
 
     const [openModalCreateAuthor, setOpenModalCreateAuthor] = useState(false);
+
+    const [openModalPublisher, setOpenModalPublisher] = useState(false);
+
+    const [openModalCategory, setOpenModalCategory] = useState(false);
     useEffect(() => {
         fetchBook();
     }, [current, pageSize, filter]);
@@ -210,9 +216,21 @@ const BookTable = () => {
                         icon={<PlusOutlined />}
                         type="primary"
                         onClick={() => setOpenModalCreateAuthor(true)}
-                    >Thêm tác giả</Button>
+                    >Quản lí tác giả</Button>
 
-                    
+                    <Button
+                        icon={<PlusOutlined />}
+                        type="primary"
+                        onClick={() => setOpenModalPublisher(true)}
+                    >Quản lí nhà xuất bản</Button>
+
+                    <Button
+                        icon={<PlusOutlined />}
+                        type="primary"
+                        onClick={() => setOpenModalCategory(true)}
+                    >Quản lí thể loại</Button>
+
+
                     <Button type='ghost' onClick={() => {
                         setFilter("");
                         setSortQuery("")
@@ -318,7 +336,17 @@ const BookTable = () => {
             {<AuthorCreate
                 openModalCreateAuthor={openModalCreateAuthor}
                 setOpenModalCreateAuthor={setOpenModalCreateAuthor}
-            // fetchBook={fetchBook}
+            />}
+
+
+            {<PublisherTable
+                openModalPublisher={openModalPublisher}
+                setOpenModalPublisher={setOpenModalPublisher}
+            />}
+
+            {<CategoryTable
+                openModalCategory={openModalCategory}
+                setOpenModalCategory={setOpenModalCategory}
             />}
 
         </>

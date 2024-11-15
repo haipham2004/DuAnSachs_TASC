@@ -17,7 +17,9 @@ public class Authors {
 
     private String name;
 
-    private String description;
+    private String phone;
+
+    private String addRess;
 
     private LocalDateTime createdAt;
 

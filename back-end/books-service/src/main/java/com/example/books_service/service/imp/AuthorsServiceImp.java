@@ -2,6 +2,7 @@ package com.example.books_service.service.imp;
 
 import com.example.books_service.dto.request.AuthorsRequest;
 import com.example.books_service.dto.response.AuthorsResponse;
+import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.repository.AuthorsServiceRepository;
 import com.example.books_service.service.AuthorsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +21,8 @@ public class AuthorsServiceImp implements AuthorsService {
     }
 
     @Override
-    public List<AuthorsResponse> findAllAuthorsDto() {
-        return authorsServiceRepository.findAllAuthorsDto();
+    public PageResponse<AuthorsResponse> findAllAuthorsDto(String name, String phone, int pageNum, int pageSize){
+        return authorsServiceRepository.findAllAuthorsDto(name, phone, pageNum, pageSize);
     }
 
     @Override

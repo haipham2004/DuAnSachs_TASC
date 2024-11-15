@@ -4,10 +4,11 @@ import { callCreateBook, callFetchAuthor, callFetchCategory, callFetchPublisher,
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 const BookModalCreate = (props) => {
+     console.log("props là: ",props.listAuthor2)
     const { openModalCreate, setOpenModalCreate } = props;
     const [isSubmit, setIsSubmit] = useState(false);
 
-    const [listAuthor, setlistAuthor] = useState([]);
+    const [listAuthor, setListAuthor] = useState([]);
     const [listCategory, setListCategory] = useState([]);
     const [listPublisher, setListPublisher] = useState([]);
     const [form] = Form.useForm();
@@ -21,26 +22,30 @@ const BookModalCreate = (props) => {
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState('');
     const [previewTitle, setPreviewTitle] = useState('');
+    
+    const { listAuthor2, setListAuthor2 } = props;
 
     useEffect(() => {
         const fetchAuthor = async () => {
             const res = await callFetchAuthor();
             if (res && res.data) {
-                const d = res.data.map(item => ({
+                const d = res.data.content.map(item => ({
                     label: item.name,
                     value: item.id
                 }));
-                setlistAuthor(d);
+                setListAuthor(d);
+          
             }
         };
         fetchAuthor();
+
     }, []);
 
     useEffect(() => {
         const fetchPublisher = async () => {
             const res = await callFetchPublisher();
             if (res && res.data) {
-                const d = res.data.map(item => ({
+                const d = res.data.content.map(item => ({
                     label: item.name,
                     value: item.id
                 }));
@@ -54,7 +59,7 @@ const BookModalCreate = (props) => {
         const fetchCategory = async () => {
             const res = await callFetchCategory();
             if (res && res.data) {
-                const d = res.data.map(item => ({
+                const d = res.data.content.map(item => ({
                     label: item.name,
                     value: item.id
                 }));
