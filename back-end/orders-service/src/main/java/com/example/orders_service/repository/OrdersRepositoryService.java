@@ -1,11 +1,12 @@
 package com.example.orders_service.repository;
 
 import com.example.orders_service.dto.response.OrdersResponse;
-
-import java.util.List;
+import com.example.orders_service.dto.response.PageResponse;
 
 public interface OrdersRepositoryService {
 
-    List<OrdersResponse> fillAll();
+    PageResponse<OrdersResponse> fillAll(String fullName, String phone,int pageNum, int pageSize);
+
+
 
 }

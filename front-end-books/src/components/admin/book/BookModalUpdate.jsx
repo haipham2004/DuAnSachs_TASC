@@ -34,7 +34,7 @@ const BookModalUpdate = (props) => {
         const fetchAuthor = async () => {
             const res = await callFetchAuthor();
             if (res && res.data) {
-                const d = res.data.map(item => ({
+                const d = res.data.content.map(item => ({
                     label: item.name,
                     value: item.id
                 }));
@@ -49,7 +49,7 @@ const BookModalUpdate = (props) => {
         const fetchPublisher = async () => {
             const res = await callFetchPublisher();
             if (res && res.data) {
-                const d = res.data.map(item => ({
+                const d = res.data.content.map(item => ({
                     label: item.name,
                     value: item.id
                 }));
@@ -63,7 +63,7 @@ const BookModalUpdate = (props) => {
         const fetchCategory = async () => {
             const res = await callFetchCategory();
             if (res && res.data) {
-                const d = res.data.map(item => ({
+                const d = res.data.content.map(item => ({
                     label: item.name,
                     value: item.id
                 }));

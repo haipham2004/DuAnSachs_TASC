@@ -30,7 +30,7 @@ const Home = () => {
         const initCategory = async () => {
             const res = await callFetchCategory();
             if (res && res.data) {
-                const d = res.data.map(item => {
+                const d = res.data.content.map(item => {
                     return { label: item.name || item, value: item.id || item };
                 });
                 setListCategory(d);

@@ -13,6 +13,7 @@ public class CategoriesRowMapper implements RowMapper<CategoriesResponse> {
         CategoriesResponse categoriesResponse=new CategoriesResponse();
         categoriesResponse.setId(rs.getInt("category_id"));
         categoriesResponse.setName(rs.getString("name_categories"));
+        categoriesResponse.setDeletedAt(rs.getBoolean("deleted_at"));
         return categoriesResponse;
     }
 }

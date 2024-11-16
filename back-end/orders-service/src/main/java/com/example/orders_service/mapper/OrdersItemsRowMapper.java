@@ -20,6 +20,7 @@ public class OrdersItemsRowMapper implements RowMapper<OrdersItemsResponse> {
         ordersItemsResponse.setOrderId(rs.getInt("order_id"));
         ordersItemsResponse.setBookId(rs.getInt("book_id"));
         ordersItemsResponse.setTileBook(rs.getString("title"));
+        ordersItemsResponse.setTotal(rs.getDouble("price") * rs.getInt("quantity"));
         return ordersItemsResponse;
     }
 }

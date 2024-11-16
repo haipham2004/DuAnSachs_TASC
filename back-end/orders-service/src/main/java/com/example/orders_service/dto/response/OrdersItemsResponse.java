@@ -39,4 +39,6 @@ public class OrdersItemsResponse {
 
     private String tileBook;
 
+    private Double total;
+
 }
