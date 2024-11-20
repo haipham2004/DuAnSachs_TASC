@@ -16,13 +16,13 @@ public class OrdersRowMapper implements RowMapper<OrdersResponse> {
         ordersResponse.setStatus(rs.getString("status"));
         ordersResponse.setShippingAddress(rs.getString("shipping_address"));
         ordersResponse.setPaymentMethod(rs.getString("payment_method"));
-        ordersResponse.setPaymentStatus(rs.getString("payment_status"));
         ordersResponse.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         ordersResponse.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         ordersResponse.setDeletedAt(rs.getBoolean("deleted_at"));
         ordersResponse.setUserId(rs.getInt("user_id"));
         ordersResponse.setFullNameUsers(rs.getString("fullname"));
         ordersResponse.setPhoneUsers(rs.getString("phone"));
+        ordersResponse.setEmailUser(rs.getString("email"));
         return ordersResponse;
     }
 }

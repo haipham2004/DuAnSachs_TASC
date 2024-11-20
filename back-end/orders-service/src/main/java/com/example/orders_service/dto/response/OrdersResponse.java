@@ -1,5 +1,6 @@
 package com.example.orders_service.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,12 +33,11 @@ public class OrdersResponse {
 
     private String paymentMethod;
 
-    private String paymentStatus;
-
+    @JsonIgnore
     private LocalDateTime createdAt;
-
+    @JsonIgnore
     private LocalDateTime updatedAt;
-
+    @JsonIgnore
     private Boolean deletedAt;
 
     private int userId;
@@ -45,6 +45,8 @@ public class OrdersResponse {
     private String fullNameUsers;
 
     private String phoneUsers;
+
+    private String emailUser;
 
     private List<OrdersItemsResponse> ordersItems;
 

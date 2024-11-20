@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Nhận Đơn Hàng</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.8rem;
+            color: #0056b3;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-size: 1.8rem;
+            color: #333;
+        }
+        .banner {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .banner img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .card {
+            background: #f4f8ff;
+            border: 1px solid #e0e8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        .card h2 {
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+        .card p, .card span {
+            font-size: 1rem;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        table th {
+            background-color: #0056b3;
+            color: white;
+        }
+        table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #555;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .cta-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Xác Nhận Đơn Hàng</h1>
+<!--    <div class="banner">-->
+<!--        <img src="https://via.placeholder.com/800x300" alt="Banner">-->
+<!--    </div>-->
+
+    <div class="card">
+        <h2><i class="fas fa-box"></i> Thông Tin Đơn Hàng</h2>
+        <p><strong>Mã Đơn Hàng:</strong> <span th:text="${ordersResponse.trackingNumber}"></span></p>
+        <p><strong>Tổng Tiền:</strong> <span th:text="${ordersResponse.total}"></span> VNĐ</p>
+        <p><strong>Trạng Thái:</strong> <span th:text="${ordersResponse.status}"></span></p>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-user"></i> Thông Tin Khách Hàng</h2>
+        <p><strong>Họ Tên:</strong> <span th:text="${ordersResponse.fullNameUsers}"></span></p>
+        <p><strong>Số Điện Thoại:</strong> <span th:text="${ordersResponse.phoneUsers}"></span></p>
+        <p><strong>Email:</strong> <span th:text="${ordersResponse.emailUser}"></span></p>
+        <p><strong>Địa Chỉ Nhận Hàng:</strong> <span th:text="${ordersResponse.shippingAddress}"></span></p>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-shopping-cart"></i> Chi Tiết Sản Phẩm</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Sản Phẩm</th>
+                <th>Số Lượng</th>
+                <th>Đơn Giá</th>
+                <th>Tổng Tiền</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${ordersResponse.ordersItems}">
+                <td th:text="${item.tileBook}"></td>
+                <td th:text="${item.quantity}"></td>
+                <td th:text="${item.price}"></td>
+                <td th:text="${item.quantity * item.price}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a href="#" class="cta-button">Xem Chi Tiết Đơn Hàng</a>
+
+    <div class="footer">
+        <p>Cảm ơn bạn đã mua sắm tại <strong>TASC</strong>!</p>
+        <p><i class="fas fa-phone-alt"></i> Hotline: 0334294889</p>
+        <p><i class="fas fa-envelope"></i> Email: support@tasc.com</p>
+        <p><i class="fas fa-map-marker-alt"></i> Địa Chỉ: Xóm 7, Khánh Thuỷ, Ninh Bình</p>
+    </div>
+</div>
+</body>
+</html>

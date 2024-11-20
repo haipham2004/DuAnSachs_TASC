@@ -85,4 +85,26 @@ public class BooksController {
                 .build();
     }
 
+    @GetMapping("getAvailableQuantity")
+    public ApiResponse<Integer> getAvailableQuantity(@RequestParam("bookId") Integer bookId){
+        return ApiResponse.<Integer>builder().statusCode(200).message("getAvailableQuantity book").data(booksService.getAvailableQuantity(bookId)).build();
+    }
+
+
+
+    @PutMapping("decreaseQuantity")
+    public ApiResponse<Void> decreaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+                                              @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
+        booksService.decreaseQuantity(bookId,quantity);
+        return ApiResponse.<Void>builder().statusCode(200).message("Update giam book").build();
+    }
+
+
+    @PutMapping("increaseQuantity")
+    public ApiResponse<Void> increaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+                                              @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
+        booksService.increaseQuantity(bookId,quantity);
+        return ApiResponse.<Void>builder().statusCode(200).message("Update tang book").build();
+    }
+
 }

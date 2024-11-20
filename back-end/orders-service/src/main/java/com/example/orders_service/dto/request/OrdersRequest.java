@@ -1,11 +1,14 @@
 package com.example.orders_service.dto.request;
 
+import com.example.orders_service.dto.response.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,12 +26,12 @@ public class OrdersRequest {
 
     private String trackingNumber;
 
-    private String status;
+    private OrderStatus status;
 
     private String shippingAddress;
 
     private String paymentMethod;
 
-    private String paymentStatus;
+    private List<OrdersItemsRequest> ordersItemsRequests;
 
 }

@@ -22,4 +22,10 @@ public interface BooksServiceRepository {
     PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher,
                                                String nameCategory, double priceMin, double priceMax, int pageNumber, int pageSize, String sort);
 
+    int getAvailableQuantity(int bookId);
+
+    void decreaseQuantity(Integer bookId, Integer quantity);
+
+    void increaseQuantity(Integer bookId, Integer quantity);
+
 }
