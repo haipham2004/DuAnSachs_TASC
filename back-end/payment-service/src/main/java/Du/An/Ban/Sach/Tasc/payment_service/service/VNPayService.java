@@ -132,7 +132,7 @@ public class VNPayService {
         }
     }
 
-    public String refundTransaction(String transactionNo, long amount, String createdBy, String description) {
+    public String refundTransaction(String transactionNo, double amount, String createdBy, String description) {
         String vnp_Command = "refund";
         String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
         String vnp_HashSecret = VNPayConfig.vnp_HashSecret;
