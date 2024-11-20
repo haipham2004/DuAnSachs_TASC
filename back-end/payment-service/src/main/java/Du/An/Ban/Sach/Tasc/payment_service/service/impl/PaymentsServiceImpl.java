@@ -4,6 +4,7 @@ import Du.An.Ban.Sach.Tasc.payment_service.client.ApiNotificationsClient;
 import Du.An.Ban.Sach.Tasc.payment_service.client.ApiOrdersClient;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.TransactionHistoryRequest;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.request.VnPayOrderRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
@@ -18,6 +19,8 @@ import Du.An.Ban.Sach.Tasc.payment_service.exception.NotfoundException;
 import Du.An.Ban.Sach.Tasc.payment_service.repository.PaymentsRepository;
 import Du.An.Ban.Sach.Tasc.payment_service.service.PaymentsService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.TransactionHistoryService;
+import Du.An.Ban.Sach.Tasc.payment_service.service.VNPayService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,14 +44,17 @@ public class PaymentsServiceImpl implements PaymentsService {
 
     private TransactionHistoryService transactionHistoryService;
 
+    private VNPayService vnPayService;
+
     @Autowired
-    public PaymentsServiceImpl(PaymentsRepository paymentsRepository, ModelMapper modelMapper, ApiOrdersClient apiOrdersClient,
-                               ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService) {
+    public PaymentsServiceImpl(PaymentsRepository paymentsRepository, ModelMapper modelMapper,
+                               ApiOrdersClient apiOrdersClient, ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService, VNPayService vnPayService) {
         this.paymentsRepository = paymentsRepository;
         this.modelMapper = modelMapper;
         this.apiOrdersClient = apiOrdersClient;
         this.apiNotificationsClient = apiNotificationsClient;
         this.transactionHistoryService = transactionHistoryService;
+        this.vnPayService = vnPayService;
     }
 
     @Override
@@ -145,49 +151,84 @@ public class PaymentsServiceImpl implements PaymentsService {
     }
 
     @Override
-    public String processPayment(PaymentsRequest paymentRequest) {
-
+    public String processPayment(PaymentsRequest paymentRequest, HttpServletRequest request) {
+        // Bước 1: Kiểm tra đơn hàng
         ApiResponse<OrdersResponse> orderResponseApi = apiOrdersClient.findById(paymentRequest.getIdOrder());
 
+        // Kiểm tra phản hồi từ API
         if (orderResponseApi == null || orderResponseApi.getData() == null) {
             throw new CustomException(MessageExceptionResponse.ORDER_NOT_FOUND);
         }
 
         OrdersResponse order = orderResponseApi.getData();
 
+        // Kiểm tra trạng thái thanh toán của đơn hàng
         if (OrderStatus.SUCCESS.name().equals(order.getStatus())) {
             throw new CustomException(MessageExceptionResponse.ORDER_ALREADY_PAID);
         }
 
-        double epsilon = 1e-6;
+        // Bước 2: Kiểm tra số tiền thanh toán
+        double epsilon = 1e-6; // Độ chính xác cho so sánh số thực
 
+        // Kiểm tra số tiền thanh toán có đủ không
         if (paymentRequest.getAmount() < order.getTotal()) {
             throw new CustomException(MessageExceptionResponse.INSUFFICIENT_PAYMENT_AMOUNT);
         }
 
+        // Kiểm tra số tiền thanh toán có hợp lệ không
         if (Math.abs(paymentRequest.getAmount() - order.getTotal()) > epsilon) {
             throw new CustomException(MessageExceptionResponse.INVALID_PAYMENT_AMOUNT);
         }
 
+        // Bước 3: Tạo đơn thanh toán qua VNPay
+        // Giả sử số tiền đã được chuyển đổi sang VND (có thể có phần thập phân)
+        double amountInVND = paymentRequest.getAmount();
+
+        long amountInVNDLong = Math.round(amountInVND * 100); // Ví dụ: 199.95 => 19995
+
+        String orderInfo = String.valueOf(paymentRequest.getIdOrder());
+
+        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+
+        String paymentUrl = vnPayService.createOrder(request, amountInVNDLong, orderInfo, baseUrl);
+
+        return "redirect:" + paymentUrl;
+
+    }
+
+    @Override
+    public String processPaymentSuccess(PaymentsRequest paymentRequest) {
+
+        ApiResponse<OrdersResponse> orderResponseApi = apiOrdersClient.findById(paymentRequest.getIdOrder());
+
+        OrdersResponse order = orderResponseApi.getData();
+        // Tạo đối tượng Payments để lưu vào cơ sở dữ liệu
         Payments payments = new Payments();
         payments.setIdOrder(paymentRequest.getIdOrder());
         payments.setAmount(paymentRequest.getAmount());
-        payments.setPaymentMethod(PaymentsMethod.CARD.name());
+        payments.setPaymentMethod(PaymentsMethod.VNPAY.name());  // Giả sử thanh toán qua thẻ
         payments.setPaymentDate(LocalDateTime.now());
         payments.setStatus(PaymentStatus.SUCCESS.name());
 
+        // Lưu thông tin thanh toán vào cơ sở dữ liệu
         Payments savedPayment = paymentsRepository.save(payments);
+
+        // Cập nhật trạng thái đơn hàng thành công
         apiOrdersClient.updateOrdersStatus(order.getOrderId(), OrderStatus.SUCCESS.name());
 
-        TransactionHistoryRequest transactionHistoryRequest=TransactionHistoryRequest.builder()
+        // Lưu lịch sử giao dịch
+        TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
                 .orderId(order.getOrderId())
                 .userId(order.getUserId())
-                .status("SUCCESS_History")
+                .status("SUCCESS_History") // Trạng thái lịch sử giao dịch
                 .build();
         transactionHistoryService.save(transactionHistoryRequest);
+
+        // Gửi email thông báo cho khách hàng
         apiNotificationsClient.sendEmail(order.getEmailUser(),"Xin chào Khách Hàng",order.getOrderId());
 
-        // Trả về kết quả
+        // Trả về kết quả thành công
         return "Payment processed successfully with ID: " + savedPayment.getPaymentId();
     }
+
 }

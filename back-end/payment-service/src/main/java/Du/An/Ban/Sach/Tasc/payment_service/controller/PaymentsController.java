@@ -3,7 +3,9 @@ package Du.An.Ban.Sach.Tasc.payment_service.controller;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
+import Du.An.Ban.Sach.Tasc.payment_service.exception.CustomException;
 import Du.An.Ban.Sach.Tasc.payment_service.service.PaymentsService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,9 +54,30 @@ public class PaymentsController {
     }
 
     @PostMapping("processPayment")
-    public ApiResponse<String> processPayment(@RequestBody PaymentsRequest paymentsRequest){
-        return ApiResponse.<String>builder().statusCode(201).message("Thanh toán paymentss success")
-                .data(paymentsService.processPayment(paymentsRequest)).build();
+    public ApiResponse<String> processPayment(@RequestBody PaymentsRequest paymentsRequest, HttpServletRequest httpServletRequest) {
+        try {
+            String paymentUrl = paymentsService.processPayment(paymentsRequest, httpServletRequest);
+
+            return ApiResponse.<String>builder()
+                    .statusCode(201)
+                    .message("Thanh toán thành công. Chuyển hướng đến VNPay.")
+                    .data(paymentUrl) // Trả về URL thanh toán để client có thể chuyển hướng
+                    .build();
+        } catch (CustomException e) {
+            // Xử lý các ngoại lệ tùy chỉnh và trả về thông báo lỗi
+            return ApiResponse.<String>builder()
+                    .statusCode(400) // Hoặc mã trạng thái phù hợp với loại lỗi
+                    .message(e.getMessage())
+                    .data(null)
+                    .build();
+        } catch (Exception e) {
+            // Xử lý ngoại lệ chung
+            return ApiResponse.<String>builder()
+                    .statusCode(500)
+                    .message("Đã xảy ra lỗi trong quá trình thanh toán.")
+                    .data(null)
+                    .build();
+        }
     }
 
 }

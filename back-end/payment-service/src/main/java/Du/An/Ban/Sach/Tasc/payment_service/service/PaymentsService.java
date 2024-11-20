@@ -2,6 +2,7 @@ package Du.An.Ban.Sach.Tasc.payment_service.service;
 
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -17,5 +18,8 @@ public interface PaymentsService {
 
     void delete(Integer id);
 
-     String processPayment(PaymentsRequest paymentRequest);
+     String processPayment(PaymentsRequest paymentRequest, HttpServletRequest request);
+
+
+     String processPaymentSuccess(PaymentsRequest paymentRequest);
 }
