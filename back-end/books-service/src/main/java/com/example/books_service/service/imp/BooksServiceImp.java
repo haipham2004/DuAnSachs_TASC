@@ -55,5 +55,20 @@ public class BooksServiceImp implements BooksService {
         return booksServiceRepository.findBooksPage3( nameBook,  nameAuthor,  namePublisher,  nameCategory, priceMin, priceMax,  pageNumber,  pageSize, sort );
     }
 
+    @Override
+    public int getAvailableQuantity(int bookId) {
+        return booksServiceRepository.getAvailableQuantity(bookId);
+    }
+
+    @Override
+    public void decreaseQuantity(Integer bookId, Integer quantity) {
+        booksServiceRepository.decreaseQuantity(bookId,quantity);
+    }
+
+    @Override
+    public void increaseQuantity(Integer bookId, Integer quantity) {
+       booksServiceRepository.increaseQuantity(bookId,quantity);
+    }
+
 
 }

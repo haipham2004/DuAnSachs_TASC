@@ -188,4 +188,39 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
     }
 
 
+    @Override
+    public int getAvailableQuantity(int bookId) {
+        String sql = "SELECT quantity FROM books WHERE book_id = ?";
+
+        // Sử dụng queryForObject để lấy số lượng sách
+        Integer quantity = jdbcTemplate.queryForObject(sql, Integer.class,bookId);
+
+        // Nếu không tìm thấy sách, trả về 0
+        return (quantity != null) ? quantity : 0;
+    }
+
+    // Giảm số lượng sách khi bán hoặc khi đặt hàng
+    @Override
+    public void decreaseQuantity(Integer bookId, Integer quantity) {
+        String sql = "UPDATE books SET quantity = quantity - ? WHERE book_id = ? AND quantity >= ?";
+        int rowsAffected = jdbcTemplate.update(sql, quantity, bookId, quantity);
+
+        if (rowsAffected == 0) {
+            throw new RuntimeException("Not enough quantity available for book ID: " + bookId);
+        }
+    }
+
+    // Tăng số lượng sách khi xóa order_item hoặc trả hàng
+    @Override
+    public void increaseQuantity(Integer bookId, Integer quantity) {
+        String sql = "UPDATE books SET quantity = quantity + ? WHERE book_id = ?";
+        int rowsAffected = jdbcTemplate.update(sql, quantity, bookId);
+
+        if (rowsAffected == 0) {
+            throw new RuntimeException("Book ID not found: " + bookId);
+        }
+    }
+
+
+
 }

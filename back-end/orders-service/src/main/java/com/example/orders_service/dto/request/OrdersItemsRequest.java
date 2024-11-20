@@ -1,5 +1,7 @@
 package com.example.orders_service.dto.request;
 
+import com.example.orders_service.dto.response.OrderItemStatus;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,18 +15,19 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrdersItemsRequest {
 
     private int orderItemId;
 
-    private int orderId;
+    private Integer orderId;
 
-    private int bookId;
+    private Integer bookId;
 
     private int quantity;
 
     private Double price;
 
-    private String status;
+    private OrderItemStatus status;
 
 }

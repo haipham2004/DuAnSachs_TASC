@@ -1,5 +1,6 @@
 package com.example.orders_service.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,14 +28,16 @@ public class OrdersItemsResponse {
 
     private String status;
 
+    @JsonIgnore
     private LocalDateTime createdAt;
-
+    @JsonIgnore
     private LocalDateTime updatedAt;
-
+    @JsonIgnore
     private Boolean deletedAt;
 
+    @JsonIgnore
     private int orderId;
-
+   @JsonIgnore
     private int bookId;
 
     private String tileBook;

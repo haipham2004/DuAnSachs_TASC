@@ -9,7 +9,9 @@
         <outputRelativeToContentRoot value="true" />
         <module name="eureka-service" />
         <module name="orders-service" />
+        <module name="core" />
         <module name="books-service" />
+        <module name="payment-service" />
         <module name="spring-cloud-config-service" />
         <module name="users-service" />
         <module name="api-gateway-service" />
@@ -19,10 +21,12 @@
     <bytecodeTargetLevel>
       <module name="api-gateway-service" target="17" />
       <module name="books-service" target="17" />
+      <module name="core" target="17" />
       <module name="eureka-service" target="17" />
       <module name="notifications" target="17" />
       <module name="notifications-service" target="17" />
       <module name="orders-service" target="17" />
+      <module name="payment-service" target="17" />
       <module name="spring-cloud-config-service" target="17" />
       <module name="users-service" target="17" />
     </bytecodeTargetLevel>
@@ -31,10 +35,12 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway-service" options="-parameters" />
       <module name="books-service" options="-parameters" />
+      <module name="core" options="-parameters" />
       <module name="eureka-service" options="-parameters" />
       <module name="notifications" options="-parameters" />
       <module name="notifications-service" options="-parameters" />
       <module name="orders-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
       <module name="spring-cloud-config-service" options="-parameters" />
       <module name="users-service" options="-parameters" />
     </option>

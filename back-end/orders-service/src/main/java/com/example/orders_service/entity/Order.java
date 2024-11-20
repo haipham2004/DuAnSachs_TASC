@@ -1,5 +1,6 @@
 package com.example.orders_service.entity;
 
+import com.example.orders_service.dto.response.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,13 +22,11 @@ public class Order {
 
     private String trackingNumber;
 
-    private String status;
+    private OrderStatus status;
 
     private String shippingAddress;
 
     private String paymentMethod;
-
-    private String paymentStatus;
 
     private LocalDateTime createdAt;
 

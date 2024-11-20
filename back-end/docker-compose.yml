@@ -1,0 +1,96 @@
+services:
+
+  eureka-service:
+    build:
+      context: eureka-service
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+
+  api-gateway-service:
+    build:
+      context: eureka-service
+      dockerfile: Dockerfile
+    ports:
+      - "8763:8763"
+    networks:
+      - app-network
+    depends_on:
+      - eureka-service
+
+  user-service:
+    build:
+      context: users-service
+      dockerfile: Dockerfile
+    ports:
+      - "8801:8801"
+    networks:
+      - app-network
+    depends_on:
+      - eureka-service
+
+  books-service:
+    build:
+      context: books-service
+      dockerfile: Dockerfile
+    ports:
+      - "8802:8802"
+    networks:
+      - app-network
+    depends_on:
+      - eureka-service
+
+  orders-service:
+    build:
+      context: orders-service
+      dockerfile: Dockerfile
+    ports:
+      - "8803:8803"
+    environment:
+      - "AXONIQ_AXONSERVER_SERVERS=axon-server:8024 " # Địa chỉ Axon Server (HTTP)
+    networks:
+      - app-network
+    depends_on:
+      - eureka-service
+      - axon-server
+
+  payment-service:
+    build:
+      context: payment-service
+      dockerfile: Dockerfile
+    ports:
+      - "8804:8804"
+    networks:
+      - app-network
+    depends_on:
+      - eureka-service
+
+  notifications-service:
+    build:
+      context: notifications-service
+      dockerfile: Dockerfile
+    ports:
+      - "2222:2222"
+    networks:
+      - app-network
+    depends_on:
+      - eureka-service
+
+  axon-server:
+    image: axoniq/axonserver:latest  # Sửa lại phiên bản đúng
+    hostname: axon-server
+    container_name: axon-server
+    environment:
+      - "AXONIQ_AXONSERVER_STANDALONE=true"
+    ports:
+      - "8024:8024"  # Cổng HTTP
+      - "8124:8124"  # Cổng gRPC
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -33,7 +35,7 @@ public class Books{
 
     private String imageUrl;
 
-    private String thumbnail;
+    private List<String> thumbnail;
 
 }
 
