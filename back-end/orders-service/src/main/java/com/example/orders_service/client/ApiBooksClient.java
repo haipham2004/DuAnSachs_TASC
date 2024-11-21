@@ -10,15 +10,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface ApiBooksClient {
 
     @GetMapping("/books/getAvailableQuantity")
-    public ApiResponse<Integer> getAvailableQuantity(@RequestParam("bookId") Integer bookId);
+    ApiResponse<Integer> getAvailableQuantity(@RequestParam("bookId") Integer bookId);
 
     @PutMapping("/books/decreaseQuantity")
-    public ApiResponse<Void> decreaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+     ApiResponse<Void> decreaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
                                               @RequestParam(name="quantity",defaultValue = "0") Integer quantity);
 
 
     @PutMapping("/books/increaseQuantity")
-    public ApiResponse<Void> increaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+     ApiResponse<Void> increaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
                                               @RequestParam(name="quantity",defaultValue = "0") Integer quantity);
 
 

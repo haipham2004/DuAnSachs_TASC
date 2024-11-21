@@ -37,7 +37,7 @@ public class OrdersItemsResponse {
 
     @JsonIgnore
     private int orderId;
-   @JsonIgnore
+    @JsonIgnore
     private int bookId;
 
     private String tileBook;

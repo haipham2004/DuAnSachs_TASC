@@ -26,8 +26,6 @@ public class OrderAggregate {
 
     private String shippingAddress;
 
-    private String paymentMethod;
-
     private List<OrdersItemsRequest> items;
 
     private OrderStatus orderStatus;
@@ -44,7 +42,6 @@ public class OrderAggregate {
                 .totalAmount(command.getTotalAmount())
                 .trackingNumber(null)
                 .shippingAddress(command.getShippingAddress())
-                .paymentMethod(command.getPaymentMethod())
                 .items(command.getItems())
                 .orderStatus(OrderStatus.CREATED)
                 .build();
@@ -59,7 +56,6 @@ public class OrderAggregate {
         this.totalAmount = event.getTotalAmount();
         this.trackingNumber = event.getTrackingNumber();
         this.shippingAddress = event.getShippingAddress();
-        this.paymentMethod = event.getPaymentMethod();
         this.items = event.getItems();
         this.orderStatus = event.getOrderStatus();
     }

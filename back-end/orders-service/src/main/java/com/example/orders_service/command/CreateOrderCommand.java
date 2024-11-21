@@ -29,8 +29,6 @@ public class CreateOrderCommand {
 
     private String shippingAddress;
 
-    private String paymentMethod;
-
     private List<OrdersItemsRequest> items;
 
     private OrderStatus orderStatus;

@@ -18,7 +18,7 @@ public interface PaymentsService {
 
     void delete(Integer id);
 
-     String processPayment(PaymentsRequest paymentRequest, HttpServletRequest request);
+     String processPayment(PaymentsRequest paymentRequest);
 
 
      String processPaymentSuccess(PaymentsRequest paymentRequest);

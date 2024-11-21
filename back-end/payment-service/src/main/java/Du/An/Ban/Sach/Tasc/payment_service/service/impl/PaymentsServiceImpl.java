@@ -1,10 +1,10 @@
 package Du.An.Ban.Sach.Tasc.payment_service.service.impl;
 
+import Du.An.Ban.Sach.Tasc.payment_service.client.ApiBookClient;
 import Du.An.Ban.Sach.Tasc.payment_service.client.ApiNotificationsClient;
 import Du.An.Ban.Sach.Tasc.payment_service.client.ApiOrdersClient;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.TransactionHistoryRequest;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.request.VnPayOrderRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
@@ -20,7 +20,6 @@ import Du.An.Ban.Sach.Tasc.payment_service.repository.PaymentsRepository;
 import Du.An.Ban.Sach.Tasc.payment_service.service.PaymentsService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.TransactionHistoryService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.VNPayService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,35 +45,34 @@ public class PaymentsServiceImpl implements PaymentsService {
 
     private VNPayService vnPayService;
 
+    private ApiBookClient apiBookClient;
+
     @Autowired
-    public PaymentsServiceImpl(PaymentsRepository paymentsRepository, ModelMapper modelMapper,
-                               ApiOrdersClient apiOrdersClient, ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService, VNPayService vnPayService) {
+    public PaymentsServiceImpl(PaymentsRepository paymentsRepository, ModelMapper modelMapper, ApiOrdersClient apiOrdersClient,
+                               ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService, VNPayService vnPayService, ApiBookClient apiBookClient) {
         this.paymentsRepository = paymentsRepository;
         this.modelMapper = modelMapper;
         this.apiOrdersClient = apiOrdersClient;
         this.apiNotificationsClient = apiNotificationsClient;
         this.transactionHistoryService = transactionHistoryService;
         this.vnPayService = vnPayService;
+        this.apiBookClient = apiBookClient;
     }
 
     @Override
         public List<PaymentsResponse> findAll() {
-            // Lấy tất cả các payment từ PaymentsRepository
+
             List<Payments> paymentsList = paymentsRepository.findAll();
 
-            // Lấy danh sách đơn hàng từ microservice Orders, kết quả là một trang (Page)
             ApiResponse<PageResponse<OrdersResponse>> ordersResponseApi = apiOrdersClient.findAll("", "", 1, 10);
 
-            // Lấy danh sách đơn hàng từ page (content của PageResponse)
             List<OrdersResponse> ordersList = ordersResponseApi.getData().getContent();
 
-            // Tạo một Map để ánh xạ từ orderId sang OrdersResponse
             Map<Integer, OrdersResponse> orderMap = new HashMap<>();
             for (OrdersResponse order : ordersList) {
                 orderMap.put(order.getOrderId(), order);
             }
 
-            // Tạo danh sách PaymentsResponse kết hợp dữ liệu thanh toán và thông tin đơn hàng
             List<PaymentsResponse> paymentsResponseList = new ArrayList<>();
             for (Payments payment : paymentsList) {
                 PaymentsResponse paymentsResponse = modelMapper.map(payment, PaymentsResponse.class); // Ánh xạ từ Payments sang PaymentsResponse
@@ -82,13 +80,12 @@ public class PaymentsServiceImpl implements PaymentsService {
                 OrdersResponse order = orderMap.get(payment.getIdOrder());
 
                 if (order != null) {
-                    // Ánh xạ thêm thông tin đơn hàng vào PaymentsResponse
+
                     paymentsResponse.setStatusOrder(order.getStatus());
                     paymentsResponse.setFullNameOrder(order.getFullNameUsers());
                     paymentsResponse.setTotal(order.getTotal());
                 }
 
-                // Thêm paymentsResponse vào danh sách kết quả
                 paymentsResponseList.add(paymentsResponse);
             }
 
@@ -151,8 +148,8 @@ public class PaymentsServiceImpl implements PaymentsService {
     }
 
     @Override
-    public String processPayment(PaymentsRequest paymentRequest, HttpServletRequest request) {
-        // Bước 1: Kiểm tra đơn hàng
+    public String processPayment(PaymentsRequest paymentRequest) {
+
         ApiResponse<OrdersResponse> orderResponseApi = apiOrdersClient.findById(paymentRequest.getIdOrder());
 
         // Kiểm tra phản hồi từ API
@@ -188,9 +185,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 
         String orderInfo = String.valueOf(paymentRequest.getIdOrder());
 
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-
-        String paymentUrl = vnPayService.createOrder(request, amountInVNDLong, orderInfo, baseUrl);
+        String paymentUrl = vnPayService.createOrder(amountInVNDLong, orderInfo);
 
         return "redirect:" + paymentUrl;
 

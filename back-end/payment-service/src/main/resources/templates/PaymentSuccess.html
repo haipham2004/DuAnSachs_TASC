@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán thành công</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #4CAF50;
+        }
+        .content {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .content p {
+            margin: 10px 0;
+        }
+        .content span {
+            font-weight: bold;
+            color: #333;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .status p {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .status .success {
+            color: #4CAF50;
+        }
+        .status .fail {
+            color: #F44336;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+        .back-link a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link a:hover {
+            color: #388E3C;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Thanh toán thành công</h1>
+    </div>
+
+    <div class="content">
+        <p><span>Mã đơn hàng:</span> <span th:text="${orderId}"></span></p>
+        <p><span>Trạng thái:</span> <span th:text="${status}"></span></p>
+        <p><span>Tổng số tiền:</span> <span th:text="${total}"></span> VND</p>
+        <p><span>Số tiền thanh toán:</span> <span th:text="${totalPayment}"></span> VND</p>
+    </div>
+
+    <div class="status">
+        <p th:class="${status == 'SUCCESS' ? 'success' : 'fail'}">
+            <span th:text="${status == 'SUCCESS' ? 'Thanh toán thành công!' : 'Thanh toán thất bại!'}"></span>
+        </p>
+    </div>
+
+    <a href="/home" class="button">Quay lại trang chủ</a>
+
+    <div class="back-link">
+        <a href="/">Trở lại trang thanh toán</a>
+    </div>
+</div>
+</body>
+</html>

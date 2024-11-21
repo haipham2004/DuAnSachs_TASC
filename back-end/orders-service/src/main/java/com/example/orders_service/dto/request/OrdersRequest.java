@@ -30,8 +30,8 @@ public class OrdersRequest {
 
     private String shippingAddress;
 
-    private String paymentMethod;
-
     private List<OrdersItemsRequest> ordersItemsRequests;
+
+    private String paymentUrl;
 
 }

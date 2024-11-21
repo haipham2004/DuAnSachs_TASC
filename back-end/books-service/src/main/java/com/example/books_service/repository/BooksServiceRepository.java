@@ -28,4 +28,8 @@ public interface BooksServiceRepository {
 
     void increaseQuantity(Integer bookId, Integer quantity);
 
+    List<BooksResponse> reduceQuantitys(Integer bookId, Integer quantity);
+
+    List<BooksResponse> increaseQuantitys(Integer bookId, Integer quantity);
+
 }
