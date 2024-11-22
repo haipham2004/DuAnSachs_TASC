@@ -36,12 +36,6 @@ public class JwtUtils {
         return null;
     }
 
-    public String getJwtFromHeaderCheck(String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            return token.substring(7); // Remove Bearer prefix
-        }
-        return null; // Return null if token is not in Bearer format
-    }
 
 
 

@@ -1,9 +1,7 @@
 package com.example.books_service.controller;
 
-import com.example.books_service.dto.request.AuthorsRequest;
 import com.example.books_service.dto.request.PublishersRequest;
 import com.example.books_service.dto.response.ApiResponse;
-import com.example.books_service.dto.response.AuthorsResponse;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.dto.response.PublishersResponse;
 import com.example.books_service.service.PublishersService;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
 
 @RestController
 @RequestMapping("publisher")

@@ -1,28 +1,25 @@
-package com.example.users_service.security;
+package com.example.books_service.config;
 
-
-import com.example.users_service.security.jwt.AuthEntryPointJwt;
-import com.example.users_service.security.jwt.AuthTokenFilter;
+import lombok.experimental.NonFinal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -31,38 +28,52 @@ import static org.springframework.security.config.Customizer.withDefaults;
         jsr250Enabled = true)
 public class SecurityConfig {
 
-    private AuthEntryPointJwt unauthorizedHandler;
+    private AuthEntryPointJwt authEntryPointJwt;
+
+    private CustomJwtDecoder customJwtDecoder;
 
     @Autowired
-    public SecurityConfig(AuthEntryPointJwt unauthorizedHandler) {
-        this.unauthorizedHandler = unauthorizedHandler;
+    public SecurityConfig(AuthEntryPointJwt authEntryPointJwt, CustomJwtDecoder customJwtDecoder1) {
+        this.authEntryPointJwt = authEntryPointJwt;
+        this.customJwtDecoder = customJwtDecoder1;
     }
 
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
+    @NonFinal
+    static final String[] PUBLIC_ENDPOINT = {
+            "/books/**",
+            "/categories/**",
+            "/authors/**",
+            "/publisher/**",
+            "/files"
+
+    };
 
     @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-//        http.csrf(csrf ->
-//                csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-//                        .ignoringRequestMatchers("/api/auth/public/**")
-//        );
-        http.csrf(c -> c.disable())
-        .cors(Customizer.withDefaults())
-        .authorizeHttpRequests((requests)
-                -> requests
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/csrf-token","api/auth/refresh-token","testnhe/**").permitAll()
-                .requestMatchers("/api/auth/public/**").permitAll()
-                .anyRequest().permitAll());
-        http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.formLogin(withDefaults());
-        http.httpBasic(withDefaults());
-        return http.build();
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeHttpRequests(request ->
+                        request
+                                .requestMatchers(PUBLIC_ENDPOINT)
+                                .permitAll()
+                                .anyRequest()
+                                .authenticated()
+                );
+
+        httpSecurity.oauth2ResourceServer(oauth2 ->
+                oauth2.jwt(jwtConfigurer ->
+                        jwtConfigurer
+                                .decoder(customJwtDecoder)
+                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                )
+                        .authenticationEntryPoint(authEntryPointJwt)
+        );
+
+        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
+
+        return httpSecurity.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -73,6 +84,17 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
+        return jwtAuthenticationConverter;
     }
 
     @Bean

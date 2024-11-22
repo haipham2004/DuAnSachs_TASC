@@ -25,7 +25,6 @@ const Home = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
 
-    console.log("filter1: ", filter)
     useEffect(() => {
         const initCategory = async () => {
             const res = await callFetchCategory();
@@ -44,7 +43,7 @@ const Home = () => {
 
         fetchBook();
     }, [current, pageSize, filter, sortQuery]);
-    console.log("filter2: ", filter)
+    
 
     const fetchBook = async () => {
         setIsLoading(true);
