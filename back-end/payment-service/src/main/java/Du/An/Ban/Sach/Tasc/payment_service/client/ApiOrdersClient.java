@@ -24,5 +24,4 @@ public interface ApiOrdersClient {
     @PutMapping("/orders/updateOrdersStatus")
     ApiResponse<Void> updateOrdersStatus( @RequestParam("idOrder") Integer idOrder,@RequestParam("status") String status);
 
-
 }

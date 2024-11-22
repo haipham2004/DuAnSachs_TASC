@@ -21,7 +21,6 @@ public class OrdersRowMapper2 implements RowMapper<OrdersResponse> {
         ordersResponse.setTrackingNumber(rs.getString("tracking_number"));
         ordersResponse.setStatus(rs.getString("status"));
         ordersResponse.setShippingAddress(rs.getString("shipping_address"));
-        ordersResponse.setPaymentMethod(rs.getString("payment_method"));
         ordersResponse.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         ordersResponse.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
         ordersResponse.setDeletedAt(rs.getBoolean("deleted_at"));

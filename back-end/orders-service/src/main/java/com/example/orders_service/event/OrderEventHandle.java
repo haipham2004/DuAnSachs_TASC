@@ -26,7 +26,6 @@ public class OrderEventHandle {
                 .trackingNumber(null)
                 .status(event.getOrderStatus())
                 .shippingAddress(event.getShippingAddress())
-                .paymentMethod(event.getPaymentMethod())
                 .ordersItemsRequests(event.getItems())
                 .shippingAddress(event.getShippingAddress())
                 .build();

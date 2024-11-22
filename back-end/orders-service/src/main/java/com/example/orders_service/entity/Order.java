@@ -26,8 +26,6 @@ public class Order {
 
     private String shippingAddress;
 
-    private String paymentMethod;
-
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;

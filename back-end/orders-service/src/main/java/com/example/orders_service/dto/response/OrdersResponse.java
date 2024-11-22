@@ -31,8 +31,6 @@ public class OrdersResponse {
 
     private String shippingAddress;
 
-    private String paymentMethod;
-
     @JsonIgnore
     private LocalDateTime createdAt;
     @JsonIgnore

@@ -222,5 +222,45 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
     }
 
 
+    @Override
+    public List<BooksResponse> reduceQuantitys(Integer bookId, Integer quantity) {
+        // Cập nhật số lượng sách
+        String updateSql = "UPDATE books SET quantity = quantity - ? WHERE book_id = ? AND quantity >= ?";
+        int rowsAffected = jdbcTemplate.update(updateSql, quantity, bookId, quantity);
+
+        // Truy vấn sách sau khi cập nhật
+        String querySql = "SELECT book_id, title, quantity FROM books WHERE book_id = ?";
+        return jdbcTemplate.query(querySql, (rs, rowNum) -> {
+            BooksResponse response = new BooksResponse();
+            response.setBookId(rs.getInt("book_id"));
+            response.setTitle(rs.getString("title"));
+            response.setQuantity(rs.getInt("quantity"));
+            return response;
+        }, bookId);
+    }
+
+    @Override
+    public List<BooksResponse> increaseQuantitys(Integer bookId, Integer quantity) {
+        // Cập nhật số lượng sách
+        String updateSql = "UPDATE books SET quantity = quantity + ? WHERE book_id = ? AND quantity >= ?";
+        int rowsAffected = jdbcTemplate.update(updateSql, quantity, bookId,quantity);
+
+        // Truy vấn sách sau khi cập nhật
+        String querySql = "SELECT book_id, title, quantity FROM books WHERE book_id = ?";
+        return jdbcTemplate.query(querySql, (rs, rowNum) -> {
+            BooksResponse response = new BooksResponse();
+            response.setBookId(rs.getInt("book_id"));
+            response.setTitle(rs.getString("title"));
+            response.setQuantity(rs.getInt("quantity"));
+            return response;
+        }, bookId);
+    }
+
+
+
+
+
+
+
 
 }

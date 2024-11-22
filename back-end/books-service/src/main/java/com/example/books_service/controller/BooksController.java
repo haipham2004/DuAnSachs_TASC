@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("books")
 public class BooksController {
@@ -105,6 +107,20 @@ public class BooksController {
                                               @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
         booksService.increaseQuantity(bookId,quantity);
         return ApiResponse.<Void>builder().statusCode(200).message("Update tang book").build();
+    }
+
+    @PutMapping("reduceQuantitys")
+    public ApiResponse<List<BooksResponse>> reduceQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+                                                            @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
+        booksService.decreaseQuantity(bookId,quantity);
+        return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update giam book").data(booksService.reduceQuantitys(bookId,quantity)).build();
+    }
+
+
+    @PutMapping("increaseQuantitys")
+    public ApiResponse<List<BooksResponse>>  increaseQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+                                              @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
+        return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update tang book").data(booksService.increaseQuantitys(bookId,quantity)).build();
     }
 
 }

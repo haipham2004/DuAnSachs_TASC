@@ -1,6 +1,7 @@
 package com.example.orders_service.repository.Impl;
 
 import com.example.orders_service.client.ApiBooksClient;
+import com.example.orders_service.client.PaymentClient;
 import com.example.orders_service.dto.request.OrdersItemsRequest;
 import com.example.orders_service.dto.request.OrdersRequest;
 import com.example.orders_service.dto.response.ApiResponse;
@@ -9,7 +10,6 @@ import com.example.orders_service.dto.response.OrderStatus;
 import com.example.orders_service.dto.response.OrdersItemsResponse;
 import com.example.orders_service.dto.response.OrdersResponse;
 import com.example.orders_service.dto.response.PageResponse;
-import com.example.orders_service.dto.response.PaymentStatus;
 import com.example.orders_service.exception.NotfoundException;
 import com.example.orders_service.mapper.OrdersRowMapper;
 import com.example.orders_service.mapper.OrdersRowMapper2;
@@ -38,10 +38,12 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
 
     private ApiBooksClient apiBooksClient;
 
+    private PaymentClient paymentClient;
     @Autowired
-    public OdersRepositoryServiceImpl(JdbcTemplate jdbcTemplate, ApiBooksClient apiBooksClient) {
+    public OdersRepositoryServiceImpl(JdbcTemplate jdbcTemplate, ApiBooksClient apiBooksClient, PaymentClient paymentClient) {
         this.jdbcTemplate = jdbcTemplate;
         this.apiBooksClient = apiBooksClient;
+        this.paymentClient = paymentClient;
     }
 
     public static String generateOrderCode() {
@@ -59,7 +61,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
 
         String sql = "SELECT " +
                 "o.order_id, o.total, o.tracking_number, o.status, " +
-                "o.shipping_address, o.payment_method, " +
+                "o.shipping_address, " +
                 "o.created_at, o.updated_at, o.deleted_at, " +
                 "o.user_id, u.fullname, u.phone, u.email " +
                 "FROM orders o " +
@@ -93,7 +95,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     public OrdersResponse findById(Integer id) {
         String sql = "SELECT " +
                 "o.order_id, o.total, o.tracking_number, o.status, " +
-                "o.shipping_address, o.payment_method," +
+                "o.shipping_address, " +
                 "o.created_at, o.updated_at, o.deleted_at, " +
                 "o.user_id, u.fullname, u.phone, u.email " +
                 "FROM orders o " +
@@ -110,7 +112,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     @Override
     public OrdersResponse findByIdOrder(Integer id) {
         String sql = "SELECT o.order_id, o.total, o.tracking_number, o.status, " +
-                "o.shipping_address, o.payment_method, " +
+                "o.shipping_address, " +
                 "o.created_at, o.updated_at, o.deleted_at, " +
                 "o.user_id, u.fullname, u.phone, u.email, " +
                 "oi.order_item_id, oi.quantity, oi.price, b.title " +
@@ -132,8 +134,8 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
         String satus = OrderStatus.CREATED.name();
         String trackingNumber = UUID.randomUUID().toString();
         String sql = "INSERT INTO orders (total, tracking_number, status, shipping_address, " +
-                "payment_method,user_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                "user_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -144,8 +146,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
             ps.setString(2, trackingNumber);
             ps.setString(3, satus);
             ps.setString(4, ordersRequest.getShippingAddress());
-            ps.setString(5, ordersRequest.getPaymentMethod());
-            ps.setInt(6, ordersRequest.getUserId());
+            ps.setInt(5, ordersRequest.getUserId());
             return ps;
         }, keyHolder);
 
@@ -157,7 +158,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     @Override
     public OrdersRequest update(Integer id, OrdersRequest ordersRequest) {
         String sql = "UPDATE orders SET total = ?, tracking_number = ?, status = ?, " +
-                "shipping_address = ?, payment_method = ? " +
+                "shipping_address = ? " +
                 "WHERE order_id = ?";
 
         jdbcTemplate.update(sql,
@@ -165,7 +166,6 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
                 ordersRequest.getTrackingNumber(),
                 ordersRequest.getStatus(),
                 ordersRequest.getShippingAddress(),
-                ordersRequest.getPaymentMethod(),
                 id);
 
         ordersRequest.setOrderId(id);
@@ -182,12 +182,12 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     public OrdersRequest createOrder(OrdersRequest ordersRequest) {
         double total = 0.0;
 
-        // Kiểm tra các mục đặt hàng không rỗng
+        // **Bước 1: Kiểm tra danh sách sản phẩm trong đơn hàng**
         if (ordersRequest.getOrdersItemsRequests() == null || ordersRequest.getOrdersItemsRequests().isEmpty()) {
             throw new IllegalArgumentException("Order items cannot be empty");
         }
 
-        // Kiểm tra số lượng sách có sẵn
+        // **Bước 2: Tính tổng tiền và kiểm tra tồn kho**
         for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
             ApiResponse<Integer> availableQuantity = apiBooksClient.getAvailableQuantity(item.getBookId());
             if (item.getQuantity() > availableQuantity.getData()) {
@@ -195,35 +195,31 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
             }
             total += item.getQuantity() * item.getPrice();
         }
-
-        // Lưu tổng tiền và thông tin đơn hàng
         ordersRequest.setTotal(total);
 
-        // Thực hiện lưu đơn hàng
-        String sqlOrder = "INSERT INTO orders (total, tracking_number, status, shipping_address, " +
-                "payment_method, user_id) VALUES (?, ?, ?, ?, ?, ?)";
+        // **Bước 3: Lưu đơn hàng**
+        String trackingNumber = generateOrderCode(); // Tạo mã duy nhất cho đơn hàng
+        String sqlOrder = "INSERT INTO orders (total, tracking_number, status, shipping_address, user_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
             ps.setDouble(1, ordersRequest.getTotal());
-            ps.setString(2, generateOrderCode());
+            ps.setString(2, trackingNumber);
             ps.setString(3, OrderStatus.CREATED.name());
             ps.setString(4, ordersRequest.getShippingAddress());
-            ps.setString(5, PaymentStatus.PENDING.name());
-            ps.setInt(6, ordersRequest.getUserId());
+            ps.setInt(5, ordersRequest.getUserId());
             return ps;
         }, keyHolder);
 
-        // Lấy ID của đơn hàng
         int orderId = keyHolder.getKey().intValue();
         ordersRequest.setOrderId(orderId);
 
-        // Thêm các mục đơn hàng và lấy ID của mỗi mục
+        // **Bước 4: Lưu chi tiết đơn hàng**
         String sqlOrderItem = "INSERT INTO order_items (order_id, book_id, quantity, price, status) " +
                 "VALUES (?, ?, ?, ?, ?)";
         for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
-            KeyHolder itemKeyHolder = new GeneratedKeyHolder();  // Tạo KeyHolder riêng cho mỗi mục
+            KeyHolder itemKeyHolder = new GeneratedKeyHolder();
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sqlOrderItem, Statement.RETURN_GENERATED_KEYS);
                 ps.setInt(1, orderId);
@@ -234,22 +230,17 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
                 return ps;
             }, itemKeyHolder);
 
-            // Lấy ID của từng order item và gán lại cho từng item
             int orderItemId = itemKeyHolder.getKey().intValue();
-            item.setOrderItemId(orderItemId);  // Gán ID của order item cho đối tượng item
+            item.setOrderItemId(orderItemId);
             item.setStatus(OrderItemStatus.PENDING);
         }
-
-        // Giảm số lượng sách trong kho sau khi tất cả đều được kiểm tra và lưu
-        for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
-            apiBooksClient.decreaseQuantity(item.getBookId(), item.getQuantity());
-        }
-
-        // Cập nhật trạng thái đơn hàng
         ordersRequest.setStatus(OrderStatus.CREATED);
-        ordersRequest.setTrackingNumber(generateOrderCode());
+        ordersRequest.setTrackingNumber(trackingNumber);
+        String redirectUrl = paymentClient.processPayment((long) total*100, String.valueOf(orderId));
+        ordersRequest.setPaymentUrl(redirectUrl);
         return ordersRequest;
     }
+
 
     @Override
     public OrdersRequest updateOrder(int orderId, OrdersRequest updatedOrderRequest) {
@@ -369,8 +360,6 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     }
 
 
-
-
     @Override
     public void deleteOrder(Integer orderId) {
         // Bước 1: Lấy danh sách order items liên quan đến order
@@ -378,7 +367,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
         List<OrdersItemsResponse> orderItems = jdbcTemplate.query(sqlGetOrderItems, new RowMapper<OrdersItemsResponse>() {
             @Override
             public OrdersItemsResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-                OrdersItemsResponse ordersItemsResponse=new OrdersItemsResponse();
+                OrdersItemsResponse ordersItemsResponse = new OrdersItemsResponse();
                 ordersItemsResponse.setBookId(rs.getInt("book_id"));
                 ordersItemsResponse.setQuantity(rs.getInt("quantity"));
                 return ordersItemsResponse;
@@ -417,12 +406,10 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     }
 
     @Override
-    public void updateOrdersStatus(Integer idOrder,String status){
+    public void updateOrdersStatus(Integer idOrder, String status) {
         String sqlUpdateOrderStatus = "UPDATE orders SET status = ? WHERE order_id = ?";
         jdbcTemplate.update(sqlUpdateOrderStatus, status, idOrder);
     }
-
-
 
 
 //    @Override

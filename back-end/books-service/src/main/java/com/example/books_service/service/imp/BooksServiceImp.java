@@ -70,5 +70,15 @@ public class BooksServiceImp implements BooksService {
        booksServiceRepository.increaseQuantity(bookId,quantity);
     }
 
+    @Override
+    public List<BooksResponse> reduceQuantitys(Integer bookId, Integer quantity) {
+        return booksServiceRepository.reduceQuantitys(bookId,quantity);
+    }
+
+    @Override
+    public List<BooksResponse> increaseQuantitys(Integer bookId, Integer quantity) {
+        return booksServiceRepository.increaseQuantitys(bookId,quantity);
+    }
+
 
 }
