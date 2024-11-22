@@ -4,7 +4,7 @@ import { callCreateBook, callFetchAuthor, callFetchCategory, callFetchPublisher,
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 const BookModalCreate = (props) => {
-     console.log("props là: ",props.listAuthor2)
+
     const { openModalCreate, setOpenModalCreate } = props;
     const [isSubmit, setIsSubmit] = useState(false);
 

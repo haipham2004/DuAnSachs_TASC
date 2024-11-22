@@ -25,11 +25,11 @@ const LoginPage = () => {
   const res= await callLogin(username, password);
   setIsSubmit(false)
  console.log("login ",res)
+ localStorage.setItem('access_token', res.jwtToken);
+ console.log("Data localStorage: ", localStorage.getItem('access_token'));
 
   if(res && res.username){
-    localStorage.setItem('access_token', res.jwtToken);
-    console.log("Data localStorage: ", localStorage.getItem('access_token'));
-
+ 
     dispatch(doLoginAction({
       username: res.username,
       roles: res.roles,

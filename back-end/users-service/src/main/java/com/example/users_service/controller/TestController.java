@@ -5,11 +5,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("testnhe")
+@RequestMapping("check")
 public class TestController {
 
-    @GetMapping("wellcome")
+    @GetMapping("wellCome")
     public String wellCOme(){
         return "Xin chào hải phạm";
+    }
+
+    @GetMapping("goodBye")
+    public String goodBye(){
+        return "Tạm biệt hải phạm";
     }
 }

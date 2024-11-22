@@ -123,4 +123,9 @@ public class BooksController {
         return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update tang book").data(booksService.increaseQuantitys(bookId,quantity)).build();
     }
 
+    @GetMapping("test")
+    public String test(){
+        return "Xin chào mọi người";
+    }
+
 }

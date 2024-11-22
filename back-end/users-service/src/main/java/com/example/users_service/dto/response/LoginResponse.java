@@ -26,15 +26,6 @@ public class LoginResponse {
         this.phone = phone;
     }
 
-    public LoginResponse(String jwtToken, String username, List<String> roles, String message, String email, String phone) {
-        this.jwtToken = jwtToken;
-        this.username = username;
-        this.roles = roles;
-        this.message = message;
-        this.email = email;
-        this.phone = phone;
-    }
-
     public LoginResponse(String jwtToken, String jwtTokenRefresh, String username, List<String> roles, String message, String email, String phone) {
         this.jwtToken = jwtToken;
         this.jwtTokenRefresh=jwtTokenRefresh;

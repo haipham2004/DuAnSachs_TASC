@@ -43,10 +43,16 @@ const handleRefreshToken = async () => {
 
 // Thêm interceptor cho yêu cầu của userInstance
 userInstance.interceptors.request.use(
-    function (config) {
-        const token = window.localStorage.getItem('access_token');
-        if (token) {
-            config.headers.Authorization = 'Bearer ' + token;
+    async (config) => {
+        // Nếu là login, signup hoặc các API công khai, loại bỏ Authorization
+        if (config.url && (config.url.startsWith('/api/auth/public/signin') || config.url.startsWith('/api/auth/public/signup'))) {
+            delete config.headers.Authorization; // Loại bỏ Authorization header
+        } else {
+            // Nếu có token, thêm vào Authorization header
+            const token = window.localStorage.getItem('access_token');
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`; // Thêm token vào header nếu có
+            }
         }
         return config;
     },
