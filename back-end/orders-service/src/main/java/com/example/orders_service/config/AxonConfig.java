@@ -1,10 +1,15 @@
 package com.example.orders_service.config;
 
+import com.thoughtworks.xstream.XStream;
+import jakarta.activation.DataSource;
 import org.axonframework.commandhandling.CommandCallback;
 import org.axonframework.commandhandling.CommandMessage;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.common.Registration;
+import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
+import org.axonframework.eventsourcing.eventstore.jdbc.JdbcEventStorageEngine;
 import org.axonframework.messaging.MessageDispatchInterceptor;
+import org.axonframework.serialization.xml.XStreamSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,32 +20,14 @@ import java.util.concurrent.TimeUnit;
 public class AxonConfig {
 
     @Bean
-    public CommandGateway commandGateway() {
-        return new CommandGateway() {
-            @Override
-            public Registration registerDispatchInterceptor(MessageDispatchInterceptor<? super CommandMessage<?>> messageDispatchInterceptor) {
-                return null;
-            }
+    public XStream xStream() {
+        XStream xStream = new XStream();
 
-            @Override
-            public <C, R> void send(C c, CommandCallback<? super C, ? super R> commandCallback) {
-
-            }
-
-            @Override
-            public <R> R sendAndWait(Object o) {
-                return null;
-            }
-
-            @Override
-            public <R> R sendAndWait(Object o, long l, TimeUnit timeUnit) {
-                return null;
-            }
-
-            @Override
-            public <R> CompletableFuture<R> send(Object o) {
-                return null;
-            }
-        };
+        xStream.allowTypesByWildcard(new String[] {
+                "com.example.**"
+        });
+        return xStream;
     }
+
+
 }

@@ -23,7 +23,7 @@ public interface BooksService {
                                                String nameCategory, double priceMin, double priceMax,
                                                int pageNumber, int pageSize, String sort);
 
-    int getAvailableQuantity(int bookId);
+    List<BooksResponse> getAvailableQuantity(List<Integer> bookId);
 
     void decreaseQuantity(Integer bookId, Integer quantity);
 

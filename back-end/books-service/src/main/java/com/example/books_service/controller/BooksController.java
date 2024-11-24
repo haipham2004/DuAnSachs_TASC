@@ -4,6 +4,7 @@ import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.ApiResponse;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
+import com.example.books_service.exception.NotfoundException;
 import com.example.books_service.service.BooksService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,48 +84,72 @@ public class BooksController {
         return ApiResponse.<PageResponse<BooksResponse>>builder()
                 .statusCode(200)
                 .message("Page book success")
-                .data(booksService.findBooksPage3(title, nameAuthor, namePublisher, nameCategory,priceMin,priceMax, pageNumber, pageSize, sort))
+                .data(booksService.findBooksPage3(title, nameAuthor, namePublisher, nameCategory, priceMin, priceMax, pageNumber, pageSize, sort))
                 .build();
     }
 
     @GetMapping("getAvailableQuantity")
-    public ApiResponse<Integer> getAvailableQuantity(@RequestParam("bookId") Integer bookId){
-        return ApiResponse.<Integer>builder().statusCode(200).message("getAvailableQuantity book").data(booksService.getAvailableQuantity(bookId)).build();
+    public ApiResponse<List<BooksResponse>> getAvailableQuantity(@RequestParam("bookId") List<Integer> bookIds) {
+        if (bookIds == null || bookIds.isEmpty()) {
+            return ApiResponse.<List<BooksResponse>>builder()
+                    .statusCode(400)
+                    .message("Danh sách bookIds không thể null hoặc rỗng")
+                    .data(null)
+                    .build();
+        }
+
+        try {
+            // Lấy thông tin sách có sẵn từ service
+            List<BooksResponse> availableBooks = booksService.getAvailableQuantity(bookIds);
+
+            // Trả về kết quả với thông tin sách có sẵn
+            return ApiResponse.<List<BooksResponse>>builder()
+                    .statusCode(200)
+                    .message("Lấy thông tin sách thành công")
+                    .data(availableBooks)
+                    .build();
+
+        } catch (NotfoundException ex) {
+            // Trả về thông báo lỗi nếu có ngoại lệ
+            return ApiResponse.<List<BooksResponse>>builder()
+                    .statusCode(404)
+                    .message(ex.getMessage())
+                    .data(null)
+                    .build();
+        }
     }
 
-
-
     @PutMapping("decreaseQuantity")
-    public ApiResponse<Void> decreaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
-                                              @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
-        booksService.decreaseQuantity(bookId,quantity);
+    public ApiResponse<Void> decreaseQuantity(@RequestParam(name = "bookId", defaultValue = "0") Integer bookId,
+                                              @RequestParam(name = "quantity", defaultValue = "0") Integer quantity) {
+        booksService.decreaseQuantity(bookId, quantity);
         return ApiResponse.<Void>builder().statusCode(200).message("Update giam book").build();
     }
 
 
     @PutMapping("increaseQuantity")
-    public ApiResponse<Void> increaseQuantity(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
-                                              @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
-        booksService.increaseQuantity(bookId,quantity);
+    public ApiResponse<Void> increaseQuantity(@RequestParam(name = "bookId", defaultValue = "0") Integer bookId,
+                                              @RequestParam(name = "quantity", defaultValue = "0") Integer quantity) {
+        booksService.increaseQuantity(bookId, quantity);
         return ApiResponse.<Void>builder().statusCode(200).message("Update tang book").build();
     }
 
     @PutMapping("reduceQuantitys")
-    public ApiResponse<List<BooksResponse>> reduceQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
-                                                            @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
-        booksService.decreaseQuantity(bookId,quantity);
-        return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update giam book").data(booksService.reduceQuantitys(bookId,quantity)).build();
+    public ApiResponse<List<BooksResponse>> reduceQuantitys(@RequestParam(name = "bookId", defaultValue = "0") Integer bookId,
+                                                            @RequestParam(name = "quantity", defaultValue = "0") Integer quantity) {
+        booksService.decreaseQuantity(bookId, quantity);
+        return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update giam book").data(booksService.reduceQuantitys(bookId, quantity)).build();
     }
 
 
     @PutMapping("increaseQuantitys")
-    public ApiResponse<List<BooksResponse>>  increaseQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
-                                              @RequestParam(name="quantity",defaultValue = "0") Integer quantity){
-        return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update tang book").data(booksService.increaseQuantitys(bookId,quantity)).build();
+    public ApiResponse<List<BooksResponse>> increaseQuantitys(@RequestParam(name = "bookId", defaultValue = "0") Integer bookId,
+                                                              @RequestParam(name = "quantity", defaultValue = "0") Integer quantity) {
+        return ApiResponse.<List<BooksResponse>>builder().statusCode(200).message("Update tang book").data(booksService.increaseQuantitys(bookId, quantity)).build();
     }
 
     @GetMapping("test")
-    public String test(){
+    public String test() {
         return "Xin chào mọi người";
     }
 

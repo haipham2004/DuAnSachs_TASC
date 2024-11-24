@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional
@@ -189,15 +190,30 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
 
 
     @Override
-    public int getAvailableQuantity(int bookId) {
-        String sql = "SELECT quantity FROM books WHERE book_id = ?";
+    public List<BooksResponse> getAvailableQuantity(List<Integer> bookId) {
+        if (bookId == null || bookId.isEmpty()) {
+            throw new IllegalArgumentException("Book IDs list cannot be null or empty");
+        }
 
-        // Sử dụng queryForObject để lấy số lượng sách
-        Integer quantity = jdbcTemplate.queryForObject(sql, Integer.class,bookId);
+        String placeholders = bookId.stream()
+                .map(id -> "?")
+                .collect(Collectors.joining(","));
 
-        // Nếu không tìm thấy sách, trả về 0
-        return (quantity != null) ? quantity : 0;
+        String sql = "SELECT book_id, quantity, price FROM books WHERE book_id IN (" + placeholders + ")";
+
+        Object[] params = bookId.toArray();
+
+        return jdbcTemplate.query(
+                sql,
+                (rs, rowNum) -> BooksResponse.builder()
+                        .bookId(rs.getInt("book_id"))
+                        .quantity(rs.getInt("quantity"))
+                        .price(rs.getDouble("price"))
+                        .build(),params
+        );
     }
+
+
 
     // Giảm số lượng sách khi bán hoặc khi đặt hàng
     @Override
@@ -224,11 +240,10 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
 
     @Override
     public List<BooksResponse> reduceQuantitys(Integer bookId, Integer quantity) {
-        // Cập nhật số lượng sách
         String updateSql = "UPDATE books SET quantity = quantity - ? WHERE book_id = ? AND quantity >= ?";
+
         int rowsAffected = jdbcTemplate.update(updateSql, quantity, bookId, quantity);
 
-        // Truy vấn sách sau khi cập nhật
         String querySql = "SELECT book_id, title, quantity FROM books WHERE book_id = ?";
         return jdbcTemplate.query(querySql, (rs, rowNum) -> {
             BooksResponse response = new BooksResponse();
@@ -255,12 +270,5 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
             return response;
         }, bookId);
     }
-
-
-
-
-
-
-
 
 }

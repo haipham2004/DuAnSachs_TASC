@@ -33,14 +33,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthenticationFilter implements GlobalFilter, Ordered, GatewayFilter {
-    @Lazy UsersService usersService;
+    UsersService usersService;
 
     String[] publicEndpoints = {
             "/api/auth/public/fetchAccount",
             "/api/auth/public/checkToKen",
             "/api/auth/public/signin",
-            "/testnhe/wellcome",
-            ""
+            "/test/wellCome"
     };
 
     @SneakyThrows
@@ -60,7 +59,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered, GatewayFilte
 
         String token = authHeader.get(0).replace("Bearer ", "");
 
-        Mono<ApiResponse<LoginResponse>> result = usersService.validateToken(token);
+        Mono<ApiResponse<LoginResponse>> result = usersService.checkToken(token);
 
         return result.flatMap(apiResponse -> {
             if (apiResponse != null && apiResponse.getResults().getUsername() != null) {

@@ -6,7 +6,9 @@ import Du.An.Ban.Sach.Tasc.payment_service.config.VNPayConfig;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.TransactionHistoryRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.exception.CustomException;
 import Du.An.Ban.Sach.Tasc.payment_service.repository.PaymentsRepository;
@@ -118,14 +120,13 @@ public class PaymentsController {
                     return "redirect:/payment-error";
                 }
 
+//                paymentsRepository.updatePaymentStatus(orderId,, PaymentStatus.SUCCESS.name());
 
-                model.addAttribute("orderId", ordersResponse.getOrderId());
-                model.addAttribute("status", ordersResponse.getStatus());
-                model.addAttribute("total", ordersResponse.getTotal());
-                model.addAttribute("totalPayment", totalPayment);
+                // Cập nhật trạng thái đơn hàng thành 'SUCCESS'
+                apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.SUCCESS.name());
 
-//                       apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.SUCCESS.name());
-//          Lưu lịch sử giao dịch
+
+                // Lưu lịch sử giao dịch
                 TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
                         .orderId(orderId)
                         .userId(ordersResponse.getUserId())
@@ -136,9 +137,14 @@ public class PaymentsController {
                 // Gửi thông báo email cho người dùng
                 apiNotificationsClient.sendEmail(ordersResponse.getEmailUser(), "Xin chào Khách Hàng", ordersResponse.getOrderId());
 
+                // Thêm thông tin vào model
+                model.addAttribute("orderId", ordersResponse.getOrderId());
+                model.addAttribute("status", ordersResponse.getStatus());
+                model.addAttribute("total", ordersResponse.getTotal());
+                model.addAttribute("totalPayment", totalPayment);
 
-                // Trả về view thành công
-                return "PaymentSuccess";
+                // Trả về view thanh toán thành công
+                return "redirect:/PaymentSuccess";
             } else if (status == 0) {  // Thanh toán thất bại
                 return "redirect:/payment-fail?orderId=" + orderId;
             } else {  // Lỗi hoặc dữ liệu không hợp lệ
@@ -149,6 +155,7 @@ public class PaymentsController {
             return "redirect:/payment-error";  // Redirect về trang lỗi nếu có ngoại lệ
         }
     }
+
 
 
 //    @PostMapping("/refund")
