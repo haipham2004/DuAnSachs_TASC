@@ -22,7 +22,7 @@ public interface BooksServiceRepository {
     PageResponse<BooksResponse> findBooksPage3(String nameBook, String nameAuthor, String namePublisher,
                                                String nameCategory, double priceMin, double priceMax, int pageNumber, int pageSize, String sort);
 
-    int getAvailableQuantity(int bookId);
+    List<BooksResponse> getAvailableQuantity(List<Integer> bookIds);
 
     void decreaseQuantity(Integer bookId, Integer quantity);
 

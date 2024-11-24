@@ -3,12 +3,14 @@ package com.example.books_service.service.imp;
 import com.example.books_service.dto.request.BooksRequest;
 import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
+import com.example.books_service.exception.NotfoundException;
 import com.example.books_service.repository.BooksServiceRepository;
 import com.example.books_service.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BooksServiceImp implements BooksService {
@@ -56,9 +58,45 @@ public class BooksServiceImp implements BooksService {
     }
 
     @Override
-    public int getAvailableQuantity(int bookId) {
-        return booksServiceRepository.getAvailableQuantity(bookId);
+    public List<BooksResponse> getAvailableQuantity(List<Integer> bookIds) {
+        // Lấy thông tin tất cả sách có trong danh sách bookIds từ repository
+        List<BooksResponse> availableBooks = booksServiceRepository.getAvailableQuantity(bookIds);
+
+        // Kiểm tra nếu sách không tồn tại
+        List<Integer> foundBookIds = availableBooks.stream()
+                .map(BooksResponse::getBookId)
+                .collect(Collectors.toList());
+
+        // Danh sách các bookIds không tồn tại trong cơ sở dữ liệu
+        List<Integer> missingBookIds = bookIds.stream()
+                .filter(bookId -> !foundBookIds.contains(bookId))
+                .collect(Collectors.toList());
+
+        // Nếu có bất kỳ sách nào không tồn tại, ném ngoại lệ NotFoundException cho những sách đó
+        if (!missingBookIds.isEmpty()) {
+            String missingBooks = missingBookIds.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            throw new NotfoundException("Không tìm thấy sách với bookIds: " + missingBooks);
+        }
+
+        // Kiểm tra nếu sách có số lượng bằng 0 (hết hàng)
+        List<String> outOfStockBooks = availableBooks.stream()
+                .filter(book -> book.getQuantity() == 0)
+                .map(book -> book.getBookId() + " - " + book.getTitle()) // Kèm theo tên sách
+                .collect(Collectors.toList());
+
+        // Nếu có sách hết hàng, ném ngoại lệ NotFoundException với thông báo hết hàng
+        if (!outOfStockBooks.isEmpty()) {
+            String outOfStockMessage = outOfStockBooks.stream()
+                    .collect(Collectors.joining(", "));
+            throw new NotfoundException("Sách hết hàng với bookIds và title: " + outOfStockMessage);
+        }
+
+        // Trả về danh sách các sách có sẵn
+        return availableBooks;
     }
+
 
     @Override
     public void decreaseQuantity(Integer bookId, Integer quantity) {

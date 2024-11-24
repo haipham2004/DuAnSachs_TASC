@@ -26,4 +26,6 @@ public class PaymentsRequest {
     private String paymentMethod;
 
     private String status;
+
+    private String redirectUrl;
 }

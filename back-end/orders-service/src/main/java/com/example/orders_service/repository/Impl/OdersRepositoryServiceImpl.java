@@ -1,7 +1,7 @@
 package com.example.orders_service.repository.Impl;
 
 import com.example.orders_service.client.ApiBooksClient;
-import com.example.orders_service.client.PaymentClient;
+import com.example.orders_service.client.ApiPaymentClient;
 import com.example.orders_service.dto.request.OrdersItemsRequest;
 import com.example.orders_service.dto.request.OrdersRequest;
 import com.example.orders_service.dto.response.ApiResponse;
@@ -38,17 +38,15 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
 
     private ApiBooksClient apiBooksClient;
 
-    private PaymentClient paymentClient;
+    private ApiPaymentClient apiPaymentClient;
     @Autowired
-    public OdersRepositoryServiceImpl(JdbcTemplate jdbcTemplate, ApiBooksClient apiBooksClient, PaymentClient paymentClient) {
+    public OdersRepositoryServiceImpl(JdbcTemplate jdbcTemplate, ApiBooksClient apiBooksClient, ApiPaymentClient apiPaymentClient) {
         this.jdbcTemplate = jdbcTemplate;
         this.apiBooksClient = apiBooksClient;
-        this.paymentClient = paymentClient;
+        this.apiPaymentClient = apiPaymentClient;
     }
 
-    public static String generateOrderCode() {
-        return "DHYKA" + UUID.randomUUID().toString();
-    }
+
 
     private OrdersRowMapper getOrdersMapper() {
         return new OrdersRowMapper();
@@ -180,32 +178,13 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
 
     @Override
     public OrdersRequest createOrder(OrdersRequest ordersRequest) {
-        double total = 0.0;
-
-        // **Bước 1: Kiểm tra danh sách sản phẩm trong đơn hàng**
-        if (ordersRequest.getOrdersItemsRequests() == null || ordersRequest.getOrdersItemsRequests().isEmpty()) {
-            throw new IllegalArgumentException("Order items cannot be empty");
-        }
-
-        // **Bước 2: Tính tổng tiền và kiểm tra tồn kho**
-        for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
-            ApiResponse<Integer> availableQuantity = apiBooksClient.getAvailableQuantity(item.getBookId());
-            if (item.getQuantity() > availableQuantity.getData()) {
-                throw new IllegalArgumentException("Requested quantity exceeds available stock for book ID: " + item.getBookId());
-            }
-            total += item.getQuantity() * item.getPrice();
-        }
-        ordersRequest.setTotal(total);
-
-        // **Bước 3: Lưu đơn hàng**
-        String trackingNumber = generateOrderCode(); // Tạo mã duy nhất cho đơn hàng
         String sqlOrder = "INSERT INTO orders (total, tracking_number, status, shipping_address, user_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
             ps.setDouble(1, ordersRequest.getTotal());
-            ps.setString(2, trackingNumber);
+            ps.setString(2, ordersRequest.getTrackingNumber());
             ps.setString(3, OrderStatus.CREATED.name());
             ps.setString(4, ordersRequest.getShippingAddress());
             ps.setInt(5, ordersRequest.getUserId());
@@ -214,8 +193,9 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
 
         int orderId = keyHolder.getKey().intValue();
         ordersRequest.setOrderId(orderId);
+        ordersRequest.setStatus(OrderStatus.CREATED);
 
-        // **Bước 4: Lưu chi tiết đơn hàng**
+        // Lưu chi tiết các mặt hàng trong đơn hàng
         String sqlOrderItem = "INSERT INTO order_items (order_id, book_id, quantity, price, status) " +
                 "VALUES (?, ?, ?, ?, ?)";
         for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
@@ -234,129 +214,130 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
             item.setOrderItemId(orderItemId);
             item.setStatus(OrderItemStatus.PENDING);
         }
-        ordersRequest.setStatus(OrderStatus.CREATED);
-        ordersRequest.setTrackingNumber(trackingNumber);
-        String redirectUrl = paymentClient.processPayment((long) total*100, String.valueOf(orderId));
-        ordersRequest.setPaymentUrl(redirectUrl);
+
+
+
         return ordersRequest;
     }
 
 
+
     @Override
     public OrdersRequest updateOrder(int orderId, OrdersRequest updatedOrderRequest) {
-        if (updatedOrderRequest == null || updatedOrderRequest.getOrdersItemsRequests() == null) {
-            throw new IllegalArgumentException("Updated order request cannot be null or empty.");
-        }
-
-        // Lấy thông tin đơn hàng hiện tại
-        String sqlGetOrder = "SELECT total, shipping_address FROM orders WHERE order_id = ?";
-        OrdersResponse existingOrderResponse = jdbcTemplate.queryForObject(sqlGetOrder, new RowMapper<OrdersResponse>() {
-            @Override
-            public OrdersResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-                OrdersResponse order = new OrdersResponse();
-                order.setTotal(rs.getDouble("total"));
-                order.setShippingAddress(rs.getString("shipping_address"));
-                return order;
-            }
-        }, orderId);
-
-        // Cập nhật địa chỉ giao hàng nếu có thay đổi
-        if (!existingOrderResponse.getShippingAddress().equals(updatedOrderRequest.getShippingAddress())) {
-            String sqlUpdateShippingAddress = "UPDATE orders SET shipping_address = ? WHERE order_id = ?";
-            jdbcTemplate.update(sqlUpdateShippingAddress, updatedOrderRequest.getShippingAddress(), orderId);
-        }
-
-        // Lấy các mục trong đơn hàng hiện tại
-        String sqlGetOrderItems = "SELECT book_id, quantity, price FROM order_items WHERE order_id = ?";
-        List<OrdersItemsResponse> existingOrderItems = jdbcTemplate.query(sqlGetOrderItems, new RowMapper<OrdersItemsResponse>() {
-            @Override
-            public OrdersItemsResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
-                OrdersItemsResponse item = new OrdersItemsResponse();
-                item.setBookId(rs.getInt("book_id"));
-                item.setQuantity(rs.getInt("quantity"));
-                item.setPrice(rs.getDouble("price"));
-                return item;
-            }
-        }, orderId);
-
-        // Tạo một bản đồ để tra cứu số lượng hiện tại và giá của các mục
-        Map<Integer, OrdersItemsResponse> currentOrderItemsMap = existingOrderItems.stream()
-                .collect(Collectors.toMap(OrdersItemsResponse::getBookId, item -> item));
-
-        String sqlUpdateOrderItem = "UPDATE order_items SET quantity = ?, price = ? WHERE order_id = ? AND book_id = ?";
-        String sqlInsertOrderItem = "INSERT INTO order_items (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)";
-        String sqlDeleteOrderItem = "DELETE FROM order_items WHERE order_id = ? AND book_id = ?";
-
-        // Cập nhật hoặc thêm các mục trong đơn hàng
-        for (OrdersItemsRequest updatedItem : updatedOrderRequest.getOrdersItemsRequests()) {
-            int quantityDifference = 0;
-
-            // Kiểm tra số lượng yêu cầu với số lượng có sẵn trong kho
-            ApiResponse<Integer> availableQuantity = apiBooksClient.getAvailableQuantity(updatedItem.getBookId());
-            int currentQuantityInOrder = currentOrderItemsMap.getOrDefault(updatedItem.getBookId(), new OrdersItemsResponse()).getQuantity();
-
-            // Tính toán số lượng tối đa có thể yêu cầu: Số lượng hiện tại + Số lượng còn trong kho
-            int maxPossibleQuantity = currentQuantityInOrder + availableQuantity.getData();
-
-            // Kiểm tra nếu số lượng yêu cầu vượt quá số lượng tối đa có thể yêu cầu
-            if (updatedItem.getQuantity() > maxPossibleQuantity) {
-                throw new IllegalArgumentException("Requested quantity exceeds the maximum available stock for book ID: " + updatedItem.getBookId());
-            }
-
-            // Kiểm tra nếu số lượng yêu cầu là âm, ném ngoại lệ
-            if (updatedItem.getQuantity() < 0) {
-                throw new IllegalArgumentException("Quantity cannot be negative for book ID: " + updatedItem.getBookId());
-            }
-
-            if (currentOrderItemsMap.containsKey(updatedItem.getBookId())) {
-                // Nếu mục đã tồn tại, tính toán sự thay đổi số lượng
-                quantityDifference = updatedItem.getQuantity() - currentQuantityInOrder;
-
-                // Cập nhật số lượng trong cơ sở dữ liệu và điều chỉnh kho
-                if (quantityDifference != 0) {
-                    if (quantityDifference > 0) {
-                        // Giảm số lượng trong kho khi tăng số lượng trong đơn hàng
-                        apiBooksClient.decreaseQuantity(updatedItem.getBookId(), quantityDifference);
-                    } else {
-                        // Tăng số lượng trong kho khi giảm số lượng trong đơn hàng
-                        apiBooksClient.increaseQuantity(updatedItem.getBookId(), -quantityDifference);
-                    }
-
-                    // Cập nhật số lượng trong cơ sở dữ liệu
-                    jdbcTemplate.update(sqlUpdateOrderItem, updatedItem.getQuantity(), updatedItem.getPrice(), orderId, updatedItem.getBookId());
-                }
-            } else {
-                // Nếu mục chưa tồn tại, thêm mới vào cơ sở dữ liệu
-                jdbcTemplate.update(sqlInsertOrderItem, orderId, updatedItem.getBookId(), updatedItem.getQuantity(), updatedItem.getPrice());
-                // Giảm số lượng trong kho khi thêm mới
-                apiBooksClient.decreaseQuantity(updatedItem.getBookId(), updatedItem.getQuantity());
-            }
-
-            // Nếu số lượng được cập nhật về 0, xóa mục trong đơn hàng
-            if (updatedItem.getQuantity() == 0) {
-                jdbcTemplate.update(sqlDeleteOrderItem, orderId, updatedItem.getBookId());
-                // Tăng lại số lượng trong kho nếu xóa item
-                apiBooksClient.increaseQuantity(updatedItem.getBookId(), currentQuantityInOrder);
-            }
-        }
-
-        // Tính toán tổng tiền mới
-        double newTotal = updatedOrderRequest.getOrdersItemsRequests().stream()
-                .mapToDouble(item -> item.getPrice() * item.getQuantity())
-                .sum();
-
-        // Cập nhật tổng tiền trong cơ sở dữ liệu
-        if (newTotal > 0) {
-            String sqlUpdateTotal = "UPDATE orders SET total = ? WHERE order_id = ?";
-            jdbcTemplate.update(sqlUpdateTotal, newTotal, orderId);
-        } else {
-            throw new IllegalArgumentException("Total cannot be zero or negative");
-        }
-
-        // Gán tổng tiền vào đối tượng trả về
-        updatedOrderRequest.setTotal(newTotal);
-
-        return updatedOrderRequest;
+        return null;
+//        if (updatedOrderRequest == null || updatedOrderRequest.getOrdersItemsRequests() == null) {
+//            throw new IllegalArgumentException("Updated order request cannot be null or empty.");
+//        }
+//
+//        // Lấy thông tin đơn hàng hiện tại
+//        String sqlGetOrder = "SELECT total, shipping_address FROM orders WHERE order_id = ?";
+//        OrdersResponse existingOrderResponse = jdbcTemplate.queryForObject(sqlGetOrder, new RowMapper<OrdersResponse>() {
+//            @Override
+//            public OrdersResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+//                OrdersResponse order = new OrdersResponse();
+//                order.setTotal(rs.getDouble("total"));
+//                order.setShippingAddress(rs.getString("shipping_address"));
+//                return order;
+//            }
+//        }, orderId);
+//
+//        // Cập nhật địa chỉ giao hàng nếu có thay đổi
+//        if (!existingOrderResponse.getShippingAddress().equals(updatedOrderRequest.getShippingAddress())) {
+//            String sqlUpdateShippingAddress = "UPDATE orders SET shipping_address = ? WHERE order_id = ?";
+//            jdbcTemplate.update(sqlUpdateShippingAddress, updatedOrderRequest.getShippingAddress(), orderId);
+//        }
+//
+//        // Lấy các mục trong đơn hàng hiện tại
+//        String sqlGetOrderItems = "SELECT book_id, quantity, price FROM order_items WHERE order_id = ?";
+//        List<OrdersItemsResponse> existingOrderItems = jdbcTemplate.query(sqlGetOrderItems, new RowMapper<OrdersItemsResponse>() {
+//            @Override
+//            public OrdersItemsResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+//                OrdersItemsResponse item = new OrdersItemsResponse();
+//                item.setBookId(rs.getInt("book_id"));
+//                item.setQuantity(rs.getInt("quantity"));
+//                item.setPrice(rs.getDouble("price"));
+//                return item;
+//            }
+//        }, orderId);
+//
+//        // Tạo một bản đồ để tra cứu số lượng hiện tại và giá của các mục
+//        Map<Integer, OrdersItemsResponse> currentOrderItemsMap = existingOrderItems.stream()
+//                .collect(Collectors.toMap(OrdersItemsResponse::getBookId, item -> item));
+//
+//        String sqlUpdateOrderItem = "UPDATE order_items SET quantity = ?, price = ? WHERE order_id = ? AND book_id = ?";
+//        String sqlInsertOrderItem = "INSERT INTO order_items (order_id, book_id, quantity, price) VALUES (?, ?, ?, ?)";
+//        String sqlDeleteOrderItem = "DELETE FROM order_items WHERE order_id = ? AND book_id = ?";
+//
+//        // Cập nhật hoặc thêm các mục trong đơn hàng
+//        for (OrdersItemsRequest updatedItem : updatedOrderRequest.getOrdersItemsRequests()) {
+//            int quantityDifference = 0;
+//
+//            // Kiểm tra số lượng yêu cầu với số lượng có sẵn trong kho
+//            ApiResponse<Integer> availableQuantity = apiBooksClient.getAvailableQuantity(updatedItem.getBookId());
+//            int currentQuantityInOrder = currentOrderItemsMap.getOrDefault(updatedItem.getBookId(), new OrdersItemsResponse()).getQuantity();
+//
+//            // Tính toán số lượng tối đa có thể yêu cầu: Số lượng hiện tại + Số lượng còn trong kho
+//            int maxPossibleQuantity = currentQuantityInOrder + availableQuantity.getData();
+//
+//            // Kiểm tra nếu số lượng yêu cầu vượt quá số lượng tối đa có thể yêu cầu
+//            if (updatedItem.getQuantity() > maxPossibleQuantity) {
+//                throw new IllegalArgumentException("Requested quantity exceeds the maximum available stock for book ID: " + updatedItem.getBookId());
+//            }
+//
+//            // Kiểm tra nếu số lượng yêu cầu là âm, ném ngoại lệ
+//            if (updatedItem.getQuantity() < 0) {
+//                throw new IllegalArgumentException("Quantity cannot be negative for book ID: " + updatedItem.getBookId());
+//            }
+//
+//            if (currentOrderItemsMap.containsKey(updatedItem.getBookId())) {
+//                // Nếu mục đã tồn tại, tính toán sự thay đổi số lượng
+//                quantityDifference = updatedItem.getQuantity() - currentQuantityInOrder;
+//
+//                // Cập nhật số lượng trong cơ sở dữ liệu và điều chỉnh kho
+//                if (quantityDifference != 0) {
+//                    if (quantityDifference > 0) {
+//                        // Giảm số lượng trong kho khi tăng số lượng trong đơn hàng
+//                        apiBooksClient.decreaseQuantity(updatedItem.getBookId(), quantityDifference);
+//                    } else {
+//                        // Tăng số lượng trong kho khi giảm số lượng trong đơn hàng
+//                        apiBooksClient.increaseQuantity(updatedItem.getBookId(), -quantityDifference);
+//                    }
+//
+//                    // Cập nhật số lượng trong cơ sở dữ liệu
+//                    jdbcTemplate.update(sqlUpdateOrderItem, updatedItem.getQuantity(), updatedItem.getPrice(), orderId, updatedItem.getBookId());
+//                }
+//            } else {
+//                // Nếu mục chưa tồn tại, thêm mới vào cơ sở dữ liệu
+//                jdbcTemplate.update(sqlInsertOrderItem, orderId, updatedItem.getBookId(), updatedItem.getQuantity(), updatedItem.getPrice());
+//                // Giảm số lượng trong kho khi thêm mới
+//                apiBooksClient.decreaseQuantity(updatedItem.getBookId(), updatedItem.getQuantity());
+//            }
+//
+//            // Nếu số lượng được cập nhật về 0, xóa mục trong đơn hàng
+//            if (updatedItem.getQuantity() == 0) {
+//                jdbcTemplate.update(sqlDeleteOrderItem, orderId, updatedItem.getBookId());
+//                // Tăng lại số lượng trong kho nếu xóa item
+//                apiBooksClient.increaseQuantity(updatedItem.getBookId(), currentQuantityInOrder);
+//            }
+//        }
+//
+//        // Tính toán tổng tiền mới
+//        double newTotal = updatedOrderRequest.getOrdersItemsRequests().stream()
+//                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+//                .sum();
+//
+//        // Cập nhật tổng tiền trong cơ sở dữ liệu
+//        if (newTotal > 0) {
+//            String sqlUpdateTotal = "UPDATE orders SET total = ? WHERE order_id = ?";
+//            jdbcTemplate.update(sqlUpdateTotal, newTotal, orderId);
+//        } else {
+//            throw new IllegalArgumentException("Total cannot be zero or negative");
+//        }
+//
+//        // Gán tổng tiền vào đối tượng trả về
+//        updatedOrderRequest.setTotal(newTotal);
+//
+//        return updatedOrderRequest;
     }
 
 

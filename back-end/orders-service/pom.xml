@@ -162,30 +162,11 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.axonframework</groupId>
-			<artifactId>axon-spring-boot-starter</artifactId>
-			<version>4.5.9</version>
+			<groupId>com.example</groupId>
+			<artifactId>common-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.axonframework</groupId>-->
-<!--			<artifactId>axon-spring-boot-starter</artifactId>-->
-<!--			<version>4.8.0</version> &lt;!&ndash; Cập nhật lên phiên bản mới &ndash;&gt;-->
-<!--		</dependency>-->
 
-
-		<!-- https://mvnrepository.com/artifact/org.axonframework/axon-spring-boot-starter -->
-<!--				<dependency>-->
-<!--					<groupId>org.axonframework</groupId>-->
-<!--					<artifactId>axon-spring-boot-starter</artifactId>-->
-<!--					<version>4.10.2</version>-->
-<!--				</dependency>-->
-
-
-		<!--		<dependency>-->
-		<!--			<groupId>org.axonframework</groupId>-->
-		<!--			<artifactId>axon-spring-boot-starter</artifactId>-->
-		<!--			<version>4.7.0</version> &lt;!&ndash; Hoặc phiên bản mới hơn &ndash;&gt;-->
-		<!--		</dependency>-->
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
