@@ -11,13 +11,12 @@ import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersItemsResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
-import Du.An.Ban.Sach.Tasc.payment_service.repository.PaymentsRepository;
 import Du.An.Ban.Sach.Tasc.payment_service.service.PaymentsService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.TransactionHistoryService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.VNPayService;
-import com.example.common_service.event.OrderItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("payments")
@@ -49,6 +47,8 @@ public class PaymentsController {
 
     private ApiBookClient apiBookClient;
 
+//    private  KafkaTemplate<String, Object> kafkaTemplate;
+
     @Autowired
     public PaymentsController(PaymentsService paymentsService, VNPayService vnPayService, ApiOrdersClient apiOrdersClient,
                               TransactionHistoryService transactionHistoryService, ApiNotificationsClient apiNotificationsClient, ApiBookClient apiBookClient) {
@@ -58,6 +58,7 @@ public class PaymentsController {
         this.transactionHistoryService = transactionHistoryService;
         this.apiNotificationsClient = apiNotificationsClient;
         this.apiBookClient = apiBookClient;
+//        this.kafkaTemplate = kafkaTemplate;
     }
 
     @GetMapping("findAll")
@@ -120,16 +121,10 @@ public class PaymentsController {
                 log.info("Log 2: "+ordersResponse);
 
                 for (OrdersItemsResponse item : ordersResponse.getOrdersItems()) {
-                    // Lấy bookId và quantity từ item
                     Integer bookId = item.getBookId();
                     Integer quantity = item.getQuantity();
-
-                    // Tiến hành gọi API giảm số lượng cho mỗi sản phẩm
                     ApiResponse<List<BooksResponse>> bookResponse = apiBookClient.reduceQuantitys(bookId, quantity);
-
-                    // Kiểm tra nếu API trả về kết quả không hợp lệ hoặc danh sách rỗng
                     if (bookResponse == null || bookResponse.getData() == null || bookResponse.getData().isEmpty()) {
-                        // Nếu không thể giảm số lượng, có thể quay lại trạng thái lỗi
                         apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED.name());
                         paymentsService.updatePaymentStatus(orderId, "FAILED");
                         return "redirect:/payment-fail?orderId=" + orderId;
@@ -146,6 +141,18 @@ public class PaymentsController {
                         .status("SUCCESS_History")
                         .build();
                 transactionHistoryService.save(transactionHistoryRequest);
+
+
+//                MessageDto messageDto = new MessageDto(
+//                        orderId, // ID đơn hàng
+//                        ordersResponse.getEmailUser(), // Địa chỉ email
+//                        "Thông báo thanh toán thành công", // Tiêu đề
+//                        "Cảm ơn bạn đã thanh toán, đơn hàng của bạn đã được xử lý thành công.", // Nội dung
+//                        "Thanh toán thành công cho đơn hàng #" + orderId // Nội dung ngắn gọn
+//                );
+
+
+//                kafkaTemplate.send("notification-events", messageDto);
                 apiNotificationsClient.sendEmail(ordersResponse.getEmailUser(), "Đơn hàng đã được thanh toán thành công", ordersResponse.getOrderId());
                 return "redirect:/PaymentSuccess";
             } else if (status == 0) {
