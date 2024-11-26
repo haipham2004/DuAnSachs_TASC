@@ -5,6 +5,7 @@ import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.exception.NotfoundException;
 import com.example.books_service.repository.BooksServiceRepository;
+import com.example.books_service.repository.impl.BooksRepositoryImpl;
 import com.example.books_service.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,6 +118,18 @@ public class BooksServiceImp implements BooksService {
     public List<BooksResponse> increaseQuantitys(Integer bookId, Integer quantity) {
         return booksServiceRepository.increaseQuantitys(bookId,quantity);
     }
+
+    @Override
+    public BooksRequest reserve(BooksRequest desiredBook, Integer orderId) throws Exception {
+        return booksServiceRepository.reserve(desiredBook,orderId);
+    }
+
+    @Override
+    public void cancelReservation(BooksRequest bookToCancel, Integer orderId) {
+      booksServiceRepository.cancelReservation(bookToCancel,orderId);
+    }
+
+
 
 
 }

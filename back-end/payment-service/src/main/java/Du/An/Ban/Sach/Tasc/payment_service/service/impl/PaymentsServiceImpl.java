@@ -1,6 +1,5 @@
 package Du.An.Ban.Sach.Tasc.payment_service.service.impl;
 
-import Du.An.Ban.Sach.Tasc.payment_service.client.ApiBookClient;
 import Du.An.Ban.Sach.Tasc.payment_service.client.ApiNotificationsClient;
 import Du.An.Ban.Sach.Tasc.payment_service.client.ApiOrdersClient;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
@@ -45,18 +44,17 @@ public class PaymentsServiceImpl implements PaymentsService {
 
     private VNPayService vnPayService;
 
-    private ApiBookClient apiBookClient;
 
     @Autowired
     public PaymentsServiceImpl(PaymentsRepository paymentsRepository, ModelMapper modelMapper, ApiOrdersClient apiOrdersClient,
-                               ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService, VNPayService vnPayService, ApiBookClient apiBookClient) {
+                               ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService, VNPayService vnPayService) {
         this.paymentsRepository = paymentsRepository;
         this.modelMapper = modelMapper;
         this.apiOrdersClient = apiOrdersClient;
         this.apiNotificationsClient = apiNotificationsClient;
         this.transactionHistoryService = transactionHistoryService;
         this.vnPayService = vnPayService;
-        this.apiBookClient = apiBookClient;
+
     }
 
     @Override
@@ -75,7 +73,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 
             List<PaymentsResponse> paymentsResponseList = new ArrayList<>();
             for (Payments payment : paymentsList) {
-                PaymentsResponse paymentsResponse = modelMapper.map(payment, PaymentsResponse.class); // Ánh xạ từ Payments sang PaymentsResponse
+                PaymentsResponse paymentsResponse = modelMapper.map(payment, PaymentsResponse.class);
 
                 OrdersResponse order = orderMap.get(payment.getIdOrder());
 
@@ -205,25 +203,28 @@ public class PaymentsServiceImpl implements PaymentsService {
         payments.setPaymentDate(LocalDateTime.now());
         payments.setStatus(PaymentStatus.SUCCESS.name());
 
-        // Lưu thông tin thanh toán vào cơ sở dữ liệu
+
         Payments savedPayment = paymentsRepository.save(payments);
 
-        // Cập nhật trạng thái đơn hàng thành công
+
         apiOrdersClient.updateOrdersStatus(order.getOrderId(), OrderStatus.SUCCESS.name());
 
-        // Lưu lịch sử giao dịch
+
         TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
                 .orderId(order.getOrderId())
                 .userId(order.getUserId())
-                .status("SUCCESS_History") // Trạng thái lịch sử giao dịch
+                .status("SUCCESS_History")
                 .build();
         transactionHistoryService.save(transactionHistoryRequest);
 
-        // Gửi email thông báo cho khách hàng
         apiNotificationsClient.sendEmail(order.getEmailUser(),"Xin chào Khách Hàng",order.getOrderId());
 
-        // Trả về kết quả thành công
         return "Payment processed successfully with ID: " + savedPayment.getPaymentId();
+    }
+
+    @Override
+    public void updatePaymentStatus(Integer idOrder, String status) {
+        paymentsRepository.updatePaymentStatus(idOrder,status);
     }
 
 }

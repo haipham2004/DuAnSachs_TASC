@@ -1,4 +1,4 @@
-package com.example.common_service.model;
+package com.example.notifications_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +11,13 @@ import lombok.Setter;
 @Setter
 public class MessageDto {
 
+    private Integer idOrder;
+
     private String to;
 
     private String toName;
 
-    private String subject;
+    private String toSubject;
 
     private String content;
 }

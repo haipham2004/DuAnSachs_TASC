@@ -1,23 +1,17 @@
 package com.example.common_service.event;
 
-import com.example.common_service.dto.response.OrderItemStatus;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class OrdersItemsRequest {
-
+public class OrderItem {
     private int orderItemId;
 
     private Integer orderId;
@@ -27,7 +21,5 @@ public class OrdersItemsRequest {
     private int quantity;
 
     private Double price;
-
-    private OrderItemStatus status;
 
 }

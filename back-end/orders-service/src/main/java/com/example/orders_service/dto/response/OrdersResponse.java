@@ -31,13 +31,6 @@ public class OrdersResponse {
 
     private String shippingAddress;
 
-    @JsonIgnore
-    private LocalDateTime createdAt;
-    @JsonIgnore
-    private LocalDateTime updatedAt;
-    @JsonIgnore
-    private Boolean deletedAt;
-
     private int userId;
 
     private String fullNameUsers;
@@ -48,4 +41,13 @@ public class OrdersResponse {
 
     private List<OrdersItemsResponse> ordersItems;
 
+    private OrderStatus orderStatus;
+
+
+    @JsonIgnore
+    private LocalDateTime createdAt;
+    @JsonIgnore
+    private LocalDateTime updatedAt;
+    @JsonIgnore
+    private Boolean deletedAt;
 }

@@ -28,20 +28,20 @@ public class OrdersItemsResponse {
 
     private String status;
 
+    private int orderId;
+
+    private int bookId;
+
+    private String tileBook;
+
+    private Double total;
+
+
     @JsonIgnore
     private LocalDateTime createdAt;
     @JsonIgnore
     private LocalDateTime updatedAt;
     @JsonIgnore
     private Boolean deletedAt;
-
-    @JsonIgnore
-    private int orderId;
-    @JsonIgnore
-    private int bookId;
-
-    private String tileBook;
-
-    private Double total;
 
 }

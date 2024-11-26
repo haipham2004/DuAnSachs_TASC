@@ -21,6 +21,9 @@ public interface ApiOrdersClient {
     @GetMapping("/orders/findById/{id}")
      ApiResponse<OrdersResponse> findById(@PathVariable("id") Integer id);
 
+    @GetMapping("/orders/findByIdOrder/{id}")
+    ApiResponse<OrdersResponse> findByIdOrder(@PathVariable("id") Integer id);
+
     @PutMapping("/orders/updateOrdersStatus")
     ApiResponse<Void> updateOrdersStatus( @RequestParam("idOrder") Integer idOrder,@RequestParam("status") String status);
 

@@ -11,9 +11,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -269,6 +272,52 @@ public class BooksRepositoryImpl implements BooksServiceRepository {
             response.setQuantity(rs.getInt("quantity"));
             return response;
         }, bookId);
+    }
+
+
+
+    @Override
+    public BooksRequest reserve(BooksRequest desiredBook, Integer orderId) throws Exception {
+        // Truy vấn để lấy thông tin sách từ database
+        String selectQuery = "SELECT book_id, title, quantity, price FROM books WHERE book_id = ?";
+        BooksResponse booksResponse;
+            booksResponse = jdbcTemplate.queryForObject(selectQuery, new RowMapper<BooksResponse>() {
+                @Override
+                public BooksResponse mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    return BooksResponse.builder()
+                            .bookId(rs.getInt("book_id"))
+                            .title(rs.getString("title"))
+                            .quantity(rs.getInt("quantity"))
+                            .price(rs.getDouble("price"))
+                            .build();
+                }
+            }, desiredBook.getBookId());
+
+        // Cập nhật số lượng sách sau khi đặt
+        String updateQuery = "UPDATE books SET quantity = quantity - ? WHERE book_id = ?";
+        int updatedRows = jdbcTemplate.update(updateQuery, desiredBook.getQuantity(), desiredBook.getBookId());
+        if (updatedRows == 0) {
+            throw new RuntimeException("Failed to update the book quantity");
+        }
+
+        // Tạo và trả về thông tin sách đã đặt
+        BooksRequest reservedBook = new BooksRequest();
+        reservedBook.setBookId(booksResponse.getBookId());
+        reservedBook.setTitle(booksResponse.getTitle());
+        reservedBook.setQuantity(desiredBook.getQuantity());
+        reservedBook.setPrice(booksResponse.getPrice());
+
+        return reservedBook;
+    }
+
+    @Override
+    public void cancelReservation(BooksRequest bookToCancel, Integer orderId) {
+        // Cập nhật số lượng sách sau khi hủy
+        String updateQuery = "UPDATE books SET quantity = quantity + ? WHERE book_id = ?";
+        int updatedRows = jdbcTemplate.update(updateQuery, bookToCancel.getQuantity(), bookToCancel.getBookId());
+        if (updatedRows == 0) {
+            throw new RuntimeException("Failed to update the book quantity during cancellation");
+        }
     }
 
 }

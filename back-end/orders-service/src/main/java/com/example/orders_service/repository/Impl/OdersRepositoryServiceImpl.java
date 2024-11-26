@@ -1,10 +1,10 @@
 package com.example.orders_service.repository.Impl;
 
+
 import com.example.orders_service.client.ApiBooksClient;
 import com.example.orders_service.client.ApiPaymentClient;
 import com.example.orders_service.dto.request.OrdersItemsRequest;
 import com.example.orders_service.dto.request.OrdersRequest;
-import com.example.orders_service.dto.response.ApiResponse;
 import com.example.orders_service.dto.response.OrderItemStatus;
 import com.example.orders_service.dto.response.OrderStatus;
 import com.example.orders_service.dto.response.OrdersItemsResponse;
@@ -27,9 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Repository
 public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
@@ -39,13 +37,13 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
     private ApiBooksClient apiBooksClient;
 
     private ApiPaymentClient apiPaymentClient;
+
     @Autowired
     public OdersRepositoryServiceImpl(JdbcTemplate jdbcTemplate, ApiBooksClient apiBooksClient, ApiPaymentClient apiPaymentClient) {
         this.jdbcTemplate = jdbcTemplate;
         this.apiBooksClient = apiBooksClient;
         this.apiPaymentClient = apiPaymentClient;
     }
-
 
 
     private OrdersRowMapper getOrdersMapper() {
@@ -113,12 +111,13 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
                 "o.shipping_address, " +
                 "o.created_at, o.updated_at, o.deleted_at, " +
                 "o.user_id, u.fullname, u.phone, u.email, " +
-                "oi.order_item_id, oi.quantity, oi.price, b.title " +
+                "oi.order_item_id, oi.quantity, oi.price, b.title, oi.book_id " +
                 "FROM orders o " +
                 "JOIN users u ON o.user_id = u.user_id " +
                 "JOIN order_items oi ON oi.order_id = o.order_id " +
-                "JOIN books b ON b.book_id = oi.book_id " +
+                "LEFT JOIN books b ON b.book_id = oi.book_id " +
                 "WHERE o.order_id = ?";
+
 
         try {
             return jdbcTemplate.queryForObject(sql, new OrdersRowMapper2(), id);
@@ -185,7 +184,7 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
             PreparedStatement ps = connection.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
             ps.setDouble(1, ordersRequest.getTotal());
             ps.setString(2, ordersRequest.getTrackingNumber());
-            ps.setString(3, OrderStatus.CREATED.name());
+            ps.setString(3, OrderStatus.PENDING.name());
             ps.setString(4, ordersRequest.getShippingAddress());
             ps.setInt(5, ordersRequest.getUserId());
             return ps;
@@ -214,12 +213,8 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
             item.setOrderItemId(orderItemId);
             item.setStatus(OrderItemStatus.PENDING);
         }
-
-
-
         return ordersRequest;
     }
-
 
 
     @Override
@@ -407,51 +402,4 @@ public class OdersRepositoryServiceImpl implements OrdersRepositoryService {
 //        apiBooksClient.increaseQuantity(orderItem.getBookId(), orderItem.getQuantity());
 //    }
 
-
 }
-
-
-//    @Override
-//    public OrdersRequest createOrder(OrdersRequest ordersRequest) {
-//
-//        double total = 0.0;
-//
-//        for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
-//            total += item.getQuantity() * item.getPrice();
-//        }
-//        ordersRequest.setTotal(total);
-//
-//        String sqlOrder = "INSERT INTO orders (total, tracking_number, status, shipping_address, " +
-//                "payment_method, payment_status, user_id) " +
-//                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-//        KeyHolder keyHolder = new GeneratedKeyHolder();
-//
-//        jdbcTemplate.update(connection -> {
-//            PreparedStatement ps = connection.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-//            ps.setDouble(1, ordersRequest.getTotal());
-//            ps.setString(2, generateOrderCode());
-//            ps.setString(3, OrderStatus.PENDING.name());
-//            ps.setString(4, ordersRequest.getShippingAddress());
-//            ps.setString(5, ordersRequest.getPaymentMethod());
-//            ps.setString(6, PaymentStatus.PENDING.name());
-//            ps.setInt(7, ordersRequest.getUserId());
-//            return ps;
-//        }, keyHolder);
-//
-//
-//        int orderId = keyHolder.getKey().intValue();
-//        ordersRequest.setOrderId(orderId);
-//
-//        String sqlOrderItem = "INSERT INTO order_items (order_id, book_id, quantity, price, status) " +
-//                "VALUES (?, ?, ?, ?, ?)";
-//
-//        for (OrdersItemsRequest item : ordersRequest.getOrdersItemsRequests()) {
-//            jdbcTemplate.update(sqlOrderItem, orderId, item.getBookId(), item.getQuantity(), item.getPrice(), OrderStatus.PENDING.name());
-//            item.setStatus(OrderStatus.PENDING.name());
-//        }
-//        ordersRequest.setStatus(OrderStatus.PENDING.name());
-//        ordersRequest.setTrackingNumber(generateOrderCode());
-//        ordersRequest.setTotal(total);
-//        ordersRequest.setPaymentStatus(PaymentStatus.PENDING.name());
-//        return ordersRequest;
-//    }

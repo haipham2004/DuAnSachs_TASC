@@ -11,13 +11,18 @@ import java.util.List;
 @FeignClient("BOOKS-SERVICE")
 public interface ApiBookClient {
 
-    @PutMapping("reduceQuantitys")
+    @PutMapping("/books/reduceQuantitys")
     ApiResponse<List<BooksResponse>> reduceQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
                                                             @RequestParam(name="quantity",defaultValue = "0") Integer quantity);
 
 
 
-    @PutMapping("increaseQuantitys")
-    ApiResponse<List<BooksResponse>>  increaseQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
-                                                               @RequestParam(name="quantity",defaultValue = "0") Integer quantity);
+//    @PutMapping("/books/increaseQuantitys")
+//    ApiResponse<List<BooksResponse>>  increaseQuantitys(@RequestParam(name="bookId",defaultValue = "0") Integer bookId,
+//                                                               @RequestParam(name="quantity",defaultValue = "0") Integer quantity);
+//
+//
+//    @PutMapping("/books/decreaseQuantity")
+//    ApiResponse<Void> decreaseQuantity(@RequestParam(name = "bookId", defaultValue = "0") Integer bookId,
+//                                              @RequestParam(name = "quantity", defaultValue = "0") Integer quantity);
 }
