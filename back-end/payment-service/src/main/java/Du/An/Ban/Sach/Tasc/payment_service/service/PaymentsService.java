@@ -2,7 +2,7 @@ package Du.An.Ban.Sach.Tasc.payment_service.service;
 
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ public interface PaymentsService {
 
      String processPayment(PaymentsRequest paymentRequest);
 
-
      String processPaymentSuccess(PaymentsRequest paymentRequest);
+
+  void  updatePaymentStatus( Integer idOrder, String status);
 }

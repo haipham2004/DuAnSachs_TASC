@@ -32,4 +32,9 @@ public interface BooksService {
     List<BooksResponse> reduceQuantitys(Integer bookId, Integer quantity);
 
     List<BooksResponse> increaseQuantitys(Integer bookId, Integer quantity);
+
+    BooksRequest reserve(BooksRequest desiredBook, Integer orderId) throws Exception;
+
+    void cancelReservation(BooksRequest bookToCancel, Integer orderId);
+
 }

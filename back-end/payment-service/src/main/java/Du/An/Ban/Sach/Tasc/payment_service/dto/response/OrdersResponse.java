@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -44,6 +45,8 @@ public class OrdersResponse {
     private String phoneUsers;
 
     private String emailUser;
+
+    private List<OrdersItemsResponse> ordersItems;
 
 
 

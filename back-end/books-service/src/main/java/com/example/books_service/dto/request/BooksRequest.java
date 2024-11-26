@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class BooksRequest {
 
     private Integer bookId;
@@ -56,4 +58,9 @@ public class BooksRequest {
 
     @NotBlank(message = "Thumbnail cannot be blank")
     private String thumbnail;
+
+    public BooksRequest(Integer bookId, @Min(value = 0, message = "Quantity must be at least 0") Integer quantity) {
+        this.bookId = bookId;
+        this.quantity = quantity;
+    }
 }

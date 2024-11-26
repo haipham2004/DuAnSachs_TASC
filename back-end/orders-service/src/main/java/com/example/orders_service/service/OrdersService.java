@@ -14,7 +14,7 @@ public interface OrdersService {
 
     OrdersRequest save(OrdersRequest ordersRequest);
 
-    OrdersRequest update(Integer id,OrdersRequest ordersRequest);
+    OrdersRequest update(Integer id, OrdersRequest ordersRequest);
 
     void delete(Integer id);
 
@@ -25,4 +25,6 @@ public interface OrdersService {
     OrdersRequest updateOrder(int orderId, OrdersRequest updatedOrderRequest);
 
     void updateOrdersStatus(Integer idOrder,String status);
+
+
 }

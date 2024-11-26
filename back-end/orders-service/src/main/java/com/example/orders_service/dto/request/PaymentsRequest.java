@@ -1,5 +1,8 @@
 package com.example.orders_service.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +18,8 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Builder
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentsRequest {
 
     private Integer idOrder;
@@ -27,5 +32,5 @@ public class PaymentsRequest {
 
     private String status;
 
-    private String redirectUrl;
+
 }

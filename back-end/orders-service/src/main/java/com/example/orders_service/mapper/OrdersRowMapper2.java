@@ -39,6 +39,8 @@ public class OrdersRowMapper2 implements RowMapper<OrdersResponse> {
             item.setQuantity(rs.getInt("quantity"));
             item.setPrice(rs.getDouble("price"));
             item.setTileBook(rs.getString("title"));
+            item.setBookId(rs.getInt("book_id"));
+            item.setOrderId(rs.getInt("order_id"));
             orderItemResponses.add(item);
         } while (rs.next() && rs.getInt("order_id") == ordersResponse.getOrderId());
 

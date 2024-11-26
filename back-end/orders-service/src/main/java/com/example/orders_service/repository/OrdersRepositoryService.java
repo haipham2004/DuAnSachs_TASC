@@ -1,5 +1,6 @@
 package com.example.orders_service.repository;
 
+
 import com.example.orders_service.dto.request.OrdersRequest;
 import com.example.orders_service.dto.response.OrdersResponse;
 import com.example.orders_service.dto.response.PageResponse;
@@ -25,4 +26,6 @@ public interface OrdersRepositoryService {
      OrdersRequest updateOrder(int orderId, OrdersRequest updatedOrderRequest);
 
     void updateOrdersStatus(Integer idOrder,String status);
+
+
 }

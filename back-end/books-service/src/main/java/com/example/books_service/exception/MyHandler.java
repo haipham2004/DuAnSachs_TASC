@@ -31,6 +31,13 @@ public class MyHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+//    @ExceptionHandler(BookInsufficientQuantityException.class)
+//    public ResponseEntity<ErrorResponse> handleBookInsufficientQuantityException(BookInsufficientQuantityException ex) {
+//        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+//    }
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> response = new HashMap<>();
