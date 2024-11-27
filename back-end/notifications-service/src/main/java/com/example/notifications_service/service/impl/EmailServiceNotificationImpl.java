@@ -51,7 +51,6 @@ public class EmailServiceNotificationImpl implements EmailServiceNotification {
             context.setVariable("name", messageDto.getToName());
             context.setVariable("content", messageDto.getContent());
 
-
             String html = springTemplateEngine.process("OrderSuccess.html", context);
 
             mimeMessageHelper.setTo(messageDto.getTo());
