@@ -8,6 +8,7 @@ import com.example.books_service.repository.BooksServiceRepository;
 import com.example.books_service.repository.impl.BooksRepositoryImpl;
 import com.example.books_service.service.BooksService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,9 +25,11 @@ public class BooksServiceImp implements BooksService {
     }
 
     @Override
+//    @Cacheable(value = "books", key = "#pageSize + '-' + #offset")
     public PageResponse<BooksResponse> findAllBooksPage(int pageSize, int offset) {
         return booksServiceRepository.findBooksPage(pageSize, offset);
     }
+
 
     @Override
     public BooksResponse findById(Integer id) {
@@ -34,6 +37,7 @@ public class BooksServiceImp implements BooksService {
     }
 
     @Override
+//    @CacheEvict(value = "books", key = "'findAllBooksPage'")
     public BooksRequest save(BooksRequest booksRequest) {
         return booksServiceRepository.save(booksRequest);
     }

@@ -7,7 +7,6 @@ import Du.An.Ban.Sach.Tasc.payment_service.dto.request.TransactionHistoryRequest
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PageResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentStatus;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsMethod;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
@@ -21,6 +20,8 @@ import Du.An.Ban.Sach.Tasc.payment_service.service.TransactionHistoryService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.VNPayService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -47,7 +48,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 
     @Autowired
     public PaymentsServiceImpl(PaymentsRepository paymentsRepository, ModelMapper modelMapper, ApiOrdersClient apiOrdersClient,
-                               ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService, VNPayService vnPayService) {
+                               ApiNotificationsClient apiNotificationsClient, TransactionHistoryService transactionHistoryService,@Lazy VNPayService vnPayService) {
         this.paymentsRepository = paymentsRepository;
         this.modelMapper = modelMapper;
         this.apiOrdersClient = apiOrdersClient;
@@ -62,7 +63,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 
             List<Payments> paymentsList = paymentsRepository.findAll();
 
-            ApiResponse<PageResponse<OrdersResponse>> ordersResponseApi = apiOrdersClient.findAll("", "", 1, 10);
+            ApiResponse<Page<OrdersResponse>> ordersResponseApi = apiOrdersClient.findAll(1,5,"", "");
 
             List<OrdersResponse> ordersList = ordersResponseApi.getData().getContent();
 
@@ -79,7 +80,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 
                 if (order != null) {
 
-                    paymentsResponse.setStatusOrder(order.getStatus());
+                    paymentsResponse.setStatusOrder(OrderStatus.PENDING.name());
                     paymentsResponse.setFullNameOrder(order.getFullNameUsers());
                     paymentsResponse.setTotal(order.getTotal());
                 }
@@ -103,7 +104,7 @@ public class PaymentsServiceImpl implements PaymentsService {
 
         PaymentsResponse paymentsResponse = modelMapper.map(payment, PaymentsResponse.class);
 
-        paymentsResponse.setStatusOrder(order.getStatus());
+        paymentsResponse.setStatusOrder(OrderStatus.PENDING.name());
         paymentsResponse.setFullNameOrder(order.getFullNameUsers());
         paymentsResponse.setTotal(order.getTotal());
 
@@ -207,7 +208,7 @@ public class PaymentsServiceImpl implements PaymentsService {
         Payments savedPayment = paymentsRepository.save(payments);
 
 
-        apiOrdersClient.updateOrdersStatus(order.getOrderId(), OrderStatus.SUCCESS.name());
+        apiOrdersClient.updateOrdersStatus(order.getOrderId(), OrderStatus.SUCCESS);
 
 
         TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
@@ -225,6 +226,11 @@ public class PaymentsServiceImpl implements PaymentsService {
     @Override
     public void updatePaymentStatus(Integer idOrder, String status) {
         paymentsRepository.updatePaymentStatus(idOrder,status);
+    }
+
+    @Override
+    public List<Payments> findByStatus(String status) {
+        return paymentsRepository.findByStatus(status);
     }
 
 }

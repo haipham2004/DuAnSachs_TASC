@@ -28,13 +28,6 @@ public class OrdersItemsResponse {
 
     private String status;
 
-    @JsonIgnore
-    private LocalDateTime createdAt;
-    @JsonIgnore
-    private LocalDateTime updatedAt;
-    @JsonIgnore
-    private Boolean deletedAt;
-
     private int orderId;
 
     private int bookId;
@@ -42,5 +35,20 @@ public class OrdersItemsResponse {
     private String tileBook;
 
     private Double total;
+
+    public OrdersItemsResponse(int orderItemId, int quantity, Double price, int orderId, int bookId) {
+        this.orderItemId = orderItemId;
+        this.quantity = quantity;
+        this.price = price;
+        this.orderId = orderId;
+        this.bookId = bookId;
+    }
+
+    @JsonIgnore
+    private LocalDateTime createdAt;
+    @JsonIgnore
+    private LocalDateTime updatedAt;
+    @JsonIgnore
+    private Boolean deletedAt;
 
 }

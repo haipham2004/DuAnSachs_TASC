@@ -36,6 +36,13 @@ public class OrdersItemsResponse {
 
     private Double total;
 
+    public OrdersItemsResponse(int orderItemId, int quantity, Double price, int orderId, int bookId) {
+        this.orderItemId = orderItemId;
+        this.quantity = quantity;
+        this.price = price;
+        this.orderId = orderId;
+        this.bookId = bookId;
+    }
 
     @JsonIgnore
     private LocalDateTime createdAt;

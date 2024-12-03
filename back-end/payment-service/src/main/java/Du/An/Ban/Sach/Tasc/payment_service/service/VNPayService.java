@@ -1,6 +1,16 @@
 package Du.An.Ban.Sach.Tasc.payment_service.service;
 
+import Du.An.Ban.Sach.Tasc.payment_service.client.ApiBookClient;
+import Du.An.Ban.Sach.Tasc.payment_service.client.ApiNotificationsClient;
+import Du.An.Ban.Sach.Tasc.payment_service.client.ApiOrdersClient;
 import Du.An.Ban.Sach.Tasc.payment_service.config.VNPayConfig;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.request.TransactionHistoryRequest;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.BooksResponse;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersItemsResponse;
+import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -11,10 +21,40 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 @Service
 public class VNPayService {
+
+    private PaymentsService paymentsService;
+
+
+    private ApiOrdersClient apiOrdersClient;
+
+    private TransactionHistoryService transactionHistoryService;
+
+    private ApiNotificationsClient apiNotificationsClient;
+
+    private ApiBookClient apiBookClient;
+
+    @Autowired
+    public VNPayService(PaymentsService paymentsService, ApiOrdersClient apiOrdersClient,
+                        TransactionHistoryService transactionHistoryService, ApiNotificationsClient apiNotificationsClient, ApiBookClient apiBookClient) {
+        this.paymentsService = paymentsService;
+        this.apiOrdersClient = apiOrdersClient;
+        this.transactionHistoryService = transactionHistoryService;
+        this.apiNotificationsClient = apiNotificationsClient;
+        this.apiBookClient = apiBookClient;
+    }
+
     public String createOrder(long amount, String orderInfor){
         // Các bạn có thể tham khảo tài liệu hướng dẫn và điều chỉnh các tham số
         String vnp_Version = "2.1.0";
@@ -85,7 +125,7 @@ public class VNPayService {
         return paymentUrl;
     }
 
-    public int orderReturn(Map<String, String> params) {
+    public int processVNPayCallback(Map<String, String> params) {
         try {
             // Tạo một map các tham số từ callback
             Map<String, String> fields = new HashMap<>();
@@ -108,12 +148,15 @@ public class VNPayService {
 
             // Kiểm tra chữ ký và trạng thái thanh toán
             if (signValue.equals(vnp_SecureHash)) {
+                Integer orderId = Integer.parseInt(params.get("vnp_OrderInfo"));
+                String totalPayment = params.get("vnp_Amount");
+
                 if ("00".equals(params.get("vnp_TransactionStatus"))) {
                     // Thanh toán thành công
-                    return 1; // Thành công
+                    return handleSuccessfulPayment(params, orderId, totalPayment);
                 } else {
                     // Thanh toán thất bại
-                    return 0; // Thất bại
+                    return handleFailedPayment(orderId);
                 }
             } else {
                 // Nếu chữ ký không khớp
@@ -124,6 +167,87 @@ public class VNPayService {
             return -1; // Lỗi bất kỳ
         }
     }
+
+    private int handleSuccessfulPayment(Map<String, String> params, Integer orderId, String totalPayment) {
+        ApiResponse<OrdersResponse> orderResponse = apiOrdersClient.findByIdOrder(orderId);
+        OrdersResponse ordersResponse = orderResponse.getData();
+
+
+        for (OrdersItemsResponse item : ordersResponse.getOrderItems()) {
+            Integer bookId = item.getBookId();
+            Integer quantity = item.getQuantity();
+            ApiResponse<List<BooksResponse>> bookResponse = apiBookClient.reduceQuantitys(bookId, quantity);
+
+            if (bookResponse == null || bookResponse.getData() == null || bookResponse.getData().isEmpty()) {
+                apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED);
+                paymentsService.updatePaymentStatus(orderId, "FAILED");
+                return 0; // Thanh toán thất bại
+            }
+        }
+
+        apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.SUCCESS);
+        paymentsService.updatePaymentStatus(orderId, "SUCCESS");
+
+        // Lưu lịch sử giao dịch
+        TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
+                .orderId(orderId)
+                .userId(ordersResponse.getUserId())
+                .status("SUCCESS_History")
+                .build();
+        transactionHistoryService.save(transactionHistoryRequest);
+
+        // Gửi email thông báo thanh toán thành công
+        apiNotificationsClient.sendEmail(ordersResponse.getEmailUser(), "Đơn hàng đã được thanh toán thành công", ordersResponse.getOrderId());
+
+        return 1; // Thành công
+    }
+
+    private int handleFailedPayment(Integer orderId) {
+        apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED);
+        paymentsService.updatePaymentStatus(orderId, "FAILED");
+        return 0; // Thanh toán thất bại
+    }
+
+
+//    public int orderReturn(Map<String, String> params) {
+//        try {
+//            // Tạo một map các tham số từ callback
+//            Map<String, String> fields = new HashMap<>();
+//            for (String key : params.keySet()) {
+//                String value = params.get(key);
+//                if (value != null && !value.isEmpty()) {
+//                    fields.put(key, value);
+//                }
+//            }
+//
+//            // Lấy giá trị của SecureHash từ callback
+//            String vnp_SecureHash = params.get("vnp_SecureHash");
+//
+//            // Loại bỏ các trường không cần thiết khỏi fields
+//            fields.remove("vnp_SecureHash");
+//            fields.remove("vnp_SecureHashType");
+//
+//            // Tính toán chữ ký bảo mật từ các tham số còn lại
+//            String signValue = VNPayConfig.hashAllFields(fields);
+//
+//            // Kiểm tra chữ ký và trạng thái thanh toán
+//            if (signValue.equals(vnp_SecureHash)) {
+//                if ("00".equals(params.get("vnp_TransactionStatus"))) {
+//                    // Thanh toán thành công
+//                    return 1; // Thành công
+//                } else {
+//                    // Thanh toán thất bại
+//                    return 0; // Thất bại
+//                }
+//            } else {
+//                // Nếu chữ ký không khớp
+//                return -1; // Lỗi chữ ký
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return -1; // Lỗi bất kỳ
+//        }
+//    }
 
     public String refundTransaction(String transactionNo, double amount, String createdBy, String description) {
         String vnp_Command = "refund";
