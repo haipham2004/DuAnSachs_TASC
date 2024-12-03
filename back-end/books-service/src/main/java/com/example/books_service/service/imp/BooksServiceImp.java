@@ -5,30 +5,88 @@ import com.example.books_service.dto.response.BooksResponse;
 import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.exception.NotfoundException;
 import com.example.books_service.repository.BooksServiceRepository;
-import com.example.books_service.repository.impl.BooksRepositoryImpl;
 import com.example.books_service.service.BooksService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class BooksServiceImp implements BooksService {
+
+    private static final String BOOK_CACHE_KEY = "all_books";
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private BooksServiceRepository booksServiceRepository;
 
     @Autowired
-    public BooksServiceImp(BooksServiceRepository booksServiceRepository) {
+    public BooksServiceImp(RedisTemplate<String, Object> redisTemplate, BooksServiceRepository booksServiceRepository) {
+        this.redisTemplate = redisTemplate;
         this.booksServiceRepository = booksServiceRepository;
     }
 
     @Override
-//    @Cacheable(value = "books", key = "#pageSize + '-' + #offset")
     public PageResponse<BooksResponse> findAllBooksPage(int pageSize, int offset) {
-        return booksServiceRepository.findBooksPage(pageSize, offset);
+        long startTime = System.currentTimeMillis(); // Bắt đầu đo thời gian
+
+        // Truy vấn từ database (hoặc phương thức khác)
+        PageResponse<BooksResponse> response = booksServiceRepository.findBooksPage(pageSize, offset);
+
+        long elapsedTime = System.currentTimeMillis() - startTime; // Tính thời gian đã trôi qua
+
+        // Log thời gian truy xuất dữ liệu
+        log.info("Thời gian truy vấn findAllBooksPage với pageSize: {} và offset: {} là: {} ms", pageSize, offset, elapsedTime);
+
+        return response;
     }
+
+//    @Override
+//    public PageResponse<BooksResponse> findAllBooksPage(int pageSize, int offset) {
+//        String cacheKey = BOOK_CACHE_KEY + "_pageSize_" + pageSize + "_offset_" + offset;
+//
+//        // Kiểm tra cache Redis
+//        long startTime = System.currentTimeMillis();  // Thời gian bắt đầu đo
+//        String cachedResponseJson = (String) redisTemplate.opsForValue().get(cacheKey);
+//
+//        if (cachedResponseJson != null) {
+//            // Log khi lấy từ Redis cache
+//            long elapsedTime = System.currentTimeMillis() - startTime;  // Thời gian thực hiện
+//            log.info("Truy vấn dữ liệu từ Redis cache với key: {}. Thời gian truy vấn: {} ms", cacheKey, elapsedTime);
+//
+//            try {
+//                ObjectMapper objectMapper = new ObjectMapper();
+//                return objectMapper.readValue(cachedResponseJson, PageResponse.class);
+//            } catch (JsonProcessingException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        // Nếu không có trong cache, truy vấn từ database
+//        startTime = System.currentTimeMillis();  // Đo lại thời gian khi truy vấn database
+//        PageResponse<BooksResponse> response = booksServiceRepository.findBooksPage(pageSize, offset);
+//
+//        long elapsedTime = System.currentTimeMillis() - startTime;  // Thời gian thực hiện
+//        log.info("Truy vấn dữ liệu từ database. Thời gian truy vấn: {} ms", elapsedTime);
+//
+//        try {
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            String responseJson = objectMapper.writeValueAsString(response);
+//            redisTemplate.opsForValue().set(cacheKey, responseJson, 30, TimeUnit.MINUTES);
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return response;
+//    }
+
 
 
     @Override
@@ -110,7 +168,7 @@ public class BooksServiceImp implements BooksService {
 
     @Override
     public void increaseQuantity(Integer bookId, Integer quantity) {
-       booksServiceRepository.increaseQuantity(bookId,quantity);
+        booksServiceRepository.increaseQuantity(bookId,quantity);
     }
 
     @Override
@@ -130,7 +188,7 @@ public class BooksServiceImp implements BooksService {
 
     @Override
     public void cancelReservation(BooksRequest bookToCancel, Integer orderId) {
-      booksServiceRepository.cancelReservation(bookToCancel,orderId);
+        booksServiceRepository.cancelReservation(bookToCancel,orderId);
     }
 
 
