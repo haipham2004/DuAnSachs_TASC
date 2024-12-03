@@ -1,22 +1,12 @@
 package Du.An.Ban.Sach.Tasc.payment_service.controller;
 
-import Du.An.Ban.Sach.Tasc.payment_service.client.ApiBookClient;
-import Du.An.Ban.Sach.Tasc.payment_service.client.ApiNotificationsClient;
-import Du.An.Ban.Sach.Tasc.payment_service.client.ApiOrdersClient;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.request.TransactionHistoryRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.ApiResponse;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.response.BooksResponse;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrderStatus;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersItemsResponse;
-import Du.An.Ban.Sach.Tasc.payment_service.dto.response.OrdersResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
 import Du.An.Ban.Sach.Tasc.payment_service.service.PaymentsService;
-import Du.An.Ban.Sach.Tasc.payment_service.service.TransactionHistoryService;
 import Du.An.Ban.Sach.Tasc.payment_service.service.VNPayService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,26 +29,15 @@ public class PaymentsController {
 
     private VNPayService vnPayService;
 
-    private ApiOrdersClient apiOrdersClient;
 
-    private TransactionHistoryService transactionHistoryService;
-
-    private ApiNotificationsClient apiNotificationsClient;
-
-    private ApiBookClient apiBookClient;
 
 //    private  KafkaTemplate<String, Object> kafkaTemplate;
 
+
     @Autowired
-    public PaymentsController(PaymentsService paymentsService, VNPayService vnPayService, ApiOrdersClient apiOrdersClient,
-                              TransactionHistoryService transactionHistoryService, ApiNotificationsClient apiNotificationsClient, ApiBookClient apiBookClient) {
+    public PaymentsController(PaymentsService paymentsService, VNPayService vnPayService) {
         this.paymentsService = paymentsService;
         this.vnPayService = vnPayService;
-        this.apiOrdersClient = apiOrdersClient;
-        this.transactionHistoryService = transactionHistoryService;
-        this.apiNotificationsClient = apiNotificationsClient;
-        this.apiBookClient = apiBookClient;
-//        this.kafkaTemplate = kafkaTemplate;
     }
 
     @GetMapping("findAll")
@@ -108,56 +87,13 @@ public class PaymentsController {
                 return "redirect:/payment-error";
             }
 
-            int status = vnPayService.orderReturn(params);
+            int status = vnPayService.processVNPayCallback(params);
             Integer orderId = Integer.parseInt(params.get("vnp_OrderInfo"));
-            String totalPayment = params.get("vnp_Amount");
 
+            // If status is successful
             if (status == 1) {
-
-                ApiResponse<OrdersResponse> orderResponse = apiOrdersClient.findByIdOrder(orderId);
-                OrdersResponse ordersResponse = orderResponse.getData();
-
-                log.info("Log 1: "+ordersResponse.getOrdersItems());
-                log.info("Log 2: "+ordersResponse);
-
-                for (OrdersItemsResponse item : ordersResponse.getOrdersItems()) {
-                    Integer bookId = item.getBookId();
-                    Integer quantity = item.getQuantity();
-                    ApiResponse<List<BooksResponse>> bookResponse = apiBookClient.reduceQuantitys(bookId, quantity);
-                    if (bookResponse == null || bookResponse.getData() == null || bookResponse.getData().isEmpty()) {
-                        apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED.name());
-                        paymentsService.updatePaymentStatus(orderId, "FAILED");
-                        return "redirect:/payment-fail?orderId=" + orderId;
-                    }
-                }
-
-
-
-                apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.SUCCESS.name());
-                paymentsService.updatePaymentStatus(orderId, "SUCCESS");
-                TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
-                        .orderId(orderId)
-                        .userId(ordersResponse.getUserId())
-                        .status("SUCCESS_History")
-                        .build();
-                transactionHistoryService.save(transactionHistoryRequest);
-
-
-//                MessageDto messageDto = new MessageDto(
-//                        orderId, // ID đơn hàng
-//                        ordersResponse.getEmailUser(), // Địa chỉ email
-//                        "Thông báo thanh toán thành công", // Tiêu đề
-//                        "Cảm ơn bạn đã thanh toán, đơn hàng của bạn đã được xử lý thành công.", // Nội dung
-//                        "Thanh toán thành công cho đơn hàng #" + orderId // Nội dung ngắn gọn
-//                );
-
-
-//                kafkaTemplate.send("notification-events", messageDto);
-                apiNotificationsClient.sendEmail(ordersResponse.getEmailUser(), "Đơn hàng đã được thanh toán thành công", ordersResponse.getOrderId());
                 return "redirect:/PaymentSuccess";
             } else if (status == 0) {
-                apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED.name());
-                paymentsService.updatePaymentStatus(orderId, "FAILED");
                 return "redirect:/payment-fail?orderId=" + orderId;
             } else {
                 return "redirect:/payment-error";
@@ -168,6 +104,75 @@ public class PaymentsController {
         }
     }
 }
+
+
+//    @RequestMapping("vnpay-payment-return")
+//    public String handleVNPayCallback(@RequestParam Map<String, String> params, Model model) {
+//        try {
+//            if (params.isEmpty() || !params.containsKey("vnp_TxnRef") || !params.containsKey("vnp_ResponseCode")) {
+//                return "redirect:/payment-error";
+//            }
+//
+//            int status = vnPayService.orderReturn(params);
+//            Integer orderId = Integer.parseInt(params.get("vnp_OrderInfo"));
+//            String totalPayment = params.get("vnp_Amount");
+//
+//            if (status == 1) {
+//
+//                ApiResponse<OrdersResponse> orderResponse = apiOrdersClient.findByIdOrder(orderId);
+//                OrdersResponse ordersResponse = orderResponse.getData();
+//
+//                log.info("Log 1: "+ordersResponse.getOrdersItems());
+//                log.info("Log 2: "+ordersResponse);
+//
+//                for (OrdersItemsResponse item : ordersResponse.getOrdersItems()) {
+//                    Integer bookId = item.getBookId();
+//                    Integer quantity = item.getQuantity();
+//                    ApiResponse<List<BooksResponse>> bookResponse = apiBookClient.reduceQuantitys(bookId, quantity);
+//                    if (bookResponse == null || bookResponse.getData() == null || bookResponse.getData().isEmpty()) {
+//                        apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED.name());
+//                        paymentsService.updatePaymentStatus(orderId, "FAILED");
+//                        return "redirect:/payment-fail?orderId=" + orderId;
+//                    }
+//                }
+//
+//
+//
+//                apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.SUCCESS.name());
+//                paymentsService.updatePaymentStatus(orderId, "SUCCESS");
+//                TransactionHistoryRequest transactionHistoryRequest = TransactionHistoryRequest.builder()
+//                        .orderId(orderId)
+//                        .userId(ordersResponse.getUserId())
+//                        .status("SUCCESS_History")
+//                        .build();
+//                transactionHistoryService.save(transactionHistoryRequest);
+//
+//
+////                MessageDto messageDto = new MessageDto(
+////                        orderId, // ID đơn hàng
+////                        ordersResponse.getEmailUser(), // Địa chỉ email
+////                        "Thông báo thanh toán thành công", // Tiêu đề
+////                        "Cảm ơn bạn đã thanh toán, đơn hàng của bạn đã được xử lý thành công.", // Nội dung
+////                        "Thanh toán thành công cho đơn hàng #" + orderId // Nội dung ngắn gọn
+////                );
+//
+//
+////                kafkaTemplate.send("notification-events", messageDto);
+//                apiNotificationsClient.sendEmail(ordersResponse.getEmailUser(), "Đơn hàng đã được thanh toán thành công", ordersResponse.getOrderId());
+//                return "redirect:/PaymentSuccess";
+//            } else if (status == 0) {
+//                apiOrdersClient.updateOrdersStatus(orderId, OrderStatus.CANCELLED.name());
+//                paymentsService.updatePaymentStatus(orderId, "FAILED");
+//                return "redirect:/payment-fail?orderId=" + orderId;
+//            } else {
+//                return "redirect:/payment-error";
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "redirect:/payment-error";
+//        }
+//    }
+//}
 
 
 //    @PostMapping("/refund")

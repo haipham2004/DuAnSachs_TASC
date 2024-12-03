@@ -1,4 +1,4 @@
-package com.example.orders_service.dto.response;
+package com.example.notifications_service.dto.response;
 
 public enum OrderStatus {
     CREATED,

@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface PaymentsRepository extends JpaRepository<Payments,Integer> {
 
@@ -15,4 +17,6 @@ public interface PaymentsRepository extends JpaRepository<Payments,Integer> {
     @Modifying
     @Query(value = "UPDATE Payments p SET p.status = :status WHERE p.idOrder = :idOrder")
     void updatePaymentStatus(@Param("idOrder") Integer idOrder, @Param("status") String status);
+
+    List<Payments> findByStatus(String status);
 }

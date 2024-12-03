@@ -2,7 +2,7 @@ package Du.An.Ban.Sach.Tasc.payment_service.service;
 
 import Du.An.Ban.Sach.Tasc.payment_service.dto.request.PaymentsRequest;
 import Du.An.Ban.Sach.Tasc.payment_service.dto.response.PaymentsResponse;
-import org.springframework.data.repository.query.Param;
+import Du.An.Ban.Sach.Tasc.payment_service.entity.Payments;
 
 import java.util.List;
 
@@ -18,9 +18,11 @@ public interface PaymentsService {
 
     void delete(Integer id);
 
-     String processPayment(PaymentsRequest paymentRequest);
+    String processPayment(PaymentsRequest paymentRequest);
 
-     String processPaymentSuccess(PaymentsRequest paymentRequest);
+    String processPaymentSuccess(PaymentsRequest paymentRequest);
 
-  void  updatePaymentStatus( Integer idOrder, String status);
+    void  updatePaymentStatus( Integer idOrder, String status);
+
+    List<Payments> findByStatus(String status);
 }

@@ -1,5 +1,7 @@
 package com.example.orders_service.entity;
 
+
+import com.example.orders_service.dto.response.OrderItemStatus;
 import com.example.orders_service.dto.response.OrderStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -25,34 +28,29 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name="orders")
-public class Order {
-
+@Table(name="order_items")
+public class OrderItems {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "order_item_id")
+    private Integer orderItemId;
+
+    @Column(name = "order_id", nullable = false)
     private Integer orderId;
 
-    @Column(name="user_id")
-    private int userId;  // Lớp User phải được ánh xạ ở đây
 
-//    @Column(name = "order_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-//    private LocalDateTime orderDate;
+    @Column(name = "book_id", nullable = false)
+    private int bookId;
 
-    @Column(name = "total", nullable = false)
-    private Double total;
+    private Integer quantity;
 
-    @Column(name = "tracking_number")
-    private String trackingNumber;
+    private Double price;
 
     @ToString.Exclude
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private OrderStatus status;
-
-    @Column(name = "shipping_address", nullable = false)
-    private String shippingAddress;
+    @Enumerated(EnumType.STRING)  // Lưu giá trị Enum dưới dạng chuỗi
+    @Column(name = "status", nullable = false, unique = true, length = 50)
+    private OrderItemStatus status;
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
@@ -65,20 +63,20 @@ public class Order {
     @Column(name = "deleted_at", columnDefinition = "BIT(0) DEFAULT 0")
     private boolean deletedAt = true;
 
+
 }
 
-
+//    private int orderItemId;
+//
 //    private int orderId;
 //
-//    private int userId;
+//    private int bookId;
 //
-//    private Double total;
+//    private int quantity;
 //
-//    private String trackingNumber;
+//    private Double price;
 //
 //    private OrderStatus status;
-//
-//    private String shippingAddress;
 //
 //    private LocalDateTime createdAt;
 //
