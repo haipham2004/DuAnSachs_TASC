@@ -6,15 +6,12 @@ import com.example.books_service.dto.response.PageResponse;
 import com.example.books_service.exception.NotfoundException;
 import com.example.books_service.repository.BooksServiceRepository;
 import com.example.books_service.service.BooksService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service

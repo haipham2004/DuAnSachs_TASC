@@ -29,6 +29,11 @@ public class UserDetailsImpl implements UserDetails {
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
+    private String fullname;
+
+    private String address;
+
+
     public UserDetailsImpl(Integer id, String username, String email, String phone,String password,
                        Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
@@ -38,6 +43,19 @@ public class UserDetailsImpl implements UserDetails {
         this.password = password;
         this.authorities = authorities;
     }
+
+    public UserDetailsImpl(Integer id, String username, String email, String phone,String password,
+                           Collection<? extends GrantedAuthority> authorities, String fullname, String address) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.phone = phone;
+        this.password = password;
+        this.authorities = authorities;
+        this.fullname=fullname;
+        this.address=address;
+    }
+
 
     public static UserDetailsImpl build(Users users, Roles role) {
         // Lấy tên vai trò từ đối tượng Roles
@@ -49,7 +67,10 @@ public class UserDetailsImpl implements UserDetails {
                 users.getEmail(),
                 users.getPhone(),
                 users.getPassword(),
-                List.of(authority) // Gói quyền đơn lẻ vào một danh sách
+                List.of(authority),
+                users.getFullName(),
+                users.getAddRess()
+
         );
     }
 

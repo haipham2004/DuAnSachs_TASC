@@ -4,12 +4,16 @@ const initialState = {
     isAuthenticated: false,
     isLoading: true,
     user: {
-        username: "", // String userName
-        email: "", // String email
-        phone: "", // String phone
-        roles: [] // Array of Integer idRoles
+        userId: "",
+        username: "",
+        email: "",
+        phone: "",
+        fullname: "",  
+        address: "",   
+        roles: []
     }
 };
+
 
 export const accountSlice = createSlice({
     name: 'account',

@@ -189,11 +189,20 @@ export const getOrderWithItems = (id) => {
 }
 
 
-export const callPlaceOrder = (data) => {
-    return axios.post('/api/v1/order', {
-        ...data
-    })
-}
+// export const callPlaceOrder = (data) => {
+//     return axios.post('/api/v1/order', {
+//         ...data
+//     })
+// }
+
+export const callCreateOrder = (total, shippingAddress, userId, ordersItemsRequests) => {
+    return orderInstance.post('/orders/createOrder', {
+        total,               
+        shippingAddress,    
+        userId,             
+        ordersItemsRequests  
+    });
+};
 
 
 

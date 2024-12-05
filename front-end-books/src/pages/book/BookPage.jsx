@@ -10,15 +10,12 @@ const BookPage = () => {
     let params = new URLSearchParams(location.search);
     const id = params?.get("id"); // book id
    
-
-    console.log("id ",id)
     useEffect(() => {
         fetchBook(id);
     }, [id]);
 
     const fetchBook = async (id) => {
         const res = await callFetchBookById(id);
-        console.log("id book raw ",res)
         if (res && res.data) {
             let raw = res.data;
             //process data
@@ -26,33 +23,43 @@ const BookPage = () => {
             setDataBook(raw);
         }
     }
-
     const getImages = (raw) => {
         const images = [];
+        
+        // Kiểm tra và thêm thumbnail vào images nếu có
         if (raw.thumbnail) {
-            images.push(
-                {
-                    original: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${raw.thumbnail}`,
-                    thumbnail: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${raw.thumbnail}`,
+            images.push({
+                original: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${raw.thumbnail}`,
+                thumbnail: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${raw.thumbnail}`,
+                originalClass: "original-image",
+                thumbnailClass: "thumbnail-image"
+            });
+        }
+        
+        // Kiểm tra và thêm các imageUrl vào images nếu có
+        if (Array.isArray(raw.imageUrl)) {
+            raw.imageUrl.forEach(item => {
+                images.push({
+                    original: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${item}`,
+                    thumbnail: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${item}`,
                     originalClass: "original-image",
                     thumbnailClass: "thumbnail-image"
-                },
-            )
+                });
+            });
+        } else if (raw.imageUrl) {
+            // Trường hợp raw.imageUrl là một chuỗi đơn lẻ (không phải mảng)
+            images.push({
+                original: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${raw.imageUrl}`,
+                thumbnail: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${raw.imageUrl}`,
+                originalClass: "original-image",
+                thumbnailClass: "thumbnail-image"
+            });
         }
-        if (raw.imageUrl) {
-            raw.imageUrl?.map(item => {
-                images.push(
-                    {
-                        original: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${item}`,
-                        thumbnail: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${item}`,
-                        originalClass: "original-image",
-                        thumbnailClass: "thumbnail-image"
-                    },
-                )
-            })
-        }
+        
         return images;
-    }
+    };
+    
+    
     return (
         <>
             <ViewDetail dataBook={dataBook} />

@@ -33,7 +33,7 @@ const Home = () => {
                     return { label: item.name || item, value: item.id || item };
                 });
                 setListCategory(d);
-                console.log("listCate: ",d)
+            
             }
         };
         initCategory();
@@ -135,7 +135,6 @@ const Home = () => {
             key: "",
             label: `Phổ biến`,
             children: <>
-                huhu
             </>,
         },
         {

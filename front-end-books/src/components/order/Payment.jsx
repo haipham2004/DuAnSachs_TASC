@@ -2,9 +2,9 @@ import { Col, Divider, Form, Radio, Row, message, notification } from 'antd';
 import { DeleteTwoTone, LoadingOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { doDeleteItemCartAction, doPlaceOrderAction, doUpdateCartAction } from '../../redux/order/OrderSlice';
+import { doDeleteItemCartAction, doPlaceOrderAction } from '../../redux/order/OrderSlice';
 import { Input } from 'antd';
-import { callPlaceOrder } from '../../services/Api';
+import { callCreateOrder } from '../../services/Api';
 const { TextArea } = Input;
 
 const Payment = (props) => {
@@ -13,9 +13,12 @@ const Payment = (props) => {
     const dispatch = useDispatch();
     const [isSubmit, setIsSubmit] = useState(false);
     const user = useSelector(state => state.account.user);
+    const userId = user.userId;
+    console.log("User buy: "+userId)
+
     const [form] = Form.useForm();
 
-
+   
     useEffect(() => {
         if (carts && carts.length > 0) {
             let sum = 0;
@@ -29,47 +32,54 @@ const Payment = (props) => {
     }, [carts]);
 
 
-    const handlePlaceOrder = () => {
-        if (!address) {
-            notification.error({
-                message: "Đã có lỗi xảy ra",
-                description: "Thông tin địa chỉ không được để trống!"
-            })
-            return;
-        }
-        props.setCurrentStep(2);
-    }
-
     const onFinish = async (values) => {
         setIsSubmit(true);
-        const detailOrder = carts.map(item => {
-            return {
-                bookName: item.detail.mainText,
-                quantity: item.quantity,
-                _id: item._id
-            }
-        })
-        const data = {
-            name: values.name,
-            address: values.address,
-            phone: values.phone,
-            totalPrice: totalPrice,
-            detail: detailOrder
-        }
+        
+        const total = parseFloat(totalPrice);
 
-        const res = await callPlaceOrder(data);
+        const ordersItemsRequests = carts.map(item => {
+            return {
+                bookId: item.detail.bookId,
+                quantity: item.quantity,
+                price: parseFloat(item.detail.price),
+            };
+        });
+    
+        console.log("Orders Items Requests:", JSON.stringify(ordersItemsRequests, null, 2));
+        
+        const data = {
+            total: total,
+            shippingAddress: values.address,
+            userId: user.userId,
+            ordersItemsRequests: ordersItemsRequests,
+        };
+
+        console.log("Data gửi đi:", JSON.stringify(data, null, 2));
+    
+        const res = await callCreateOrder(data.total, data.shippingAddress, data.userId, data.ordersItemsRequests);
+        console.log("Response API: ", res);
+        
         if (res && res.data) {
-            message.success('Đặt hàng thành công !');
+            message.success('Đặt hàng thành công!');
             dispatch(doPlaceOrderAction());
+            
+            const paymentUrl = res.data.paymentUrl;
+            if (paymentUrl) {
+                window.location.href = paymentUrl.replace("redirect:", "");
+            }
+            
             props.setCurrentStep(2);
         } else {
             notification.error({
                 message: "Đã có lỗi xảy ra",
-                description: res.message
-            })
+                description: res.message,
+            });
         }
         setIsSubmit(false);
-    }
+    };
+    
+    
+    
 
     return (
         <Row gutter={[20, 20]}>
@@ -116,7 +126,7 @@ const Payment = (props) => {
                             labelCol={{ span: 24 }}
                             label="Tên người nhận"
                             name="name"
-                            initialValue={user?.fullName}
+                            initialValue={user?.fullname}
                             rules={[{ required: true, message: 'Tên người nhận không được để trống!' }]}
                         >
                             <Input />
@@ -136,6 +146,7 @@ const Payment = (props) => {
                             labelCol={{ span: 24 }}
                             label="Địa chỉ"
                             name="address"
+                            initialValue={user?.address}
                             rules={[{ required: true, message: 'Địa chỉ không được để trống!' }]}
                         >
                             <TextArea
@@ -147,7 +158,7 @@ const Payment = (props) => {
                     <div className='info'>
                         <div className='method'>
                             <div>  Hình thức thanh toán</div>
-                            <Radio checked>Thanh toán khi nhận hàng</Radio>
+                            <Radio checked>Ví điện tử VnPay</Radio>
                         </div>
                     </div>
 

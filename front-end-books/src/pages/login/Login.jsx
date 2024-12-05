@@ -35,6 +35,9 @@ const LoginPage = () => {
       roles: res.roles,
       email: res.email,
       phone: res.phone,
+      fullname: res.fullname,
+      address: res.address,
+      userId:res.userId
   }));
   
     message.success('Đăng nhập tài khoản thành công!');
