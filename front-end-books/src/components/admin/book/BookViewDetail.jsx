@@ -27,7 +27,7 @@ const BookViewDetail = (props) => {
                     uid: uuidv4(),
                     name: dataViewDetail.thumbnail,
                     status: 'done',
-                    url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${dataViewDetail.thumbnail}`,
+                    url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${dataViewDetail.thumbnail}`,
                 }
             }
             if (dataViewDetail.imageUrl && dataViewDetail.imageUrl.length > 0) {
@@ -36,7 +36,7 @@ const BookViewDetail = (props) => {
                         uid: uuidv4(),
                         name: item,
                         status: 'done',
-                        url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${item}`,
+                        url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${item}`,
                     })
                 })
             }

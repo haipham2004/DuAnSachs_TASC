@@ -139,29 +139,5 @@ orderInstance.interceptors.response.use(
     }
 );
 
-
-// Axios interceptor cho Payment API
-paymentInstance.interceptors.request.use(
-    function (config) {
-        const token = window.localStorage.getItem('access_token');
-        if (token) {
-            config.headers.Authorization = 'Bearer ' + token;
-        }
-        return config;
-    },
-    function (error) {
-        return Promise.reject(error);
-    }
-);
-
-paymentInstance.interceptors.response.use(
-    function (response) {
-        return response && response.data ? response.data : response;
-    },
-    function (error) {
-        return error?.response?.data ?? Promise.reject(error);
-    }
-);
-
 // Export ra các instance để sử dụng ở các nơi khác trong ứng dụng
-export { userInstance, bookInstance, orderInstance, paymentInstance };
+export { userInstance, bookInstance, orderInstance };

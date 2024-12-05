@@ -80,7 +80,7 @@ const BookModalUpdate = (props) => {
                     uid: uuidv4(),
                     name: dataUpdate.thumbnail,
                     status: 'done',
-                    url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${dataUpdate.thumbnail}`,
+                    url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${dataUpdate.thumbnail}`,
                 }
             ]
 
@@ -89,7 +89,7 @@ const BookModalUpdate = (props) => {
                     uid: uuidv4(),
                     name: item,
                     status: 'done',
-                    url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avartar/${item}`,
+                    url: `${import.meta.env.VITE_BACKEND_BOOKS_URL}/storage/avatar/${item}`,
                 }
             })
 

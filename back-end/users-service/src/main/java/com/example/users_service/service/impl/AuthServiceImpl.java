@@ -132,7 +132,7 @@ public class AuthServiceImpl implements AuthService {
         response.setHeader(HttpHeaders.SET_COOKIE, resCookies.toString());
 
         LoginResponse loginResponse = new LoginResponse(jwtToken,jwtTokenRefresh, userDetails.getUsername(), roles, "Login token success",
-                userDetails.getEmail(), userDetails.getPhone());
+                userDetails.getEmail(), userDetails.getPhone(), userDetails.getFullname(),userDetails.getAddress(),userDetails.getId());
         return loginResponse;
     }
 
@@ -262,7 +262,7 @@ public class AuthServiceImpl implements AuthService {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
-        LoginResponse loginResponse = new LoginResponse(userDetails.getUsername(), roles, userDetails.getEmail(), userDetails.getPhone());
+        LoginResponse loginResponse = new LoginResponse(userDetails.getUsername(), roles, userDetails.getEmail(), userDetails.getPhone(),userDetails.getFullname(),userDetails.getAddress());
         return loginResponse;
     }
 
